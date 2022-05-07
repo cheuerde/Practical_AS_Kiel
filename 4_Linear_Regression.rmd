@@ -1,0 +1,208 @@
+---
+title: "Linear Regression"
+date: "`r Sys.Date()`"
+author: Claas Heuer
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+    use_bookdown: false
+    # Rscript -e 'library(rmarkdown); render("4_Linear_Regression.rmd", output_file = "./out/4_Linear_Regression.html")'
+---
+
+```{r, include = FALSE}
+library(pacman)
+p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse)
+interactive = FALSE
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+```
+
+```{r global_options, include=FALSE}
+
+######################
+### General Config ###
+######################
+
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+		      echo=FALSE, warning=FALSE, message=FALSE, include = FALSE, eval = TRUE)
+
+fontSize = 15
+
+```
+
+  
+# Linear Regression
+
+Linear Regression deals with fitting predicted values based on input features
+and regression weights to observations. In ordinary least squares, we aim to
+find regression weights that minimize
+the mean squared error between predicted and observed values:
+
+$$
+\hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
+$$
+
+The vector $x$ contains a "feature" or regression variable that establishes a connection with the observations.o
+We can formulate most regression problems in terms of feature matrices and their estimated weights with respect
+to predicting the observations.
+
+## Feature / Design Matrix
+
+A Feature or Design Matrix maps observations to individual feature criteria. 
+The most fundamental feature matrix is a column vector with all 1s, meaning every observation
+has the same expression for that feature. In that case, the feature serves as a mapping to the overall
+mean of the observations.
+
+We already know how to estimate the mean of y under the assumption of an underlying
+normal distribution. Now we estimate the mean with OLS:
+
+```{r design, include = TRUE, echo = TRUE}
+
+# load example data
+data(airquality)
+
+# our response vector is Wind
+y = airquality$Wind
+
+# create a design matrix for the mean
+X = matrix(data = 1, nrow = length(y), ncol = 1)
+colnames(X) = "Intercept"
+
+str(X)
+
+# define function to minimize the mean squared error between predicted and observed value
+mse <- function(par, y, X) {
+
+	# the weights are stored in "par", the length of that vector depends
+	# on the number of columns in X (number of features)
+
+	# predicted value
+	pred = X %*% par
+
+	# mean squared error
+	mse = mean((y - pred)**2)
+
+	return(mse)
+
+}
+
+p <- rep(0, ncol(X))
+names(p) <- colnames(X)
+
+res <- optim(
+	     par = p, 
+	     fn = mse, 
+	     y = y, 
+	     X = X
+            )
+
+# our solution
+res$par
+
+# plot predicted vs observed
+pred = X %*% res$par
+
+dat = data.frame(
+		 y = y,
+		 pred = pred,
+		 id = 1:length(y)
+		 )
+
+ggplot(dat, aes(y = pred, x = y)) +
+ geom_point()
+
+# plot raw data and insert intercept
+ggplot(dat, aes(x = id, y = y)) +
+	geom_point() +
+	geom_hline(yintercept = res$par, color = "red")
+```
+
+## Adding Features to the Design Matrix: Multiple Regression
+
+When there is more than one feature in the design matrix we call that Multiple Linear Regression.
+The overall principal of the problem remains the same: We aim to minimize the mean squared error
+of our predictions.
+
+```{r design_multi, include = TRUE, echo = TRUE}
+
+# load example data
+data(airquality)
+
+# our response vector is Wind
+y = airquality$Wind
+
+# now we also want another feature: Temp
+temp = airquality$Temp
+
+# create a design matrix for the mean
+X = matrix(data = 1, nrow = length(y), ncol = 1)
+
+# add temperature as a feature to our design matrix
+X = cbind(
+	 X,
+	 temp
+	 )
+
+colnames(X) = c("Intercept", "Temp")
+
+# plot Wind vs Temp
+ggplot(airquality, aes(x = Temp, y = Wind)) + 
+	geom_point()
+
+# we can use the same function as before for finding the optimum feature weights
+mse <- function(par, y, X) {
+
+	# the weights are stored in "par", the length of that vector depends
+	# on the number of columns in X (number of features)
+
+	# predicted value
+	pred = X %*% par
+
+	# mean squared error
+	mse = mean((y - pred)**2)
+
+	return(mse)
+
+}
+
+p <- rep(0, ncol(X))
+names(p) <- colnames(X)
+
+res <- optim(
+	     par = p, 
+	     fn = mse, 
+	     y = y, 
+	     X = X
+            )
+
+# our solution
+res$par
+
+# plot predicted vs observed
+pred = X %*% res$par
+
+dat = data.frame(
+		 Wind = y,
+		 Temp = airquality$Temp,
+		 pred = pred,
+		 id = 1:length(y)
+		 )
+
+ggplot(dat, aes(x = pred, y = Wind)) +
+ geom_point()
+
+# plot raw data and insert intercept and slope
+ggplot(dat, aes(x = Temp, y = Wind)) +
+	geom_point() +
+	geom_abline(intercept = res$par[1], slope = res$par[2], color = "red")
+```
+
+## Advanced Models
+
+[Mixed Model](https://gist.github.com/cheuerde/24b8c7e8010d34b8212b)

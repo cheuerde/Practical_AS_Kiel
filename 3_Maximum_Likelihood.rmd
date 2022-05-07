@@ -1,0 +1,216 @@
+---
+title: "Maximum Likelihood"
+date: "`r Sys.Date()`"
+author: Claas Heuer
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+    use_bookdown: false
+    # Rscript -e 'library(rmarkdown); render("3_Maximum_Likelihood.rmd", output_file = "./out/3_Maximum_Likelihood.html")'
+---
+
+```{r, include = FALSE}
+library(pacman)
+p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse)
+interactive = FALSE
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+```
+
+```{r global_options, include=FALSE}
+
+######################
+### General Config ###
+######################
+
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+		      echo=FALSE, warning=FALSE, message=FALSE, include = FALSE, eval = TRUE)
+
+fontSize = 15
+
+```
+
+  
+# Maximum Likelihood
+
+Maximum Likelihood is a parameterized optimization framwework that aims to find
+the most likely parameters given a set of observations:
+
+$$
+L = f(y_1,y_2, y_3, ..., y_n | \theta) = f(y_1 | \theta) \times f(y_2 | \theta) \times f(y_3 | \theta) \times  ... \times f(y_3 | \theta)
+$$
+
+The overall likelhood is therefore the product of the likelihood of every single observation given the parameters.
+This can become a very small product that generates numerical problems for the optimzation algorithm,
+therefore it is often rephrased as an equivalent log-likelihood function:
+
+$$
+\log L = \sum_{i = 1}^{n}  \log (y_i | \theta)
+$$
+
+## Finding the mean of a normal distribution
+
+$$
+f(y) = \frac{1}{\sigma \sqrt{2\pi}} \mathrm{e}^{-0.5 ((x - \mu) / \sigma)^2}
+$$
+
+The normal distribution has two parameters ("moments"), the mean: $\mu$ and the standard deviation: $\sigma$.
+The likelihood function of the normal distribution return the product of the individual likelihoods of all
+observations, given the provided paramters ($\mu$ and $\sigma$).
+
+A normal distribution (or any function) can be plotted in R with `curve`:
+
+```{r nd, include = TRUE, echo = TRUE}
+curve(
+      dnorm(
+	    x,
+	    mean = 10,
+	    sd = 2),
+      from = 0,
+      to = 20,
+      main = "Normal distribution"
+)
+```
+
+In R, we can find the maximum likelihood estimator of the mean the following way:
+
+```{r mean, include = TRUE, echo = TRUE}
+# generate random normal variable 
+mean = 4.5
+sd = 1
+n = 1000
+
+y = rnorm(n, mean, sd)
+
+# the likelihood function = L(y;.) = y ~ N(mu, sigma) * rho ~ U(-1,1)
+lik <- function(par, y, sd = 1) {
+
+	# we construct the covariance matrix out of the correlation coefficient
+	mean = par[1]
+
+	# the likelihood of y
+	L <- dnorm(x = y, mean = mean, sd = sd, log=TRUE)
+
+	# the joint likelihood
+	return(-sum(L))
+
+}
+
+
+# the parameters we wish to estimate
+p <- c(0)
+names(p) <- c("mu")
+
+# Get the Maximum Likelihood estimates for our unknowns
+ML <- optim(p, lik, y=y)
+
+# compare ML results to empirical mean
+print("Maximum Likelihood:")
+ML$par
+
+print("Empirical")
+mean(y)
+```
+
+## Excercise
+
+Finding the maximum likelihood estimates for the mean **and** the standard deviation
+
+## Estimating correlation of two multivariate normal random variables
+
+
+```{r cor, include = TRUE, echo = TRUE}
+library(mvtnorm)
+
+# likelihood on correlation coefficient.
+# this is essentially a uniform prior on
+# the range -1 to 1 and 0 density outside
+# that range
+corlik <- function(x) {
+
+	res <- 0
+	if(x >= -1 & x <= 1) res = 1
+
+	return(log(res))
+
+}
+
+# the likelihood for the variance components.
+# uniform above 0 and zero if negative
+varlik <- function(x) {
+
+	res <- 0
+	if(x > 0) res = 1
+
+	return(log(res))
+
+}
+
+# the likelihood function = L(y;.) = y ~ MVN(mu, sigma) * rho ~ U(-1,1)
+lik <- function(par, y) {
+
+	# we construct the covariance matrix out of the correlation coefficient
+	# and the variance components
+	covAB <- par[5] * (sqrt(par[3]) * sqrt(par[4]))
+	sigma <- array(c(par[3], covAB, covAB, par[4]), dim=c(2,2))
+
+	# the likelihood of y
+	L1 <- dmvnorm(x = Y, mean = c(par[1],par[2]), sigma = sigma, log=TRUE)
+
+	# the prior = likelihood of rho (correlation coefficient)
+	L2 <- corlik(par[5])
+
+	# and the priors on the variance components
+	L3 <- varlik(par[3])
+	L4 <- varlik(par[4])
+
+	# the joint likelihood
+	return(-sum(L1 + L2 + L3 + L4))
+
+}
+
+
+# those are the optimizers available
+methods = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN","Brent")
+
+# the parameters we wish to estimate
+p <- c(0,0,1,1,0.2)
+names(p) <- c("mu1","mu2","tauA","tauB","rho")
+
+# create random data
+n = 10
+tauA <- 3
+tauB <- 10
+rho = 0.7
+covAB <- rho * (sqrt(tauA) * sqrt(tauB))
+muA <- 5
+muB <- 20
+
+# the variance-covariance matrix
+sigma <- array(c(tauA,covAB,covAB,tauB), dim=c(2,2))
+
+# the random data
+Y <- rmvnorm(n, c(muA,muB), sigma)
+
+# Get the Maximum Likelihood estimates for our unknowns
+ML <- optim(p, lik, y=y, method = methods[2])
+
+res <- as.list(ML$par)
+res$covAB <- res$rho * (sqrt(res$tauA) * sqrt(res$tauB))
+
+# compare ML estimates with empiricals
+out <- rbind(unlist(res), c(colMeans(Y), var(Y[,1]), var(Y[,2]), cor(Y)[1,2], cov(Y)[1,2]))
+colnames(out) <- names(res)
+rownames(out) <- c("ML","empirical")
+
+# insepct results
+out
+```
+
+

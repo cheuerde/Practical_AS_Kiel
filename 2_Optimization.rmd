@@ -1,0 +1,166 @@
+---
+title: "Optimization"
+date: "`r Sys.Date()`"
+author: Claas Heuer
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+    use_bookdown: false
+    # Rscript -e 'library(rmarkdown); render("2_Optimization.rmd", output_file = "./out/2_Optimization.html")'
+---
+
+```{r, include = FALSE}
+library(pacman)
+p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse)
+interactive = FALSE
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+```
+
+```{r global_options, include=FALSE}
+
+######################
+### General Config ###
+######################
+
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='Figs/',
+		      echo=FALSE, warning=FALSE, message=FALSE, include = FALSE, eval = TRUE)
+
+fontSize = 15
+
+```
+
+  
+# Optimization - Introduction
+
+Optimization deals with finding values for variables that maximize or minimze an
+objective function of those variables.
+
+The general formulation is:
+
+$$
+Objective Function = max(f(x)),
+$$
+
+where $x$ is a vecvtor of variables and $f(x)$ is a function that takes the vector of varialbes $x$
+as input.
+
+## Example
+
+Our optimization function might look like this:
+
+$$
+f(x) = x_1 + x_2 - (x_{1}^{2})
+$$
+
+Our vector of variables contains 2 elements, $x_1$ and $x_2$ and we want to maximize
+the sum of both variables minus the square of the first variable.
+
+Most of the time, our variables are constrained in the sense that they can only take values
+in a given range. Constraints essentially narrow down the possible solution space. For real
+valued variables, the precission matters as well.
+For our optimization function, we might want to impose the constraint for the variables
+to lye between 1 and 100:
+
+$$
+\begin{aligned}                                                                                          
+x_1 &>= 1 \\
+x_2 &>= 1 \\
+x_1 &<= 100 \\
+x_2 &<= 100
+\end{aligned}                                                                                          
+$$
+
+This defines our solution space and, assuming there is no closed form analytical solution, we can find the optimal solution
+by evaluating the objective function for all possible realisation of $x_1$ and $x_2$.
+
+Example in R
+
+```r
+library(lattice)
+lower = 1
+upper = 100
+x1 = lower:upper
+x2 = lower:upper
+
+# loop over all possible combinations and evaluate our function
+sol = outer(
+	    X = x1, 
+	    Y = x2,
+	    FUN = function(x,y) (x**2 + y) - y**2
+	   )
+
+# grid search solutions
+levelplot(sol)
+
+# optimum solution(s)
+which(sol == max(sol), arr.ind = TRUE)
+```
+
+Finding the optimum solution through a grid search reaches its limits very fast and we
+have to use algorithms that find the global maximum (or minimum) without having to evaluate
+the objective function across the entire solution space.
+
+In R the most generic way of using algorithms for optimzation problems is `optim`.
+For our problem, it would look like this
+
+```r
+solOptim = optim(
+		 par = c(1,1),
+		 fn = function(par) (par[1]**2 + par[2]) - par[2]**2,
+		 lower = 1,
+		 upper = 100,
+		 method = "L-BFGS-B",
+		 control = list(fnscale = -1) # maximize
+		)
+
+# check solution
+solOptim$par
+```
+
+The optimization yields the same solution as our grid search.
+One important thing to note here is how the constraints enter 
+the optimzation algorithm. It might be necessary to incorporate 
+the constraints into the objective function, if the optimization algorithm
+does not allow for constraint parameter space. In our example,
+this could look like this:
+
+```r
+objective = function(par, lower, upper) {
+
+# constraints
+	if(
+	   par[1] < lower |
+	   par[2] < lower |
+	   par[1] > upper |
+	   par[2] > upper 
+	  ) {
+
+		return(0)
+
+	} else {
+
+		return((par[1]**2 + par[2]) - par[2]**2)
+
+	}
+
+}
+
+solOptim = optim(
+		 par = c(1,1),
+		 fn = function(par) objective(par, lower = 1, upper = 100),
+		 method = "L-BFGS", # this algorithm does not allow for constraint variables
+		 control = list(fnscale = -1) # maximize
+		)
+
+# check solution - very close to the strict integer solution
+solOptim$par
+```
+
+
