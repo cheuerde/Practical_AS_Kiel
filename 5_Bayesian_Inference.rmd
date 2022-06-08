@@ -43,7 +43,7 @@ $$
 p(A|B) = \frac{p(B|A)p(A)}{p(B)}
 $$
 
-In statistical modelling, the Bayes theorem inferes the probability of observing the parameters of interest,
+In statistical modelling, the Bayes theorem infers the probability of observing the parameters of interest,
 given our prior beliefs about those parameters and the likelihood of the data given the parameters:
 
 $$
@@ -58,13 +58,13 @@ in parameter estimation ($p(\theta|y) \propto p(y|\theta)p(\theta)$)
 
 # Estimating the mean of a normal distribution
 
-In a Bayesian Framework, we formulate our problem in terms of the assumed distribution
-of our data (likelihood) and the prior distribution of our parameters we wish to estimate.
+In a Bayesian framework, we formulate our problem in terms of the assumed distribution
+of our data (likelihood) and the prior distributions of our parameters we wish to estimate.
 The parameter space (solution space) is only constrained by the prior choice, so it becomes important
 to explore the posterior distribution in an efficient way.
 The available prior distributions depend on the MCMC algorithm being used. [Stan](https://mc-stan.org/) (backend of [brms](https://github.com/paul-buerkner/brms)),
 uses an [HMC sampler](https://mc-stan.org/docs/2_19/reference-manual/hamiltonian-monte-carlo.html) and allows for non-conjugant priors, meaning
-virtually any prior distribution for any parameter can be chosen, regardless of the likelihood distribution.
+virtually any prior distribution for any parameter can be chosen, regardless of the likelihood function of the data.
 
 $$
 \begin{align}
@@ -73,11 +73,9 @@ $$
 \end{align}
 $$
 
-The probability of our parameters given the data ($p(\mu|y)$) is proportional to the product of the likelihood of the data given our parameter ($p(y|\theta)$,
-which is a normal density function, and the prior likelihood of the parameter ($p(\theta)$), which is a normal density function again, which mean
+The probability of our parameters given the data ($p(\mu|y)$) is proportional to the product of the likelihood of the data given our parameters ($p(y|\theta)$,
+which is a normal density function, and the prior likelihood of the parameters ($p(\theta)$), which is a normal density function again, with mean
 and standard deviation reflecting our prior belief in location and our confidence in that location of the mean.
-
-
 
 ```{r brms_mean, include = TRUE, echo = TRUE, eval = TRUE}
 if(!require(brms)) install.packages('brms')
@@ -138,7 +136,7 @@ p
 
 ## Updating priors from existing evidence
 
-Bayesian Inference allows us to incorporate actualy prior evidence in the estimation
+Bayesian Inference allows us to incorporate actual prior evidence in the estimation
 of parameters. For example, we might have conducted a previous experiment and we arrived
 at an estimate of the mean of our observations.
 We then do another experiment of similar setup and want to update our mean estimate.

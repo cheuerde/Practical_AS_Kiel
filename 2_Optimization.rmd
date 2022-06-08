@@ -56,15 +56,15 @@ as input.
 Our optimization function might look like this:
 
 $$
-f(x) = x_1 + x_2 - (x_{1}^{2})
+f(x) = (x_{1}^2 + x_2) - (x_{2}^{2})
 $$
 
 Our vector of variables contains 2 elements, $x_1$ and $x_2$ and we want to maximize
-the sum of both variables minus the square of the first variable.
+the sum of the first variable squared plut the second variable minus the square of the second variable.
 
 Most of the time, our variables are constrained in the sense that they can only take values
 in a given range. Constraints essentially narrow down the possible solution space. For real
-valued variables, the precission matters as well.
+valued variables, the precision matters as well.
 For our optimization function, we might want to impose the constraint for the variables
 to lye between 1 and 100:
 
@@ -78,7 +78,7 @@ x_2 &<= 100
 $$
 
 This defines our solution space and, assuming there is no closed form analytical solution, we can find the optimal solution
-by evaluating the objective function for all possible realisation of $x_1$ and $x_2$.
+by evaluating the objective function for all possible realisations of $x_1$ and $x_2$.
 
 Example in R
 

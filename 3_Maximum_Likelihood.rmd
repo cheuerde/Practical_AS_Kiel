@@ -40,7 +40,7 @@ fontSize = 15
 # Maximum Likelihood
 
 Maximum Likelihood is a parameterized optimization framwework that aims to find
-the most likely parameters given a set of observations:
+parameter estimates that maximizes the likelihood function of the data, given the parameters:
 
 $$
 L = f(y_1,y_2, y_3, ..., y_n | \theta) = f(y_1 | \theta) \times f(y_2 | \theta) \times f(y_3 | \theta) \times  ... \times f(y_3 | \theta)
@@ -61,7 +61,7 @@ f(y) = \frac{1}{\sigma \sqrt{2\pi}} \mathrm{e}^{-0.5 ((x - \mu) / \sigma)^2}
 $$
 
 The normal distribution has two parameters ("moments"), the mean: $\mu$ and the standard deviation: $\sigma$.
-The likelihood function of the normal distribution return the product of the individual likelihoods of all
+The likelihood function of the normal distribution returns the product of the individual likelihoods of all
 observations, given the provided paramters ($\mu$ and $\sigma$).
 
 A normal distribution (or any function) can be plotted in R with `curve`:

@@ -48,7 +48,7 @@ $$
 \hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
 $$
 
-The vector $x$ contains a "feature" or regression variable that establishes a connection with the observations.o
+The vector $x$ contains a "feature" or regression variable that establishes a connection with the observations.
 We can formulate most regression problems in terms of feature matrices and their estimated weights with respect
 to predicting the observations.
 
@@ -60,7 +60,7 @@ has the same expression for that feature. In that case, the feature serves as a 
 mean of the observations.
 
 We already know how to estimate the mean of y under the assumption of an underlying
-normal distribution. Now we estimate the mean with OLS:
+normal distribution. Now we estimate the mean with a linear regression ("Ordinary Least Squares" = OLS):
 
 ```{r design, include = TRUE, echo = TRUE}
 
@@ -123,10 +123,10 @@ ggplot(dat, aes(x = id, y = y)) +
 	geom_hline(yintercept = res$par, color = "red")
 ```
 
-## Adding Features to the Design Matrix: Multiple Regression
+## Adding Features to the Design Matrix: Multiple Linear Regression
 
 When there is more than one feature in the design matrix we call that Multiple Linear Regression.
-The overall principal of the problem remains the same: We aim to minimize the mean squared error
+The overall principle of the problem remains the same: We aim to minimize the mean squared error
 of our predictions.
 
 ```{r design_multi, include = TRUE, echo = TRUE}

@@ -39,7 +39,7 @@ fontSize = 15
 
 # Genomic Prediction
 
-Genomic Prediction entails methods to predict breeding values bases on phenotypic
+Genomic Prediction entails methods to predict breeding values based on phenotypic
 and molecular (SNP) data.
 The general concept is that the breeding value of an individual can be recovered by
 a linear regression on its genotype scores, i.e.
@@ -49,16 +49,16 @@ $$
 $$
 
 where $\mathbf{M}$ is a matrix of genotype scores in {0,1,2} coding, denoting the copies
-of the major allele of SNP markers, the individual carries, and $\mathbf{\hat{a}}$ is a vector
+of the major allele of SNP markers the individual carries, and $\mathbf{\hat{a}}$ is a vector
 of average allele effects for those markers.
 
-The estimated breeding values ($\mathbf{\hat{g}}$, EBV) is then the sum of all the average allele
+The estimated breeding value ($\mathbf{\hat{g}}$, EBV) is then the sum of all the average allele
 effects for the marker alleles the individual carries.
 
 # Ridge Regression BLUP
 
-The average allele effects can be estimated directly in a mixed effects model, treating the matrix of
-marker covariates as random effects:
+The average allele effects can be estimated directly in a mixed effects model, 
+treating the them as random effects:
 
 $$
 \mathbf{y} = \mu + \mathbf{M}\mathbf{{a}} + \mathbf{e}
@@ -96,7 +96,7 @@ $$
 $$
 
 where $\bar{\mathbf{M_i}} = \mathbf{M_i} - 2p_i$. The centering of the genotypes guarantees that our
-EBVs reflect a deviation from the general population, and the scaling (division by $tr(\bar{\mathbf{M}}\bar{\mathbf{M}}') / n}$)
+EBVs reflect a deviation from the general population, and the scaling (division by $tr(\bar{\mathbf{M}}\bar{\mathbf{M}}') / n$)
 that our estimated variance components mimic an additive genetic variance.
 
 The GBLUP model then becomes:
@@ -375,7 +375,7 @@ have a higher mixture probability for the slap, and get a significan effect size
 Binary Traits (0/1) can be modelled with generalized linear models in which the expectation of the observations
 are mapped to a linear predictor comprised of random and fixed effects.
 The likelihood for the data is a Bernoulli distribution in our case, with success probably linked to
-the linear predictor through the probit function.
+the linear predictor through the probit function:
 
 $$
 \begin{aligned}
@@ -391,7 +391,7 @@ $$
 The following shows an implmementation of that model in [Jags](https://mcmc-jags.sourceforge.io/):
 
 
-```{r bayesc, include = TRUE, echo = TRUE, eval = TRUE}
+```{r bayesc, include = TRUE, echo = TRUE, eval = FALSE}
 if (!require("rjags")) install.packages("rjags")
 library(rjags)
 
@@ -489,8 +489,8 @@ y_binary[y > mu_y] = 1
 Mc_small = Mc[, 1:50]
 
 # run model
-# mod_bcpi <- BayesCJags(y = y_binary, Z = Mc_small, threshold = TRUE, niter = 500, burnin = 250, betaPriorAlpha = 2, betaPriorBeta = 5)
+mod_bcpi <- BayesCJags(y = y_binary, Z = Mc_small, threshold = TRUE, niter = 500, burnin = 250, betaPriorAlpha = 2, betaPriorBeta = 5)
 
 # gaussian response
-# mod_bcpi_gaussian <- BayesCJags(y = y, Z = Mc_small, threshold = FALSE, niter = 500, burnin = 250, betaPriorAlpha = 2, betaPriorBeta = 5)
+mod_bcpi_gaussian <- BayesCJags(y = y, Z = Mc_small, threshold = FALSE, niter = 500, burnin = 250, betaPriorAlpha = 2, betaPriorBeta = 5)
 ```

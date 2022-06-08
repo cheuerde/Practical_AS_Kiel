@@ -74,7 +74,7 @@ Rstudio: [Documentation](https://docs.rstudio.com/)
 ## Assigning and manipulating variables
 
 Note: R has 2 assignment operator: `<-` and `=`. 
-For all relevant porpuses of the tutorial, we can safely use either of those operator interchably.
+For all relevant porpuses of the tutorial, we can safely use either of those operators interchably.
 
 ```{r assign_varialbes, include = TRUE, echo = TRUE}
 
@@ -255,7 +255,7 @@ p2
 
 ## Writing Functions
 
-All operators in R are function, for instance `+` is just a special way
+All operators in R are functions, for instance `+` is just a special way
 of calling a function:
 
 ```{r function, include = TRUE, echo = TRUE, eval = FALSE}
@@ -272,7 +272,7 @@ fix(`+`)
 
 A function is an operation on input variables ($f(x)), the function can be anything
 interpretable by R. For example, this is how we can define a function that computes
-and return the empirical mean (average) of a numeric vector:
+and returns the empirical mean (average) of a numeric vector:
 
 ```{r function_mean, include = TRUE, echo = TRUE}
 
@@ -290,7 +290,7 @@ my_mean_function = function(y) {
 ```
 
 We can now use that function inside R for estimating means on any input vector `y` for which
-the functions the operators `+` and `/` are defined.
+the the operators `+` and `/` are defined.
 
 ```{r mean_call, include = TRUE, echo = TRUE}
 
