@@ -2,6 +2,7 @@
 title: "Introduction to R"
 date: "`r Sys.Date()`"
 author: Claas Heuer
+#output: rmarkdown::github_document
 output:
   rmdformats::downcute:
     self_contained: true
