@@ -21,7 +21,7 @@ jobs:
       run: Rscript -e 'install.packages("rmarkdown")'  
       
     - name: Install pandoc 
-      run: sudo apt update && apt install -y pandoc
+      run: sudo apt update && sudo apt install -y pandoc
   
     - name: Render RMarkdown to HTML  
       run: Rscript -e 'rmarkdown::render("chapters/1_R_intro.rmd")'  
