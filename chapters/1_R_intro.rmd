@@ -2,20 +2,21 @@
 title: "Introduction to R"
 date: "`r Sys.Date()`"
 author: Claas Heuer
-#output: rmarkdown::github_document
-output:
-  rmdformats::downcute:
-    self_contained: true
-    thumbnails: true
-    lightbox: true
-    gallery: false
-    highlight: tango
-    use_bookdown: false
+output: rmarkdown::github_document
+#output:
+#  rmdformats::downcute:
+#    self_contained: true
+#    thumbnails: true
+#    lightbox: true
+#    gallery: false
+#    highlight: tango
+#    use_bookdown: false
     # Rscript -e 'library(rmarkdown); render("1_R_intro.rmd", output_file = "./out/1_R_intro.html")'
 ---
 
 
 ```{r, include = FALSE}
+if(!require(pacman)) install.packages('pacman')
 library(pacman)
 p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse)
 interactive = FALSE

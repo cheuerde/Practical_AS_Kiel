@@ -14,6 +14,7 @@ output:
 ---
 
 ```{r, include = FALSE}
+if(!require(pacman)) install.packages('pacman')
 library(pacman)
 p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse, rstan)
 interactive = FALSE

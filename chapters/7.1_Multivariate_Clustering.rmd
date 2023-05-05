@@ -13,7 +13,8 @@ output:
 # Rscript -e 'library(rmarkdown); render("7.1_Multivariate_Clustering.rmd", output_file = "./out/7.1_Multivariate_Clustering.html")'
 ---
 
-	```{r, include = FALSE}
+```{r, include = FALSE}
+if(!require(pacman)) install.packages('pacman')
 library(pacman)
 p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse, rstan, GGally, BGLR)
 interactive = FALSE

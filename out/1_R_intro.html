@@ -1,7 +1,7 @@
 Introduction to R
 ================
 Claas Heuer
-2022-06-08
+2022-11-01
 
 <script>
   addClassKlippyTo("pre.r, pre.markdown");
@@ -27,27 +27,24 @@ Rstudio: [Documentation](https://docs.rstudio.com/)
 
 # Background
 
--   R is a general programming language with a specialization for
-    statistics
--   R is generally being used through a
-    [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)
-    and interpreted live
--   Functional Programming paradigm: All about `objects` and `functions`
--   Major Appeals:
-    -   Extremely large ecosystem of packages, contributors, support
-        system and companies
-    -   Many general and special solutions already available in R
-    -   Easy to learn and get going
-    -   Amongst the best graphics/plotting ecosystem for scientific
-        output
--   Major Drawbacks:
-    -   Functional Programming lends itself to “scripting” without
-        structure
-    -   Barrier for introducing structure through packages high
-    -   R is an interpreted and not compiled language: no optimization
-    -   “Always copy paradigm” makes R slow in many settings
-    -   R is old and its [successors](https://julialang.org/) already
-        exist
+- R is a general programming language with a specialization for
+  statistics
+- R is generally being used through a
+  [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)
+  and interpreted live
+- Functional Programming paradigm: All about `objects` and `functions`
+- Major Appeals:
+  - Extremely large ecosystem of packages, contributors, support system
+    and companies
+  - Many general and special solutions already available in R
+  - Easy to learn and get going
+  - Amongst the best graphics/plotting ecosystem for scientific output
+- Major Drawbacks:
+  - Functional Programming lends itself to “scripting” without structure
+  - Barrier for introducing structure through packages high
+  - R is an interpreted and not compiled language: no optimization
+  - “Always copy paradigm” makes R slow in many settings
+  - R is old and its [successors](https://julialang.org/) already exist
 
 # Basics
 
@@ -263,12 +260,12 @@ D = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)
 D
 ```
 
-    ##            [,1]       [,2]       [,3]       [,4]       [,5]
-    ## [1,] -1.6964517  1.1913471 -2.5723624  0.4057277  0.2925035
-    ## [2,] -0.9562298 -0.6018859  0.3229281 -0.8227920 -0.2808956
-    ## [3,] -0.2189806  1.3005895  0.4036971 -1.4574723  1.0147310
-    ## [4,] -0.9097489 -1.4472122  0.4218747 -0.5764406 -0.5186586
-    ## [5,]  0.9357297  0.5848141  0.1175764  0.1296658  0.6001640
+    ##            [,1]        [,2]       [,3]       [,4]        [,5]
+    ## [1,]  0.3711906  0.07146319 -0.9965905 -0.7077254 -0.09704972
+    ## [2,] -1.2466568  0.67863462  0.1965945  0.5673342 -1.64975351
+    ## [3,]  1.7194248 -1.18804880 -1.1776582 -0.9929180  0.53611876
+    ## [4,] -0.1965537 -1.23795947 -0.7421355 -1.4096449 -0.43581231
+    ## [5,] -0.5899309 -0.81485033  1.5583243  0.4464809  0.81721919
 
 ``` r
 class(D)
@@ -282,7 +279,7 @@ means = colMeans(D)
 means
 ```
 
-    ## [1] -0.5691362  0.2055305 -0.2612572 -0.4642623  0.2215688
+    ## [1]  0.01149481 -0.49815216 -0.23229309 -0.41929465 -0.16585552
 
 ``` r
 # extract diagonal
@@ -290,7 +287,7 @@ d = diag(D)
 d
 ```
 
-    ## [1] -1.6964517 -0.6018859  0.4036971 -0.5764406  0.6001640
+    ## [1]  0.3711906  0.6786346 -1.1776582 -1.4096449  0.8172192
 
 ## Data Exploration and Visualization
 
@@ -326,7 +323,7 @@ str(iris)
 dlookr::diagnose(iris)
 ```
 
-    ## # A tibble: 5 x 6
+    ## # A tibble: 5 × 6
     ##   variables    types   missing_count missing_percent unique_count unique_rate
     ##   <chr>        <chr>           <int>           <dbl>        <int>       <dbl>
     ## 1 Sepal.Length numeric             0               0           35       0.233
@@ -373,7 +370,7 @@ of calling a function:
 fix(`+`)
 ```
 
-A function is an operation on input variables ($f(x)), the function can
+A function is an operation on input variables (\$f(x)), the function can
 be anything interpretable by R. For example, this is how we can define a
 function that computes and returns the empirical mean (average) of a
 numeric vector:
@@ -404,11 +401,11 @@ our_mean = my_mean_function(x)
 our_mean
 ```
 
-    ## [1] 23.48924
+    ## [1] 23.43136
 
 ``` r
 # compare with R's built in function
 mean(x)
 ```
 
-    ## [1] 23.48924
+    ## [1] 23.43136
