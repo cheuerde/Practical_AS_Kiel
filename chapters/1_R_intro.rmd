@@ -2,15 +2,14 @@
 title: "Introduction to R"
 date: "`r Sys.Date()`"
 author: Claas Heuer
-output: rmarkdown::github_document
-#output:
-#  rmdformats::downcute:
-#    self_contained: true
-#    thumbnails: true
-#    lightbox: true
-#    gallery: false
-#    highlight: tango
-#    use_bookdown: false
+	output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: tango
+    use_bookdown: false
     # Rscript -e 'library(rmarkdown); render("1_R_intro.rmd", output_file = "./out/1_R_intro.html")'
 ---
 
