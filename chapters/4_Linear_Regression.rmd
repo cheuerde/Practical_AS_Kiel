@@ -15,8 +15,9 @@ output:
 
 ```{r, include = FALSE}
 if(!require(pacman)) install.packages('pacman')
+if(!require(klippy)) remotes::install_github("rlesur/klippy")
 library(pacman)
-p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse)
+p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse, klippy)
 interactive = FALSE
 ```
 
@@ -112,7 +113,7 @@ pred = X %*% res$par
 dat = data.frame(
 		 y = y,
 		 pred = pred,
-		 id = 1:length(y)
+		 id = seq_along(length(y))
 		 )
 
 ggplot(dat, aes(y = pred, x = y)) +
@@ -202,6 +203,138 @@ ggplot(dat, aes(x = pred, y = Wind)) +
 ggplot(dat, aes(x = Temp, y = Wind)) +
 	geom_point() +
 	geom_abline(intercept = res$par[1], slope = res$par[2], color = "red")
+```
+
+## Ridge Regression
+
+
+$$
+\min_{\beta} \left( \sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \right)
+$$
+
+```{r ridge, include = TRUE, echo = TRUE}
+
+p_load(BGLR)
+data(wheat)
+
+subset = 1:100
+
+y = wheat.Y[subset,2]
+
+M = wheat.X
+
+# take a subset of columns
+M = M[subset,1:300]
+
+# design matrix for fixed effects (no shrinkage)
+X = matrix(data = 1, nrow = length(y), ncol = 1)
+colnames(X) = "intercept"
+
+# we can use the same function as before for finding the optimum feature weights
+mse_ridge <- function(par, y, M, X) {
+
+	# the weights are stored in "par", the length of that vector depends
+	# on the number of columns in X (number of features)
+
+	# get expectation from fixed effects
+	b = par[1:ncol(X)]
+	mu = X %*% b
+
+	# predicted value
+	u = par[(ncol(X) + 1):(length(par) - 1)]
+	pred = mu + M %*% u
+
+	# mean squared error
+	mse = mean((y - pred)**2)
+
+	ridge_param = par[length(par)]
+
+	# ridge penalty
+	ridge = ridge_param * sum(u**2)
+
+	criteria = mse + ridge
+
+	# force ridge parameter to be between  > 0
+	if(ridge_param < 0) {
+		criteria = 9999999
+	}
+
+	return(criteria)
+
+}
+
+# initialize
+p <- c(rep(0, ncol(X) + ncol(M)), runif(1))  
+
+# give names for p
+names(p) <- c(colnames(X), colnames(M), "lambda")
+
+res <- optim(
+	     par = p, 
+	     fn = mse_ridge, 
+	     y = y, 
+	     X = X,
+		 M = M,
+		 control = list(maxit = 20000),
+		 method = c(
+			#"Nelder-Mead"
+			#"BFGS" 
+			#"CG" 
+			"L-BFGS-B"
+			#"SANN"
+			#"Brent"
+            )
+)
+
+# our solution
+res$par
+
+print(paste("Ridge Parameter:", res$par[length(res$par)]))
+
+# plot predicted vs observed
+# get predicted values
+mu = X %*% res$par[1:ncol(X)]
+pred = mu + M %*% res$par[(ncol(X) + 1):(length(res$par) - 1)]
+
+dat = data.frame(
+		 y = y,
+		 pred = pred,
+		 id = 1:length(y)
+		 )
+
+ggplot(dat, aes(x = pred, y = y)) +
+ geom_point()
+
+## plot raw data and insert intercept and slope
+#ggplot(dat, aes(x = Temp, y = Wind)) +
+#	geom_point() +
+#	geom_abline(intercept = res$par[1], slope = res$par[2], color = "red")
+```
+
+Now we compare the results from the optimization to an equivalent mixed model approach with a single randome effect:
+
+$$\begin{bmatrix} X'X & X'Z \\ Z'X & Z'Z+I\lambda \end{bmatrix} \begin{bmatrix} \beta \\ u \end{bmatrix} = \begin{bmatrix} X'y \\ Z'y \end{bmatrix}$$
+
+
+```{r ridge_mme, include = TRUE, echo = TRUE}
+p_load(rrBLUP)
+mod_rr = mixed.solve(y = y, X = X, Z = M)
+
+# ridge parameter from MME
+ridge_mme = mod_rr$Ve / mod_rr$Vu
+# preditions from that model
+pred_mme = X %*% mod_rr$beta + M %*% mod_rr$u
+print(ridge_mme)
+
+dat = data.frame(
+		 y = pred,
+		 pred = pred_mme,
+		 id = 1:length(y)
+		 )
+
+ggplot(dat, aes(x = pred, y = y)) +
+ geom_point()
+
 ```
 
 ## Advanced Models
