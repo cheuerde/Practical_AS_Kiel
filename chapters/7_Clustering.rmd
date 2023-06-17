@@ -128,8 +128,10 @@ dplot = as.data.frame(dat)
 ggplot(dplot, aes(x = y)) + 
 	geom_histogram(aes(y = ..density..), bins = 50, fill = "white", color = 1) + 
 	geom_density()
+```
 
 
+```{r gauss_mixture_stan_only, include = TRUE, echo = TRUE}
 # stan program for mixture model of k normal distributions
 hcode =
 "
@@ -351,6 +353,8 @@ for(i in 1:length(thetas)) {
 			       args = list(lambda = thetas[i], mu = mus[i], sigma = sds[i]), color = colors[i], size = 3)
 
 }
+
+print(p)
 
 return(
        list(

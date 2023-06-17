@@ -15,6 +15,7 @@ output:
 
 ```{r, include = FALSE}
 if(!require(pacman)) install.packages('pacman')
+if(!require(mixtools)) devools::install_github("https://github.com/dsy109/mixtools")
 library(pacman)
 p_load(data.table, ggplot2, rrBLUP, lattice, brms, knitr, plotly, prettydoc, lubridate, DT, lsmeans, car, htmltools, pander, tidyverse, rstan, GGally, BGLR)
 interactive = FALSE
