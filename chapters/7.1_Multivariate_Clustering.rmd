@@ -238,11 +238,9 @@ elements of $x$ within a given cluster and that cluster mean ($\mu_i$).
 ```{r kmeans, include = TRUE, echo = TRUE}
 p_load(factoextra)
 
-dat = iris %>% select(-Species)
-
 dat = as.data.frame(M)
 
-kmeans <- kmeans(M, centers = 2)
+kmeans <- kmeans(M, centers = 598)
 
 # 3. Visualize
 kplot = fviz_cluster(
@@ -251,5 +249,5 @@ kplot = fviz_cluster(
 		     ggtheme = theme_minimal()
 )
 
-kplot
+kplot + theme(legend.position = "none")  
 ```
