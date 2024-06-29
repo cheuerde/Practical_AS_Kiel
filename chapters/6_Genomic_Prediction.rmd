@@ -322,11 +322,27 @@ cCV <- function(y, folds=5, reps=1, matrix=FALSE, seed=NULL) {
 }
 
 # create 5 fold cross validation samples
-cvs = cCV(y, folds = 5, reps = 1)
+cvs = cCV(y, folds = 5, reps = 10)
 
 # run cross validation
 pred = rep(as.numeric(NA), length(y))
 for(i in 1:length(cvs)) pred[is.na(cvs[[i]])] = mixed.solve(y = cvs[[i]], K = G)$u[is.na(cvs[[i]])]
+
+
+# if we have more than 1 repition, need to use this
+preds = list()
+for(i in 1:length(cvs)) {
+	
+	this_pred = mixed.solve(y = cvs[[i]], K = G)$u[is.na(cvs[[i]])]
+	this_y = y[is.na(cvs[[i]])]
+	preds[[i]] = data.frame(pred = this_pred, y = this_y)
+
+}
+
+cors = unlist(lapply(preds, function(x) cor(x$pred, x$y)))
+
+# Combine all predictions into a single vector if needed
+pred <- unlist(lapply(preds, function(x) x$pred))
 
 # plot predictes vs observed
 plot(pred, y)

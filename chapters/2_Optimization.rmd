@@ -83,7 +83,7 @@ by evaluating the objective function for all possible realisations of $x_1$ and 
 
 Example in R
 
-```r
+```{r solgrid, include=FALSE}
 library(lattice)
 lower = 1
 upper = 100
@@ -111,7 +111,7 @@ the objective function across the entire solution space.
 In R the most generic way of using algorithms for optimzation problems is `optim`.
 For our problem, it would look like this
 
-```r
+```{r solopt, include=FALSE}
 solOptim = optim(
 		 par = c(1,1),
 		 fn = function(par) (par[1]**2 + par[2]) - par[2]**2,
