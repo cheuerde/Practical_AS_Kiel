@@ -1,0 +1,265 @@
+---
+title: "Maximum Likelihood"
+subtitle: "Advanced Statistics Lab"
+author: "Claas Heuer"
+format:
+  revealjs:
+    footer: "[Lab notes](../labs/maximum-likelihood.html)"
+---
+
+## From Optimization To Likelihood
+
+Optimization asked:
+
+$$
+\widehat{\theta} = \operatorname*{arg\,min}_{\theta} f(\theta)
+$$
+
+Maximum likelihood chooses $f(\theta)$ from a probability model.
+
+## Likelihood
+
+For independent observations:
+
+$$
+L(\theta; \mathbf{y})
+=
+\prod_{i=1}^{n} p(y_i \mid \theta)
+$$
+
+$$
+\log L(\theta; \mathbf{y})
+=
+\sum_{i=1}^{n} \log p(y_i \mid \theta)
+$$
+
+## In R
+
+`optim()` minimizes.
+
+So we return the negative log-likelihood:
+
+$$
+-\sum_{i=1}^{n} \log p(y_i \mid \theta)
+$$
+
+## Normal Mean
+
+```{r}
+library(ggplot2)
+library(knitr)
+theme_set(theme_minimal(base_size = 16))
+
+set.seed(2026)
+
+mean = 4.5
+sd = 1
+n = 1000
+
+y = rnorm(n, mean, sd)
+
+lik <- function(par, y, sd = 1) {
+  mean = par[1]
+  L <- dnorm(x = y, mean = mean, sd = sd, log = TRUE)
+  return(-sum(L))
+}
+```
+
+## Estimate Mean
+
+```{r}
+p <- c(0)
+names(p) <- c("mu")
+
+ML <- optim(p, lik, y = y)
+
+data.frame(
+  method = c("Maximum Likelihood", "Empirical"),
+  mu = c(ML$par, mean(y))
+)
+```
+
+## Mean And Standard Deviation
+
+```{r}
+sdlik <- function(x) {
+  res <- 0
+  if (x > 0) res = 1
+  return(log(res))
+}
+
+lik <- function(par, y) {
+  mean = par[1]
+  sd = par[2]
+
+  L2 <- sdlik(sd)
+  if (!is.finite(L2)) return(Inf)
+
+  L1 <- dnorm(x = y, mean = mean, sd = sd, log = TRUE)
+  return(-sum(L1 + L2))
+}
+```
+
+## Estimate Both
+
+```{r}
+p <- c(0, 1)
+names(p) <- c("mu", "sigma")
+
+ML <- optim(p, lik, y = y, method = "Nelder-Mead")
+
+rbind(
+  ML = ML$par,
+  empirical = c(mean(y), sd(y))
+)
+```
+
+## Correlation Likelihood {.smaller}
+
+```{r}
+library(mvtnorm)
+
+corlik <- function(x) {
+  res <- 0
+  if (x >= -1 & x <= 1) res = 1
+  return(log(res))
+}
+
+varlik <- function(x) {
+  res <- 0
+  if (x > 0) res = 1
+  return(log(res))
+}
+```
+
+## Build Sigma
+
+```{r}
+lik <- function(par, y) {
+  L2 <- corlik(par[5])
+  L3 <- varlik(par[3])
+  L4 <- varlik(par[4])
+  if (!all(is.finite(c(L2, L3, L4)))) return(Inf)
+
+  covAB <- par[5] * (sqrt(par[3]) * sqrt(par[4]))
+  sigma <- array(c(par[3], covAB, covAB, par[4]), dim = c(2, 2))
+
+  L1 <- tryCatch(
+    dmvnorm(x = y, mean = c(par[1], par[2]), sigma = sigma, log = TRUE),
+    error = function(e) -Inf
+  )
+  if (!all(is.finite(L1))) return(Inf)
+
+  return(-sum(L1 + L2 + L3 + L4))
+}
+```
+
+## Estimate Correlation
+
+```{r}
+methods = c("Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Brent")
+
+p <- c(0, 0, 1, 1, 0.2)
+names(p) <- c("mu1", "mu2", "tauA", "tauB", "rho")
+
+set.seed(2026)
+n = 10
+tauA <- 3
+tauB <- 10
+rho = 0.7
+covAB <- rho * (sqrt(tauA) * sqrt(tauB))
+muA <- 5
+muB <- 20
+sigma <- array(c(tauA, covAB, covAB, tauB), dim = c(2, 2))
+Y <- rmvnorm(n, c(muA, muB), sigma)
+
+ML <- optim(p, lik, y = Y, method = methods[1])
+ML$par
+```
+
+## Animal Model
+
+$$
+\mathbf{y}
+=
+\mathbf{X}\mathbf{b}
++ \mathbf{a}
++ \mathbf{e}
+$$
+
+$$
+\mathbf{y} \sim MVN(\mathbf{X}\mathbf{b},
+\mathbf{A}\sigma_a^2 + \mathbf{I}\sigma_e^2)
+$$
+
+## Animal Likelihood {.smaller}
+
+```{r}
+set.seed(2026)
+n_animals <- 20
+A <- diag(n_animals)
+A[1, 2] <- A[2, 1] <- 0.5
+A[3, 4] <- A[4, 3] <- 0.5
+A[5, 6] <- A[6, 5] <- 0.25
+
+X <- matrix(1, n_animals, 1)
+b <- 30
+var_a <- 4
+var_e <- 9
+
+a <- as.numeric(rmvnorm(1, mean = rep(0, n_animals), sigma = A * var_a))
+y <- as.numeric(X %*% b + a + rnorm(n_animals, sd = sqrt(var_e)))
+```
+
+## Animal Likelihood Function {.smaller}
+
+```{r}
+lik <- function(par, y, X, A) {
+  L2 <- varlik(par[1])
+  L3 <- varlik(par[2])
+  if (!all(is.finite(c(L2, L3)))) return(Inf)
+
+  b <- matrix(c(par[3:(2 + ncol(X))]), ncol = 1)
+  G <- A * par[2]
+  R <- diag(length(y)) * par[1]
+  V <- G + R
+  mu <- X %*% b
+
+  L1 <- tryCatch(
+    dmvnorm(x = y, mean = as.numeric(mu), sigma = V, log = TRUE),
+    error = function(e) -Inf
+  )
+  if (!all(is.finite(L1))) return(Inf)
+
+  return(-sum(L1 + L2 + L3))
+}
+```
+
+## Estimate Animal Model
+
+```{r}
+getp <- function(X, b = 0.1, var_e = 1, var_a = 1) {
+  p <- c(var_e, var_a, rep(b, ncol(X)))
+  names(p) <- c("var_e", "var_a", paste("b", 0:(ncol(X) - 1), sep = ""))
+  p
+}
+
+ML <- optim(getp(X, b = mean(y)), lik, X = X, A = A, y = y, method = methods[1])
+
+rbind(
+  ML = ML$par,
+  true = c(var_e, var_a, b)
+)
+```
+
+## Take-Home
+
+Maximum likelihood is not a new algorithm.
+
+It is an optimization problem where the objective comes from a probability model.
+
+The code pattern is:
+
+1. collect unknowns in `p`,
+2. build the likelihood in `lik()`,
+3. run `optim(p, lik, ...)`.

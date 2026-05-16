@@ -1,0 +1,123 @@
+---
+title: "Clustering"
+subtitle: "Advanced Statistics Lab"
+author: "Claas Heuer"
+format:
+  revealjs:
+    footer: "[Lab notes](../labs/clustering.html)"
+---
+
+## Clustering
+
+Clustering learns grouping structure from unlabelled data.
+
+We have features, but no trusted labels.
+
+## Labelled Example
+
+```{r}
+library(ggplot2)
+library(knitr)
+theme_set(theme_minimal(base_size = 16))
+
+data(iris)
+head(iris)
+```
+
+For clustering, `Species` is ignored during fitting.
+
+## Feature Histograms
+
+```{r}
+features <- iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]
+feature_long <- stack(features)
+names(feature_long) <- c("value", "feature")
+
+ggplot(feature_long, aes(value)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 35, fill = "#fff8ef", color = "#263238") +
+  geom_density(color = "#c46a2b", linewidth = 1) +
+  facet_wrap(~feature, scales = "free") +
+  labs(x = "Feature value", y = "Density")
+```
+
+## Mixture Idea
+
+$$
+p(x)
+=
+\sum_{k=1}^{K} \lambda_k f_k(x),
+\qquad
+\sum_{k=1}^{K} \lambda_k = 1
+$$
+
+For a normal mixture:
+
+$$
+f_k(x) = N(x \mid \mu_k, \sigma_k^2)
+$$
+
+## Simulate A Mixture
+
+```{r}
+set.seed(100)
+n <- 1000
+theta <- 0.3
+y <- ifelse(runif(n) < theta, rnorm(n, 5, 1), rnorm(n, 15, 2))
+
+ggplot(data.frame(y), aes(y)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50, fill = "white", color = "#263238") +
+  geom_density(color = "#c46a2b", linewidth = 1) +
+  labs(x = "Simulated trait", y = "Density")
+```
+
+## Simple Implementation
+
+Use `kmeans()` first, then estimate normal components.
+
+```{r}
+GetProbNormalMixture <- function(y, lambda, mu, sigma) {
+  likelihood <- vapply(seq_along(lambda), function(k) {
+    lambda[k] * dnorm(y, mean = mu[k], sd = sigma[k])
+  }, numeric(length(y)))
+  likelihood / rowSums(likelihood)
+}
+
+km <- kmeans(matrix(y, ncol = 1), centers = 2, nstart = 25)
+cluster <- match(km$cluster, order(as.numeric(km$centers)))
+lambda <- as.numeric(tabulate(cluster, nbins = 2)) / length(y)
+mu <- as.numeric(tapply(y, cluster, mean))
+sigma <- as.numeric(tapply(y, cluster, sd))
+
+data.frame(component = 1:2, lambda = lambda, mu = mu, sigma = sigma)
+```
+
+## Component Probabilities
+
+```{r}
+probs <- GetProbNormalMixture(y, lambda, mu, sigma)
+dprobs <- data.frame(x = seq_along(y), y = y, prob_one = probs[, 1])
+
+ggplot(dprobs, aes(x, y, color = prob_one)) +
+  geom_point(alpha = 0.8) +
+  scale_color_gradient2(low = "#c46a2b", mid = "#fff8ef", high = "#0c6773", midpoint = 0.5) +
+  labs(x = "Observation", y = "Simulated trait", color = "P(component 1)")
+```
+
+## Apply To Iris
+
+```{r}
+petal <- iris$Petal.Length
+km_petal <- kmeans(matrix(petal, ncol = 1), centers = 2, nstart = 25)
+cluster_petal <- match(km_petal$cluster, order(as.numeric(km_petal$centers)))
+
+table(
+  cluster = cluster_petal,
+  species = iris$Species
+)
+```
+
+## Take-Home
+
+The old Stan version is useful later.
+
+For the first clustering lab, the simple version is enough to understand the idea.

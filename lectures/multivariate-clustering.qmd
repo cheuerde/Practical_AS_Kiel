@@ -1,0 +1,213 @@
+---
+title: "Multivariate Clustering"
+subtitle: "Advanced Statistics Lab"
+author: "Claas Heuer"
+format:
+  revealjs:
+    footer: "[Lab notes](../labs/multivariate-clustering.html)"
+---
+
+## Multivariate Clustering
+
+Use several features at once.
+
+Animal breeding example:
+
+- marker genotypes,
+- population structure,
+- family or line separation,
+- outlier detection.
+
+## Mixture Model
+
+For $\mathbf{x}_i \in \mathbb{R}^p$:
+
+$$
+p(\mathbf{x}_i)
+=
+\sum_{k=1}^K \pi_k
+N_p(\mathbf{x}_i \mid \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)
+$$
+
+## Ellipse Geometry
+
+$$
+d_{ik}^2
+=
+(\mathbf{x}_i - \boldsymbol{\mu}_k)'
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf{x}_i - \boldsymbol{\mu}_k)
+$$
+
+For two features, constant $d_{ik}^2$ gives an ellipse.
+
+## Simulate Lines
+
+```{r}
+library(ggplot2)
+library(knitr)
+theme_set(theme_minimal(base_size = 16))
+
+simulate_structured_genotypes <- function(n_per_line = c(70, 70, 70), n_markers = 450, seed = 2026) {
+  set.seed(seed)
+  base_frequency <- runif(n_markers, 0.15, 0.45)
+  line_shift <- c(-0.06, 0.00, 0.07)
+  marker_list <- lapply(seq_along(n_per_line), function(line) {
+    p <- base_frequency + line_shift[line] + rnorm(n_markers, 0, 0.015)
+    p <- pmin(pmax(p, 0.02), 0.98)
+    sapply(p, function(marker_p) rbinom(n_per_line[line], 2, marker_p))
+  })
+  list(M = do.call(rbind, marker_list),
+       line = factor(rep(paste("line", LETTERS[seq_along(n_per_line)]), n_per_line)))
+}
+
+geno <- simulate_structured_genotypes()
+```
+
+## PCA
+
+$$
+\mathbf{X}
+=
+\mathbf{U}\mathbf{D}\mathbf{V}'
+$$
+
+The scores $\mathbf{U}\mathbf{D}$ summarize marker variation.
+
+```{r}
+pca <- prcomp(geno$M, center = TRUE, scale. = TRUE)
+pc_data <- data.frame(
+  PC1 = pca$x[, 1],
+  PC2 = pca$x[, 2],
+  PC3 = pca$x[, 3],
+  line = geno$line
+)
+
+ggplot(pc_data, aes(PC1, PC2, color = line)) +
+  geom_point(alpha = 0.8) +
+  scale_color_manual(values = c("#0c6773", "#c46a2b", "#7a6f42")) +
+  labs(x = "PC1", y = "PC2", color = "Known line")
+```
+
+## K-Means
+
+$$
+\sum_{k=1}^K \sum_{i:z_i=k}
+\left\lVert \mathbf{x}_i - \boldsymbol{\mu}_k \right\rVert^2
+$$
+
+```{r}
+set.seed(2026)
+km <- kmeans(pc_data[, c("PC1", "PC2", "PC3")], centers = 3, nstart = 50)
+pc_data$kmeans_cluster <- factor(km$cluster)
+
+table(cluster = pc_data$kmeans_cluster, line = pc_data$line)
+```
+
+## K-Means Plot
+
+```{r}
+ggplot(pc_data, aes(PC1, PC2, color = kmeans_cluster)) +
+  geom_point(alpha = 0.8) +
+  scale_color_manual(values = c("#0c6773", "#c46a2b", "#7a6f42")) +
+  labs(x = "PC1", y = "PC2", color = "K-means")
+```
+
+## Mixture Helpers
+
+```{r include=FALSE}
+dmvn_density <- function(X, mean, Sigma) {
+  X <- as.matrix(X)
+  p <- ncol(X)
+  Sigma <- Sigma + diag(1e-6, p)
+  centered <- sweep(X, 2, mean, "-")
+  Sigma_inv <- solve(Sigma)
+  quadratic <- rowSums((centered %*% Sigma_inv) * centered)
+  log_det <- as.numeric(determinant(Sigma, logarithm = TRUE)$modulus)
+  exp(-0.5 * (p * log(2 * pi) + log_det + quadratic))
+}
+
+fit_mvn_mixture <- function(X, k = 3, max_iter = 150, tolerance = 1e-6) {
+  X <- as.matrix(X)
+  n <- nrow(X)
+  p <- ncol(X)
+  km_init <- kmeans(X, centers = k, nstart = 30)
+  pi <- as.numeric(table(factor(km_init$cluster, levels = seq_len(k)))) / n
+  mu <- do.call(rbind, lapply(seq_len(k), function(j) colMeans(X[km_init$cluster == j, , drop = FALSE])))
+  Sigma <- lapply(seq_len(k), function(j) cov(X[km_init$cluster == j, , drop = FALSE]) + diag(1e-6, p))
+  loglik <- rep(NA_real_, max_iter)
+  for (iteration in seq_len(max_iter)) {
+    density <- vapply(seq_len(k), function(j) pi[j] * dmvn_density(X, mu[j, ], Sigma[[j]]), numeric(n))
+    responsibility <- density / rowSums(density)
+    nk <- colSums(responsibility)
+    pi <- nk / n
+    for (j in seq_len(k)) {
+      mu[j, ] <- colSums(X * responsibility[, j]) / nk[j]
+      centered <- sweep(X, 2, mu[j, ], "-")
+      Sigma[[j]] <- crossprod(centered * sqrt(responsibility[, j])) / nk[j] + diag(1e-6, p)
+    }
+    density_updated <- vapply(seq_len(k), function(j) pi[j] * dmvn_density(X, mu[j, ], Sigma[[j]]), numeric(n))
+    loglik[iteration] <- sum(log(rowSums(density_updated)))
+    if (iteration > 1 && abs(loglik[iteration] - loglik[iteration - 1]) < tolerance) break
+  }
+  density <- vapply(seq_len(k), function(j) pi[j] * dmvn_density(X, mu[j, ], Sigma[[j]]), numeric(n))
+  responsibility <- density / rowSums(density)
+  list(pi = pi, mu = mu, Sigma = Sigma, responsibility = responsibility,
+       cluster = max.col(responsibility), loglik = loglik[max(which(!is.na(loglik)))])
+}
+
+ellipse_points <- function(center, Sigma, level = 0.90, n = 200) {
+  angle <- seq(0, 2 * pi, length.out = n)
+  circle <- cbind(cos(angle), sin(angle)) * sqrt(qchisq(level, df = 2))
+  points <- circle %*% chol(Sigma + diag(1e-6, 2))
+  data.frame(PC1 = points[, 1] + center[1], PC2 = points[, 2] + center[2])
+}
+```
+
+## MVN Mixture
+
+```{r}
+X2 <- as.matrix(pc_data[, c("PC1", "PC2")])
+set.seed(2026)
+mvn_fit <- fit_mvn_mixture(X2, k = 3)
+
+pc_data$mvn_cluster <- factor(mvn_fit$cluster)
+pc_data$mvn_uncertainty <- 1 - apply(mvn_fit$responsibility, 1, max)
+
+table(cluster = pc_data$mvn_cluster, line = pc_data$line)
+```
+
+## Mixture Ellipses
+
+```{r}
+ellipse_data <- do.call(rbind, lapply(seq_len(3), function(j) {
+  out <- ellipse_points(mvn_fit$mu[j, ], mvn_fit$Sigma[[j]], level = 0.90)
+  out$cluster <- factor(j)
+  out
+}))
+
+ggplot(pc_data, aes(PC1, PC2, color = mvn_cluster)) +
+  geom_point(aes(alpha = 1 - mvn_uncertainty)) +
+  geom_path(data = ellipse_data, aes(PC1, PC2, color = cluster), linewidth = 1) +
+  scale_color_manual(values = c("#0c6773", "#c46a2b", "#7a6f42")) +
+  scale_alpha(range = c(0.35, 0.9), guide = "none") +
+  labs(x = "PC1", y = "PC2", color = "Mixture")
+```
+
+## Choosing K
+
+$$
+\operatorname{BIC}
+=
+-2\ell(\hat{\theta}) + q\log(n)
+$$
+
+$$
+q = (K - 1) + Kp + K\frac{p(p + 1)}{2}
+$$
+
+## Take-Home
+
+PCA helps expose marker-based population structure.
+
+K-means gives hard clusters; mixture models give probabilities and uncertainty.

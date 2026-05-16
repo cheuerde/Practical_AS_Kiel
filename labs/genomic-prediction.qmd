@@ -1,0 +1,412 @@
+---
+title: "Genomic Prediction"
+subtitle: "Ridge marker BLUP, GBLUP, cross-validation, and Bayesian alphabet"
+format:
+  html:
+    code-fold: false
+---
+
+<div class="view-switch"><a href="../lectures/genomic-prediction.html">Open slides</a></div>
+
+Genomic prediction predicts breeding values from phenotypes and dense SNP marker data. The basic idea from the original lab is that the breeding value of an individual can be recovered by summing marker allele effects.
+
+```{r}
+#| include: false
+library(ggplot2)
+library(knitr)
+
+theme_set(theme_minimal(base_size = 13))
+```
+
+## Genomic Prediction
+
+Let $\mathbf{M}$ be a marker matrix with genotypes coded as 0, 1, and 2. Let $\hat{\mathbf{a}}$ be a vector of estimated marker effects.
+
+$$
+\hat{\mathbf{g}}
+=
+\mathbf{M}\hat{\mathbf{a}}.
+$$
+
+The genomic estimated breeding value is the sum of the estimated marker effects carried by the individual.
+
+## Ridge Regression BLUP
+
+The marker effects can be estimated directly with a mixed-model view:
+
+$$
+\mathbf{y}
+=
+\mu
++ \mathbf{M}\mathbf{a}
++ \mathbf{e},
+\qquad
+\mathbf{a} \sim N(\mathbf{0}, \mathbf{I}\sigma_a^2).
+$$
+
+For genomic prediction, marker genotypes are usually centered by allele frequencies:
+
+$$
+p_j = \frac{1}{2n}\sum_{i=1}^{n} m_{ij},
+\qquad
+\bar{m}_{ij} = m_{ij} - 2p_j.
+$$
+
+This makes EBVs deviations from the population mean:
+
+$$
+\hat{\mathbf{g}}
+=
+\bar{\mathbf{M}}\hat{\mathbf{a}}
+=
+\mathbf{M}\hat{\mathbf{a}} - 2\mathbf{p}\hat{\mathbf{a}}.
+$$
+
+## Prepare A Wheat-Style Dataset
+
+The old lab used the `wheat` data from `BGLR`. The evaluated version below uses a simulated wheat-style marker matrix so the rendered site does not require optional genomic packages. The following optional block is the original data path.
+
+```{r eval=FALSE}
+library(BGLR)
+
+data(wheat)
+y <- wheat.Y[, 1]
+M <- wheat.X
+```
+
+```{r}
+simulate_wheat_like <- function(n = 220, m = 450, n_qtl = 35, h2 = 0.45, seed = 2026) {
+  set.seed(seed)
+  p <- runif(m, min = 0.05, max = 0.50)
+  M <- sapply(p, function(marker_p) rbinom(n, size = 2, prob = marker_p))
+  colnames(M) <- paste0("marker_", seq_len(m))
+
+  qtl <- sample(seq_len(m), size = n_qtl)
+  a <- rep(0, m)
+  a[qtl] <- rnorm(n_qtl, mean = 0, sd = 0.22)
+
+  Mc <- sweep(M, 2, 2 * p, "-")
+  g <- as.numeric(Mc %*% a)
+  e_sd <- sqrt(var(g) * (1 - h2) / h2)
+  y <- 30 + g + rnorm(n, sd = e_sd)
+
+  list(y = y, M = M, p = p, g = g, source = "simulated wheat-style data")
+}
+
+dat <- simulate_wheat_like()
+y <- dat$y
+M <- dat$M
+p <- colMeans(M) / 2
+Mc <- sweep(M, MARGIN = 2, STATS = 2 * p, FUN = "-")
+
+kable(
+  data.frame(
+    source = dat$source,
+    animals = nrow(M),
+    markers = ncol(M),
+    phenotype_mean = mean(y),
+    phenotype_sd = sd(y)
+  ),
+  digits = 3
+)
+```
+
+## Genomic Relationship Matrix
+
+GBLUP uses a genomic relationship matrix:
+
+$$
+\mathbf{G}
+=
+\frac{\bar{\mathbf{M}}\bar{\mathbf{M}}'}
+{\operatorname{mean}\left(\operatorname{diag}(\bar{\mathbf{M}}\bar{\mathbf{M}}')\right)}.
+$$
+
+```{r}
+MMdash <- Mc %*% t(Mc)
+G <- MMdash / mean(diag(MMdash))
+
+g_subset <- as.data.frame(as.table(G[1:45, 1:45]))
+names(g_subset) <- c("animal_1", "animal_2", "relationship")
+
+ggplot(g_subset, aes(animal_1, animal_2, fill = relationship)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#245c73", mid = "#fff8ef", high = "#c46a2b") +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = "G")
+```
+
+## Original rrBLUP Implementation
+
+This is the compact version of the old `rrBLUP::mixed.solve()` workflow. It is useful in class if `rrBLUP` is installed.
+
+```{r eval=FALSE}
+library(rrBLUP)
+
+Z <- Mc
+X <- matrix(1, nrow = length(y), ncol = 1)
+
+mod_rr <- mixed.solve(
+  y = y,
+  X = X,
+  Z = Z,
+  method = "ML"
+)
+
+a_rr <- mod_rr$u
+g_rr <- as.numeric(Z %*% a_rr)
+
+var_a_rr <- mod_rr$Vu
+var_e_rr <- mod_rr$Ve
+var_g_rr <- mod_rr$Vu * mean(diag(MMdash))
+```
+
+## Ridge Marker Model Without Extra Packages
+
+For a portable lab version we use the equivalent ridge equations with a fixed shrinkage value:
+
+$$
+\hat{\mathbf{a}}
+=
+\left(\bar{\mathbf{M}}'\bar{\mathbf{M}} + \lambda\mathbf{I}\right)^{-1}
+\bar{\mathbf{M}}'(\mathbf{y} - \bar{y}\mathbf{1}).
+$$
+
+```{r}
+fit_marker_ridge <- function(y, Mc, lambda = 50) {
+  y_mean <- mean(y)
+  a_hat <- as.numeric(
+    solve(crossprod(Mc) + diag(lambda, ncol(Mc)), crossprod(Mc, y - y_mean))
+  )
+
+  list(
+    mean = y_mean,
+    marker_effect = a_hat,
+    gebv = as.numeric(Mc %*% a_hat)
+  )
+}
+
+lambda <- 50
+mod_rr <- fit_marker_ridge(y, Mc, lambda = lambda)
+a_rr <- mod_rr$marker_effect
+g_rr <- mod_rr$gebv
+
+kable(
+  data.frame(
+    lambda = lambda,
+    sd_marker_effects = sd(a_rr),
+    sd_gebv = sd(g_rr),
+    cor_true = cor(g_rr, dat$g)
+  ),
+  digits = 3
+)
+```
+
+```{r}
+ggplot(data.frame(true = dat$g, ridge = g_rr), aes(true, ridge)) +
+  geom_point(alpha = 0.75, color = "#0c6773") +
+  geom_abline(slope = 1, intercept = 0, color = "#c46a2b") +
+  labs(x = "True breeding value", y = "Ridge marker EBV")
+```
+
+## GBLUP Model
+
+The equivalent GBLUP model is:
+
+$$
+\mathbf{y}
+=
+\mu
++ \mathbf{g}
++ \mathbf{e},
+\qquad
+\mathbf{g} \sim MVN(\mathbf{0}, \mathbf{G}\sigma_g^2).
+$$
+
+The old lab fitted this with `rrBLUP`:
+
+```{r eval=FALSE}
+mod_gblup <- mixed.solve(
+  y = y,
+  K = G,
+  method = "ML"
+)
+
+g_gblup <- mod_gblup$u
+var_g_gblup <- mod_gblup$Vu
+var_e_gblup <- mod_gblup$Ve
+```
+
+With fixed $\lambda$, the package-free equivalent is:
+
+```{r}
+lambda_g <- lambda / mean(diag(MMdash))
+y_centered <- y - mean(y)
+
+g_gblup <- as.numeric(
+  G %*% solve(G + diag(lambda_g, nrow(G)), y_centered)
+)
+
+equivalence <- data.frame(
+  marker_model = g_rr,
+  gblup = g_gblup
+)
+
+kable(
+  data.frame(
+    correlation = cor(equivalence$marker_model, equivalence$gblup),
+    maximum_absolute_difference = max(abs(equivalence$marker_model - equivalence$gblup))
+  ),
+  digits = 6
+)
+```
+
+```{r}
+ggplot(equivalence, aes(marker_model, gblup)) +
+  geom_point(alpha = 0.75, color = "#0c6773") +
+  geom_abline(slope = 1, intercept = 0, color = "#c46a2b") +
+  labs(x = "Ridge marker model", y = "GBLUP")
+```
+
+## Cross-Validation
+
+The original lab used repeated fold splits and predicted animals that were masked from the training data.
+
+```{r}
+cCV <- function(y, folds = 5, reps = 1, seed = NULL) {
+  if (!is.vector(y)) stop("y must be a vector")
+  if (folds < 2) stop("'folds' must be larger than one")
+
+  if (is.null(seed)) {
+    seed <- as.integer((as.double(Sys.time()) * 1000 + Sys.getpid()) %% 2^31)
+  }
+
+  set.seed(seed)
+  observed <- which(!is.na(y))
+  cv_pheno <- vector("list", folds * reps)
+  count <- 0
+
+  for (rep in seq_len(reps)) {
+    fold_id <- sample(rep(seq_len(folds), length.out = length(observed)))
+
+    for (fold in seq_len(folds)) {
+      count <- count + 1
+      y_temp <- y
+      y_temp[observed[fold_id == fold]] <- NA
+      cv_pheno[[count]] <- y_temp
+    }
+  }
+
+  cv_pheno
+}
+
+predict_masked_ridge <- function(y_masked, Mc, lambda = 50) {
+  training <- !is.na(y_masked)
+  validation <- is.na(y_masked)
+
+  fit <- fit_marker_ridge(y_masked[training], Mc[training, , drop = FALSE], lambda = lambda)
+  prediction <- rep(NA_real_, length(y_masked))
+  prediction[validation] <- fit$mean + as.numeric(Mc[validation, , drop = FALSE] %*% fit$marker_effect)
+  prediction
+}
+
+cvs <- cCV(y, folds = 5, reps = 3, seed = 2026)
+
+preds <- lapply(cvs, function(y_masked) {
+  prediction <- predict_masked_ridge(y_masked, Mc, lambda = lambda)
+  validation <- is.na(y_masked)
+  data.frame(pred = prediction[validation], y = y[validation])
+})
+
+cv_out <- do.call(rbind, preds)
+
+kable(
+  data.frame(
+    prediction_accuracy = cor(cv_out$pred, cv_out$y),
+    bias_slope = coef(lm(pred ~ y, data = cv_out))[2]
+  ),
+  digits = 3
+)
+```
+
+```{r}
+ggplot(cv_out, aes(y, pred)) +
+  geom_point(alpha = 0.65, color = "#0c6773") +
+  geom_smooth(method = "lm", se = FALSE, color = "#c46a2b") +
+  labs(x = "Observed phenotype", y = "Cross-validated prediction")
+```
+
+## Bayesian Alphabet
+
+The Bayesian alphabet changes the prior on marker effects to introduce feature selection. A spike-and-slab prior is:
+
+$$
+u_j \sim \pi N(0, \sigma_u^2) + (1 - \pi)\delta_0.
+$$
+
+Markers assigned to the point mass at zero are effectively excluded. Markers assigned to the normal part can have non-zero effects.
+
+![](../misc/spike_slap.png)
+
+![](../misc/ba_priors.png)
+
+## BayesCpi Threshold Model
+
+For a binary trait, the old lab used a probit threshold model:
+
+$$
+\begin{aligned}
+\mathbf{y} &\sim \operatorname{Bernoulli}(\mathbf{p})\\
+\mathbf{p} &= \Phi(\mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\mathbf{u}) \\
+\mathbf{u} &\sim \pi N(0,\sigma_u^2) + (1-\pi)\delta_0.
+\end{aligned}
+$$
+
+The JAGS implementation remains useful as a reference, but it should be treated as an extension rather than a required live dependency.
+
+```{r eval=FALSE}
+library(rjags)
+
+BayesCJags <- function(y, Z, threshold = FALSE, niter = 5000, burnin = 2500,
+                       betaPriorAlpha = 2, betaPriorBeta = 5) {
+  modelstringThreshold <- "
+  model {
+    for (i in 1:n) {
+      y[i] ~ dbern(prob[i])
+      probit(prob[i]) <- alpha + inprod(X[i,], beta)
+    }
+    for (j in 1:p) {
+      ind[j] ~ dbern(pind)
+      betaT[j] ~ dnorm(0, tau)
+      beta[j] <- ind[j] * betaT[j]
+    }
+    tau ~ dgamma(1, 0.001)
+    alpha ~ dnorm(0, 0.0001)
+    pind ~ dbeta(betaPriorAlpha, betaPriorBeta)
+  }
+  "
+
+  data <- list(
+    y = y,
+    X = Z,
+    n = length(y),
+    p = ncol(Z),
+    betaPriorAlpha = betaPriorAlpha,
+    betaPriorBeta = betaPriorBeta
+  )
+
+  init <- list(alpha = 0, betaT = rep(0, ncol(Z)), pind = 0.5, ind = rep(0, ncol(Z)), tau = 1)
+  load.module("glm")
+  model <- jags.model(textConnection(modelstringThreshold), data = data, inits = init)
+  update(model, n.iter = burnin)
+  coda.samples(model, variable.names = names(init), n.iter = niter - burnin)
+}
+```
+
+## Exercises
+
+1. Replace the simulated data with the `BGLR::wheat` data if the package is installed.
+2. Change the marker subset size and inspect runtime.
+3. Compare the marker-model EBVs with GBLUP EBVs.
+4. Increase the number of cross-validation repetitions.
+5. Explain when ridge BLUP and spike-and-slab priors would behave differently.

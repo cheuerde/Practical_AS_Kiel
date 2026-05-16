@@ -1,0 +1,209 @@
+---
+title: "Genomic Prediction"
+subtitle: "Advanced Statistics Lab"
+author: "Claas Heuer"
+format:
+  revealjs:
+    footer: "[Lab notes](../labs/genomic-prediction.html)"
+---
+
+## Goal
+
+Use marker genotypes to predict breeding values.
+
+Two views of the same model:
+
+- marker effects: estimate $\hat{\mathbf{a}}$,
+- genomic relationships: estimate $\hat{\mathbf{g}}$ directly.
+
+## Marker Model
+
+$$
+\mathbf{y}
+=
+\mathbf{1}\mu
++ \mathbf{Z}\mathbf{a}
++ \mathbf{e}
+$$
+
+$$
+\mathbf{a} \sim N(\mathbf{0}, \mathbf{I}\sigma_a^2),
+\qquad
+\mathbf{e} \sim N(\mathbf{0}, \mathbf{I}\sigma_e^2)
+$$
+
+The GEBV is
+
+$$
+\hat{\mathbf{g}} = \mathbf{Z}\hat{\mathbf{a}}.
+$$
+
+## Simulate Markers
+
+```{r}
+library(ggplot2)
+library(knitr)
+theme_set(theme_minimal(base_size = 16))
+
+set.seed(2026)
+n_animals <- 160
+n_markers <- 300
+
+allele_frequency <- runif(n_markers, 0.05, 0.50)
+M <- sapply(allele_frequency, function(p) rbinom(n_animals, 2, p))
+
+center_markers <- function(M, allele_frequency) {
+  sweep(M, 2, 2 * allele_frequency, "-")
+}
+
+Z <- center_markers(M, allele_frequency)
+qtl <- sample(seq_len(n_markers), 12)
+a_true <- rep(0, n_markers)
+a_true[qtl] <- rnorm(length(qtl), 0, 0.35)
+g_true <- as.numeric(Z %*% a_true)
+y <- 30 + g_true + rnorm(n_animals, sd = sqrt(var(g_true) * (1 - 0.45) / 0.45))
+```
+
+## Phenotype And Genetic Signal
+
+```{r}
+ggplot(data.frame(g_true, y), aes(g_true, y)) +
+  geom_point(alpha = 0.75, color = "#0c6773") +
+  geom_smooth(method = "lm", se = FALSE, color = "#c46a2b") +
+  labs(x = "True breeding value", y = "Phenotype")
+```
+
+## Ridge Marker BLUP
+
+$$
+\hat{\mathbf{a}}
+=
+\left(\mathbf{Z}'\mathbf{Z} + \lambda\mathbf{I}\right)^{-1}
+\mathbf{Z}'(\mathbf{y} - \bar{y}\mathbf{1})
+$$
+
+```{r}
+fit_ridge_marker <- function(y, M_train, M_new = M_train, lambda = 50) {
+  p_train <- colMeans(M_train) / 2
+  Z_train <- center_markers(M_train, p_train)
+  Z_new <- center_markers(M_new, p_train)
+  y_mean <- mean(y)
+  marker_effect <- as.numeric(
+    solve(crossprod(Z_train) + diag(lambda, ncol(Z_train)), crossprod(Z_train, y - y_mean))
+  )
+  list(mean = y_mean, marker_effect = marker_effect, prediction = as.numeric(y_mean + Z_new %*% marker_effect))
+}
+
+ridge_fit <- fit_ridge_marker(y, M, lambda = 50)
+g_ridge <- ridge_fit$prediction - ridge_fit$mean
+
+cor(g_ridge, g_true)
+```
+
+## Genomic Relationship Matrix
+
+$$
+\mathbf{G}
+=
+\frac{\mathbf{Z}\mathbf{Z}'}{\operatorname{mean}\left(\operatorname{diag}(\mathbf{Z}\mathbf{Z}')\right)}
+$$
+
+```{r}
+ZZt <- tcrossprod(Z)
+G <- ZZt / mean(diag(ZZt))
+
+g_subset <- as.data.frame(as.table(G[1:35, 1:35]))
+names(g_subset) <- c("animal_1", "animal_2", "relationship")
+
+ggplot(g_subset, aes(animal_1, animal_2, fill = relationship)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#245c73", mid = "#fff8ef", high = "#c46a2b") +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = "G")
+```
+
+## GBLUP
+
+$$
+\mathbf{y}
+=
+\mathbf{1}\mu
++ \mathbf{g}
++ \mathbf{e},
+\qquad
+\mathbf{g} \sim N(\mathbf{0}, \mathbf{G}\sigma_g^2)
+$$
+
+## Equivalence
+
+```{r}
+lambda_marker <- 50
+lambda_g <- lambda_marker / mean(diag(ZZt))
+y_centered <- y - mean(y)
+
+g_gblup <- as.numeric(G %*% solve(G + diag(lambda_g, nrow(G)), y_centered))
+
+data.frame(
+  correlation = cor(g_ridge, g_gblup),
+  maximum_difference = max(abs(g_ridge - g_gblup))
+)
+```
+
+## Cross-Validation
+
+```{r}
+make_folds <- function(n, k = 5, seed = 1) {
+  set.seed(seed)
+  sample(rep(seq_len(k), length.out = n))
+}
+
+cross_validate_ridge <- function(y, M, lambda_values, k = 5, seed = 1) {
+  fold <- make_folds(length(y), k = k, seed = seed)
+  do.call(rbind, lapply(lambda_values, function(lambda) {
+    prediction <- rep(NA_real_, length(y))
+    for (f in seq_len(k)) {
+      training <- fold != f
+      validation <- fold == f
+      fit <- fit_ridge_marker(y[training], M[training, , drop = FALSE], M[validation, , drop = FALSE], lambda)
+      prediction[validation] <- fit$prediction
+    }
+    data.frame(lambda = lambda, correlation = cor(prediction, y))
+  }))
+}
+
+cv_results <- cross_validate_ridge(y, M, c(5, 15, 50, 150, 500), seed = 2026)
+cv_results
+```
+
+## Validation Curve
+
+```{r}
+ggplot(cv_results, aes(lambda, correlation)) +
+  geom_line(color = "#0c6773") +
+  geom_point(size = 3, color = "#c46a2b") +
+  scale_x_log10() +
+  labs(x = expression(lambda), y = "Prediction correlation")
+```
+
+## Bayesian Alphabet
+
+Ridge:
+
+$$
+a_j \sim N(0, \sigma_a^2)
+$$
+
+Spike-and-slab:
+
+$$
+a_j \mid \gamma_j
+\sim
+\gamma_j N(0, \sigma_a^2)
++ (1 - \gamma_j)\delta_0
+$$
+
+## Take-Home
+
+Genomic prediction is an animal model built from marker similarities.
+
+Marker BLUP and GBLUP are two computational views of the same prediction problem.

@@ -1,0 +1,73 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - labs/*.qmd
+    - lectures/*.qmd
+
+website:
+  title: "Advanced Statistics Lab"
+  site-url: "https://cheuerde.github.io/Practical_AS_Kiel/"
+  repo-url: "https://github.com/cheuerde/Practical_AS_Kiel"
+  repo-actions: [source, issue]
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Labs
+        menu:
+          - text: Introduction to R
+            href: labs/r-intro.qmd
+          - text: Optimization
+            href: labs/optimization.qmd
+          - text: Maximum Likelihood
+            href: labs/maximum-likelihood.qmd
+          - text: Least Squares
+            href: labs/linear-regression.qmd
+          - text: Bayesian Inference
+            href: labs/bayesian-inference.qmd
+          - text: Genomic Prediction
+            href: labs/genomic-prediction.qmd
+          - text: Clustering
+            href: labs/clustering.qmd
+          - text: Multivariate Clustering
+            href: labs/multivariate-clustering.qmd
+      - text: Slides
+        menu:
+          - text: Introduction to R
+            href: lectures/r-intro.qmd
+          - text: Optimization
+            href: lectures/optimization.qmd
+          - text: Maximum Likelihood
+            href: lectures/maximum-likelihood.qmd
+          - text: Least Squares
+            href: lectures/linear-regression.qmd
+          - text: Bayesian Inference
+            href: lectures/bayesian-inference.qmd
+          - text: Genomic Prediction
+            href: lectures/genomic-prediction.qmd
+          - text: Clustering
+            href: lectures/clustering.qmd
+          - text: Multivariate Clustering
+            href: lectures/multivariate-clustering.qmd
+
+format:
+  html:
+    theme:
+      - cosmo
+      - styles/site.scss
+    toc: true
+    number-sections: true
+    code-copy: true
+    code-overflow: wrap
+    df-print: paged
+    link-external-newwindow: true
+    include-after-body:
+      - assets/theme-switcher.html
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: auto

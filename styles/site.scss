@@ -1,0 +1,243 @@
+/*-- scss:defaults --*/
+$body-bg: #f7f0e6;
+$body-color: #263238;
+$font-family-sans-serif: "Aptos", "Atkinson Hyperlegible", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+$headings-font-weight: 650;
+$link-color: #0c6773;
+
+/*-- scss:rules --*/
+:root,
+:root[data-course-theme="warm"] {
+  --course-bg: #f7f0e6;
+  --course-surface: #fff8ef;
+  --course-text: #263238;
+  --course-muted: #5b615e;
+  --course-accent: #0c6773;
+  --course-accent-2: #c46a2b;
+  --course-border: #e0ccb3;
+  --course-code-bg: #fffaf1;
+  --course-code-text: #6f3f1f;
+}
+
+:root[data-course-theme="paper"] {
+  --course-bg: #fbfaf7;
+  --course-surface: #ffffff;
+  --course-text: #23272b;
+  --course-muted: #596168;
+  --course-accent: #245c73;
+  --course-accent-2: #8f5a2b;
+  --course-border: #d9dde2;
+  --course-code-bg: #f5f7f8;
+  --course-code-text: #6a3c17;
+}
+
+:root[data-course-theme="sage"] {
+  --course-bg: #eef4ec;
+  --course-surface: #fffdf6;
+  --course-text: #20302a;
+  --course-muted: #53625a;
+  --course-accent: #2f6f5e;
+  --course-accent-2: #b45a3c;
+  --course-border: #c7d9ce;
+  --course-code-bg: #f8fbf4;
+  --course-code-text: #7a3d28;
+}
+
+:root[data-course-theme="fjord"] {
+  --course-bg: #edf4f5;
+  --course-surface: #ffffff;
+  --course-text: #1f2d35;
+  --course-muted: #58666f;
+  --course-accent: #236e85;
+  --course-accent-2: #b36b2c;
+  --course-border: #c8dbe0;
+  --course-code-bg: #f4fafb;
+  --course-code-text: #70451e;
+}
+
+:root[data-course-theme="rose"] {
+  --course-bg: #f8f0f3;
+  --course-surface: #fffafa;
+  --course-text: #30252a;
+  --course-muted: #685962;
+  --course-accent: #9c3f5f;
+  --course-accent-2: #23706a;
+  --course-border: #e4ccd5;
+  --course-code-bg: #fff6f8;
+  --course-code-text: #1f625d;
+}
+
+:root[data-course-theme="graphite"] {
+  --course-bg: #f2f2f0;
+  --course-surface: #ffffff;
+  --course-text: #202124;
+  --course-muted: #5f6368;
+  --course-accent: #306b73;
+  --course-accent-2: #a5532f;
+  --course-border: #d2d5d6;
+  --course-code-bg: #f7f7f5;
+  --course-code-text: #6b3b23;
+}
+
+:root[data-course-theme="blackboard"] {
+  --course-bg: #12201c;
+  --course-surface: #1d2d28;
+  --course-text: #f0ead8;
+  --course-muted: #c9c1aa;
+  --course-accent: #9bd0c2;
+  --course-accent-2: #e2ad63;
+  --course-border: #3a4f47;
+  --course-code-bg: #0d1714;
+  --course-code-text: #f5d39c;
+}
+
+:root[data-course-theme="dark"] {
+  --course-bg: #182023;
+  --course-surface: #232d31;
+  --course-text: #f3efe7;
+  --course-muted: #c2b9aa;
+  --course-accent: #78c7d3;
+  --course-accent-2: #e0a15f;
+  --course-border: #3d4a4f;
+  --course-code-bg: #111719;
+  --course-code-text: #ffd8a8;
+}
+
+:root[data-course-theme="contrast"] {
+  --course-bg: #0b0b0b;
+  --course-surface: #ffffff;
+  --course-text: #ffffff;
+  --course-muted: #e6e6e6;
+  --course-accent: #00d5ff;
+  --course-accent-2: #ffcc00;
+  --course-border: #ffffff;
+  --course-code-bg: #000000;
+  --course-code-text: #ffcc00;
+}
+
+body {
+  background: var(--course-bg);
+  color: var(--course-text);
+  line-height: 1.6;
+}
+
+code {
+  color: var(--course-code-text);
+  border-radius: 4px;
+}
+
+.quarto-title-banner {
+  background: var(--course-surface);
+  color: var(--course-text);
+}
+
+.navbar {
+  background: var(--course-surface);
+  border-bottom: 1px solid var(--course-border);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--course-text);
+}
+
+h2 {
+  border-bottom: 2px solid var(--course-accent-2);
+  padding-bottom: 0.15rem;
+}
+
+.section-kicker {
+  align-items: center;
+  color: var(--course-muted);
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 0.45rem;
+  letter-spacing: 0.04em;
+  margin: 1rem 0 0.4rem;
+  text-transform: uppercase;
+}
+
+.section-kicker img {
+  background: var(--course-surface);
+  border: 1px solid var(--course-border);
+  border-radius: 999px;
+  height: 2rem;
+  padding: 0.18rem;
+  width: 2rem;
+}
+
+.math-note {
+  background: var(--course-surface);
+  border-left: 5px solid var(--course-accent-2);
+  color: var(--course-text);
+  margin: 1rem 0;
+  padding: 0.8rem 1rem;
+}
+
+.view-switch {
+  display: flex;
+  justify-content: flex-end;
+  margin: -0.4rem 0 1rem;
+}
+
+.view-switch a {
+  background: var(--course-accent);
+  border-radius: 999px;
+  color: var(--course-bg);
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  text-decoration: none;
+}
+
+.view-switch a:hover {
+  background: var(--course-accent-2);
+  color: var(--course-bg);
+}
+
+.theme-switcher {
+  align-items: center;
+  background: var(--course-surface);
+  border: 1px solid var(--course-border);
+  border-radius: 7px;
+  color: var(--course-text);
+  display: inline-flex;
+  gap: 0.45rem;
+  font: 700 0.78rem/1.1 "Aptos", "Atkinson Hyperlegible", sans-serif;
+  padding: 0.35rem 0.45rem;
+  position: fixed;
+  right: 0.75rem;
+  top: 4.15rem;
+  z-index: 1050;
+}
+
+.theme-switcher label {
+  color: var(--course-muted);
+  margin: 0;
+}
+
+.theme-switcher select {
+  background: var(--course-bg);
+  border: 1px solid var(--course-border);
+  border-radius: 5px;
+  color: var(--course-text);
+  font: inherit;
+  padding: 0.2rem 1.65rem 0.2rem 0.35rem;
+}
+
+.theme-switcher select:hover,
+.theme-switcher select:focus {
+  border-color: var(--course-accent);
+}
+
+@media (max-width: 760px) {
+  .theme-switcher {
+    right: 0.45rem;
+    top: 3.65rem;
+  }
+
+  .theme-switcher label {
+    display: none;
+  }
+}

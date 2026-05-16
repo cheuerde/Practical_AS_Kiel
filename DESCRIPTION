@@ -1,0 +1,44 @@
+Package: PracticalASKiel
+Type: Project
+Title: Advanced Statistics Lab Kiel
+Version: 0.0.0.9000
+Authors@R: person("Claas", "Heuer", role = c("aut", "cre"))
+Description: Teaching material for the Advanced Statistics lab in the animal breeding masters program at Kiel University.
+License: MIT
+Encoding: UTF-8
+Additional_repositories: https://mc-stan.org/r-packages/
+Imports:
+    dlookr,
+    ggplot2,
+    knitr,
+    rmarkdown
+Suggests:
+    BGLR,
+    brms,
+    bayesplot,
+    car,
+    cmdstanr,
+    data.table,
+    DT,
+    emmeans,
+    GGally,
+    htmltools,
+    klippy,
+    lattice,
+    lsmeans,
+    lubridate,
+    Matrix,
+    mixtools,
+    mvtnorm,
+    pacman,
+    pander,
+    pedigreemm,
+    plotly,
+    posterior,
+    prettydoc,
+    remotes,
+    rjags,
+    rmdformats,
+    rstan,
+    rrBLUP,
+    tidyverse

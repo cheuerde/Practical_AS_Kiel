@@ -1,0 +1,149 @@
+---
+title: "Advanced Statistics Lab"
+subtitle: "Animal breeding masters program, Kiel University"
+---
+
+This is the new Quarto home for the Advanced Statistics lab. The goal is a course format that works in class, on student laptops, and later as a reproducible reference.
+
+The old R Markdown chapters are still present under `chapters/`. New material will move into two connected forms:
+
+- `labs/`: student-facing notes with runnable code and exercises.
+- `lectures/`: RevealJS slides for projection during class.
+
+## Course Units
+
+| Unit | Lab | Slides |
+|---|---|---|
+| Introduction to R | [Lab](labs/r-intro.qmd) | [Slides](lectures/r-intro.qmd) |
+| Optimization | [Lab](labs/optimization.qmd) | [Slides](lectures/optimization.qmd) |
+| Maximum Likelihood | [Lab](labs/maximum-likelihood.qmd) | [Slides](lectures/maximum-likelihood.qmd) |
+| Least Squares | [Lab](labs/linear-regression.qmd) | [Slides](lectures/linear-regression.qmd) |
+| Bayesian Inference | [Lab](labs/bayesian-inference.qmd) | [Slides](lectures/bayesian-inference.qmd) |
+| Genomic Prediction | [Lab](labs/genomic-prediction.qmd) | [Slides](lectures/genomic-prediction.qmd) |
+| Clustering | [Lab](labs/clustering.qmd) | [Slides](lectures/clustering.qmd) |
+| Multivariate Clustering | [Lab](labs/multivariate-clustering.qmd) | [Slides](lectures/multivariate-clustering.qmd) |
+
+## Suggested Class Workflow
+
+Use the slides in a browser for projection, with RStudio open on the matching lab file. Run selected chunks live in RStudio when the class should see the code execute, and let students run the same chunks locally.
+
+This keeps the projected material clean while avoiding copy-paste between windows.
+
+The theme dropdown at the top changes the visual theme live on both lab pages and slides. The `t` key cycles through the same themes during presentation.
+
+## Local Setup
+
+Install R, RStudio, Git, and Quarto before class. Then clone or download this repository and run the package setup from the repository root.
+
+### Install R And RStudio
+
+| Platform | R | RStudio | Extra tools for brms/Stan |
+|---|---|---|---|
+| Windows | Install R from [CRAN](https://cran.r-project.org/bin/windows/base/). | Install RStudio Desktop from [Posit](https://posit.co/download/rstudio-desktop/). | Install [Rtools](https://cran.r-project.org/bin/windows/Rtools/). |
+| macOS | Install R from [CRAN](https://cran.r-project.org/bin/macosx/) or with `brew install r`. | Install RStudio Desktop from [Posit](https://posit.co/download/rstudio-desktop/) or with `brew install --cask rstudio`. | Run `xcode-select --install`. |
+| Ubuntu/Debian Linux | Run `sudo apt update && sudo apt install r-base r-base-dev`. | Download the Ubuntu/Debian `.deb` from [Posit](https://posit.co/download/rstudio-desktop/) and install it with `sudo apt install ./rstudio-*.deb`. | Run `sudo apt install build-essential gfortran libcurl4-openssl-dev libssl-dev libxml2-dev`. |
+| Fedora/RHEL Linux | Run `sudo dnf install R`. | Download the Fedora/RHEL `.rpm` from [Posit](https://posit.co/download/rstudio-desktop/) and install it with `sudo dnf install ./rstudio-*.rpm`. | Run `sudo dnf install gcc gcc-c++ gcc-gfortran make libcurl-devel openssl-devel libxml2-devel`. |
+
+Quarto is needed to render the website locally. Install it from [quarto.org](https://quarto.org/docs/get-started/). On macOS with Homebrew, this is:
+
+```bash
+brew install --cask quarto
+```
+
+On Linux, the Quarto download page provides `.deb` and `.rpm` installers. On Windows, use the `.msi` installer.
+
+### Install Git
+
+Git is needed for the recommended course setup because it lets students clone the repository and later pull updates.
+
+| Platform | Git install |
+|---|---|
+| Windows | Install [Git for Windows](https://git-scm.com/download/win). The default installer options are fine. |
+| macOS | Run `xcode-select --install` or install Git with Homebrew: `brew install git`. |
+| Ubuntu/Debian Linux | Run `sudo apt update && sudo apt install git`. |
+| Fedora/RHEL Linux | Run `sudo dnf install git`. |
+
+After installation, check that Git is available:
+
+```bash
+git --version
+```
+
+### Get The Course Repository
+
+```bash
+git clone https://github.com/cheuerde/Practical_AS_Kiel.git
+cd Practical_AS_Kiel
+```
+
+If you downloaded a ZIP file instead, open a terminal in the extracted `Practical_AS_Kiel` folder.
+
+### Install R Packages
+
+Minimal packages for the R introduction and the website:
+
+```bash
+Rscript setup/install.R --minimal
+Rscript setup/check.R --minimal
+```
+
+Applied course packages for the main labs:
+
+```bash
+Rscript setup/install.R
+Rscript setup/check.R
+```
+
+This installs the core/applied package set used by the new material:
+
+```text
+dlookr, ggplot2, knitr, rmarkdown,
+BGLR, data.table, DT, lattice, Matrix, mvtnorm, plotly, rrBLUP, tidyverse
+```
+
+Bayesian modelling with `brms` and Stan:
+
+```bash
+Rscript setup/install.R --stan --install-cmdstan
+Rscript setup/check.R --stan
+```
+
+This adds:
+
+```text
+bayesplot, brms, cmdstanr, posterior
+```
+
+Full dependency installation, including legacy chapter packages and CmdStan, is mostly useful for the instructor machine or for students who want to run archived chapters.
+
+Before running `--all`, install the platform tools above first. The archived JAGS example also needs JAGS itself before `rjags` can be installed. JAGS is not needed for the live `brms`/CmdStan workflow.
+
+| Platform | JAGS install |
+|---|---|
+| Windows | Install JAGS 4.x from the [JAGS project page](https://sourceforge.net/projects/mcmc-jags/). |
+| macOS | Run `brew install jags`. |
+| Ubuntu/Debian Linux | Run `sudo apt install jags`. |
+| Fedora/RHEL Linux | Run `sudo dnf install JAGS`. |
+
+```bash
+Rscript setup/install.R --all
+Rscript setup/check.R --all
+```
+
+The legacy and optional package set is:
+
+```text
+car, emmeans, GGally, htmltools, klippy, lsmeans, lubridate,
+mixtools, pacman, pander, pedigreemm, prettydoc,
+remotes, rjags, rmdformats, rstan
+```
+
+### Render The Website
+
+After installing Quarto:
+
+```bash
+quarto render
+```
+
+The rendered local landing page is `_site/index.html`.

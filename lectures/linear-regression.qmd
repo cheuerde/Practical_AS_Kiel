@@ -1,0 +1,315 @@
+---
+title: "Least Squares"
+subtitle: "Advanced Statistics Lab"
+author: "Claas Heuer"
+format:
+  revealjs:
+    footer: "[Lab notes](../labs/linear-regression.html)"
+---
+
+## The Problem
+
+Choose a line by making vertical distances small.
+
+```{r}
+library(ggplot2)
+library(knitr)
+theme_set(theme_minimal(base_size = 16))
+
+set.seed(2026)
+
+milk_data <- data.frame(
+  feed_kg = seq(4, 12, length.out = 36)
+)
+
+milk_data$milk_kg <- 17.5 + 1.65 * milk_data$feed_kg +
+  rnorm(nrow(milk_data), sd = 1.8)
+```
+
+## A Candidate Line
+
+```{r}
+candidate_beta <- c(intercept = 18, slope = 1.5)
+
+milk_data$candidate_pred <- candidate_beta["intercept"] +
+  candidate_beta["slope"] * milk_data$feed_kg
+
+ggplot(milk_data, aes(feed_kg, milk_kg)) +
+  geom_segment(
+    aes(xend = feed_kg, yend = candidate_pred),
+    color = "#b85c38",
+    linewidth = 0.5,
+    alpha = 0.75
+  ) +
+  geom_point(size = 2.5, color = "#155f7a") +
+  geom_line(aes(y = candidate_pred), color = "#8a4f12", linewidth = 1.1) +
+  labs(x = "Concentrate intake (kg/day)", y = "Milk yield (kg/day)")
+```
+
+::: notes
+The red vertical segments are residuals. Least squares is just a rule for choosing the line with the smallest squared residuals.
+:::
+
+## Least-Squares Objective
+
+$$
+\widehat{y}_i = \beta_0 + \beta_1 x_i
+$$
+
+$$
+\operatorname{SSE}(\boldsymbol{\beta})
+=
+\sum_{i=1}^{n}
+\left(y_i - \beta_0 - \beta_1 x_i\right)^2
+$$
+
+$$
+\widehat{\boldsymbol{\beta}}
+=
+\operatorname*{arg\,min}_{\boldsymbol{\beta} \in \mathbb{R}^2}
+\operatorname{SSE}(\boldsymbol{\beta})
+$$
+
+## `SSE()` In R
+
+```{r}
+sse_feed_model <- function(par, data) {
+  beta_0 <- par[1]
+  beta_1 <- par[2]
+
+  y_hat <- beta_0 + beta_1 * data$feed_kg
+  sum((data$milk_kg - y_hat)^2)
+}
+
+sse_feed_model(candidate_beta, milk_data)
+```
+
+## Grid Search
+
+```{r}
+loss_grid <- expand.grid(
+  intercept = seq(8, 28, length.out = 90),
+  slope = seq(0.4, 2.8, length.out = 90)
+)
+
+loss_grid$sse <- mapply(
+  FUN = function(intercept, slope) sse_feed_model(c(intercept, slope), milk_data),
+  intercept = loss_grid$intercept,
+  slope = loss_grid$slope
+)
+
+best_grid <- loss_grid[which.min(loss_grid$sse), ]
+best_grid
+```
+
+## Loss Surface
+
+```{r}
+ggplot(loss_grid, aes(intercept, slope, z = sse)) +
+  geom_contour_filled(bins = 18) +
+  geom_point(
+    data = best_grid,
+    aes(intercept, slope),
+    inherit.aes = FALSE,
+    color = "white",
+    size = 4
+  ) +
+  labs(x = "Intercept", y = "Feed response", fill = "SSE")
+```
+
+## `optim()`
+
+```{r}
+fit_optim <- optim(
+  par = c(15, 1),
+  fn = sse_feed_model,
+  data = milk_data,
+  method = "BFGS"
+)
+
+coef_optim <- setNames(fit_optim$par, c("intercept", "slope"))
+coef_optim
+```
+
+## The Fitted Line
+
+```{r}
+milk_data$optim_pred <- coef_optim["intercept"] + coef_optim["slope"] * milk_data$feed_kg
+
+ggplot(milk_data, aes(feed_kg, milk_kg)) +
+  geom_segment(
+    aes(xend = feed_kg, yend = optim_pred),
+    color = "#b85c38",
+    linewidth = 0.45,
+    alpha = 0.55
+  ) +
+  geom_point(size = 2.5, color = "#155f7a") +
+  geom_line(aes(y = optim_pred), color = "#8a4f12", linewidth = 1.1) +
+  labs(x = "Concentrate intake (kg/day)", y = "Milk yield (kg/day)")
+```
+
+## Bound Constraints {.smaller}
+
+$$
+\begin{aligned}
+\widehat{\boldsymbol{\beta}}
+&=
+\operatorname*{arg\,min}_{\boldsymbol{\beta} \in \mathbb{R}^2}
+\sum_{i=1}^{n}
+\left(y_i - \beta_0 - \beta_1 x_i\right)^2 \\
+\text{subject to } 0 &\le \beta_1 \le 4
+\end{aligned}
+$$
+
+```{r}
+fit_bounded <- optim(
+  par = c(15, 1),
+  fn = sse_feed_model,
+  data = milk_data,
+  method = "L-BFGS-B",
+  lower = c(-Inf, 0),
+  upper = c(Inf, 4)
+)
+
+fit_too_tight <- optim(
+  par = c(15, 1),
+  fn = sse_feed_model,
+  data = milk_data,
+  method = "L-BFGS-B",
+  lower = c(-Inf, 0),
+  upper = c(Inf, 1)
+)
+```
+
+## Boundary Results
+
+```{r}
+data.frame(
+  parameter = c("intercept", "slope"),
+  unconstrained = coef_optim,
+  bounded = fit_bounded$par,
+  too_tight = fit_too_tight$par
+)
+```
+
+If an estimate is exactly on a boundary, the boundary is part of the result.
+
+## Matrix Form
+
+$$
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{e}
+$$
+
+```{r}
+y_feed <- milk_data$milk_kg
+X_feed <- model.matrix(~ feed_kg, data = milk_data)
+head(X_feed)
+```
+
+## Closed-Form Solution
+
+$$
+\widehat{\boldsymbol{\beta}}
+=
+\operatorname*{arg\,min}_{\boldsymbol{\beta}}
+(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})'
+(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})
+$$
+
+$$
+\widehat{\boldsymbol{\beta}}
+=
+(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y}
+$$
+
+## Same Answer
+
+```{r}
+beta_closed <- solve(t(X_feed) %*% X_feed, t(X_feed) %*% y_feed)
+coef_lm <- coef(lm(milk_kg ~ feed_kg, data = milk_data))
+
+data.frame(
+  method = c("optim", "closed form", "lm"),
+  intercept = c(coef_optim["intercept"], beta_closed[1, 1], coef_lm[[1]]),
+  slope = c(coef_optim["slope"], beta_closed[2, 1], coef_lm[["feed_kg"]])
+)
+```
+
+## Intercept-Only
+
+```{r}
+X_mean <- matrix(1, nrow = length(y_feed), ncol = 1)
+
+solve(t(X_mean) %*% X_mean, t(X_mean) %*% y_feed)
+mean(y_feed)
+```
+
+The intercept-only least-squares estimate is the sample mean.
+
+## Design Matrices
+
+```{r}
+data(airquality)
+dat <- na.omit(airquality[, c("Wind", "Temp", "Month")])
+y <- dat$Wind
+X_temp <- model.matrix(~ Temp, data = dat)
+head(X_temp)
+```
+
+## More Predictors
+
+```{r}
+X_multi <- model.matrix(~ Temp + Month, data = dat)
+head(X_multi)
+```
+
+Design matrices can contain continuous predictors, factors, interactions, and transformations.
+
+## Ridge Regression
+
+$$
+\widehat{\boldsymbol{\beta}}_{\lambda}
+=
+\operatorname*{arg\,min}_{\boldsymbol{\beta}}
+\left[
+(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})'
+(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})
++ \lambda \boldsymbol{\beta}'\boldsymbol{\beta}
+\right]
+$$
+
+## Why Ridge Matters Here
+
+Ridge introduces shrinkage.
+
+Shrinkage is the core idea behind:
+
+- random effects,
+- BLUP,
+- genomic prediction,
+- Bayesian priors.
+
+## Animal Model Bridge {.smaller}
+
+$$
+\mathbf{y}
+=
+\mathbf{X}\boldsymbol{\beta}
++ \mathbf{Z}\mathbf{u}
++ \mathbf{e}
+$$
+
+$$
+\mathbf{u} \sim N(\mathbf{0}, \mathbf{G}), \qquad
+\mathbf{e} \sim N(\mathbf{0}, \mathbf{R})
+$$
+
+Known variance components turn BLUP into penalized least squares.
+
+## Take-Home
+
+Least squares is optimization first.
+
+The closed-form solution is a shortcut for this specific objective.
+
+The design matrix is the bridge from simple lines to animal models.

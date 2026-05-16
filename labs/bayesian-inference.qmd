@@ -1,0 +1,313 @@
+---
+title: "Bayesian Inference"
+subtitle: "Priors, brms, and animal-model patterns"
+format:
+  html:
+    code-fold: false
+---
+
+<div class="view-switch"><a href="../lectures/bayesian-inference.html">Open slides</a></div>
+
+Bayesian inference combines the likelihood with prior assumptions. In this lab the focus is practical: specify priors, fit models with `brms`, update priors from previous evidence, and recognize the animal-model structure in a Bayesian formulation.
+
+```{r}
+#| include: false
+library(ggplot2)
+library(knitr)
+
+theme_set(theme_minimal(base_size = 13))
+```
+
+## Bayes' Theorem
+
+$$
+p(\theta \mid y)
+=
+\frac{p(y \mid \theta)p(\theta)}{p(y)}.
+$$
+
+For model fitting, the denominator is a scaling constant:
+
+$$
+p(\theta \mid y)
+\propto
+p(y \mid \theta)p(\theta).
+$$
+
+That is enough for this lab: likelihood times prior gives the fitted Bayesian model.
+
+## Estimating A Normal Mean
+
+The original first example estimates the mean of `Sepal.Width` in the `iris` data:
+
+$$
+\mathbf{y} \sim N(\mu, \sigma_e^2),
+\qquad
+\mu \sim N(\mu_\text{prior}, \sigma_\text{prior}^2).
+$$
+
+The key teaching point is the role of the prior location and prior standard deviation.
+
+```{r}
+data(iris)
+
+iris_mean <- data.frame(
+  trait = "Sepal.Width",
+  n = length(iris$Sepal.Width),
+  mean = mean(iris$Sepal.Width),
+  sd = sd(iris$Sepal.Width)
+)
+
+kable(iris_mean, digits = 3)
+```
+
+## brms Mean Example
+
+This is the in-class code pattern from the old lab. It is not evaluated during site rendering, because Stan compilation should not block the course website build.
+
+```{r eval=FALSE}
+library(brms)
+library(posterior)
+
+data(iris)
+
+# inspect default priors
+get_prior(Sepal.Width ~ 1, data = iris)
+
+# custom prior for the intercept
+priors <- set_prior("normal(0, 0.2)", class = "Intercept")
+
+fit <- brm(
+  Sepal.Width ~ 1,
+  data = iris,
+  family = gaussian(),
+  prior = priors,
+  sample_prior = TRUE,
+  backend = "cmdstanr",
+  chains = 2,
+  iter = 1000,
+  seed = 2026,
+  refresh = 0
+)
+
+draws <- as_draws_array(fit)[, 1, , drop = TRUE]
+
+samples <- rbind(
+  data.frame(type = "prior", samples = as.numeric(draws[, "prior_Intercept"])),
+  data.frame(type = "posterior", samples = as.numeric(draws[, "b_Intercept"]))
+)
+
+aggregate(samples ~ type, data = samples, FUN = function(x) c(mean = mean(x), sd = sd(x)))
+plot(fit)
+```
+
+For the rendered notes, we use a lightweight preview of the same prior-vs-estimate idea.
+
+```{r}
+set.seed(2026)
+
+prior_samples <- rnorm(4000, mean = 0, sd = 0.2)
+estimate_samples <- rnorm(
+  4000,
+  mean = mean(iris$Sepal.Width),
+  sd = sd(iris$Sepal.Width) / sqrt(nrow(iris))
+)
+
+samples <- rbind(
+  data.frame(type = "prior", samples = prior_samples),
+  data.frame(type = "estimate from data", samples = estimate_samples)
+)
+
+sample_summary <- do.call(
+  rbind,
+  lapply(split(samples$samples, samples$type), function(x) {
+    data.frame(n = length(x), mean = mean(x), sd = sd(x))
+  })
+)
+sample_summary$type <- rownames(sample_summary)
+rownames(sample_summary) <- NULL
+
+kable(
+  sample_summary[, c("type", "n", "mean", "sd")],
+  digits = 3
+)
+```
+
+```{r}
+ggplot(samples, aes(samples, fill = type)) +
+  geom_density(alpha = 0.55) +
+  scale_fill_manual(values = c("prior" = "#526A83", "estimate from data" = "#68855C")) +
+  labs(x = "Mean of Sepal.Width", y = "Density", fill = NULL)
+```
+
+## Updating Priors From Existing Evidence
+
+The old lab used a first experiment to inform the prior for a second experiment. That is the practical Bayesian workflow worth keeping.
+
+```{r eval=FALSE}
+library(brms)
+library(posterior)
+
+data(iris)
+
+iris_first <- iris[1:50, ]
+iris_second <- iris[51:nrow(iris), ]
+
+fit_first <- brm(
+  Sepal.Width ~ 1,
+  data = iris_first,
+  family = gaussian(),
+  prior = set_prior("normal(0, 4)", class = "Intercept"),
+  sample_prior = TRUE,
+  backend = "cmdstanr",
+  chains = 2,
+  iter = 1000,
+  seed = 2026,
+  refresh = 0
+)
+
+draws_first <- as_draws_array(fit_first)[, 1, , drop = TRUE]
+mu_prior <- mean(draws_first[, "b_Intercept"])
+sd_prior <- sd(draws_first[, "b_Intercept"])
+
+fit_second <- brm(
+  Sepal.Width ~ 1,
+  data = iris_second,
+  family = gaussian(),
+  prior = set_prior(paste0("normal(", mu_prior, ",", sd_prior, ")"), class = "Intercept"),
+  sample_prior = TRUE,
+  backend = "cmdstanr",
+  chains = 2,
+  iter = 1000,
+  seed = 2026,
+  refresh = 0
+)
+```
+
+The same workflow can be demonstrated quickly with normal approximations:
+
+```{r}
+update_mean_preview <- function(y, prior_mean, prior_sd) {
+  data_sd <- sd(y)
+  n <- length(y)
+  precision <- 1 / prior_sd^2 + n / data_sd^2
+  post_sd <- sqrt(1 / precision)
+  post_mean <- (prior_mean / prior_sd^2 + n * mean(y) / data_sd^2) / precision
+  c(mean = post_mean, sd = post_sd)
+}
+
+iris_first <- iris[1:50, ]
+iris_second <- iris[51:nrow(iris), ]
+
+first <- update_mean_preview(iris_first$Sepal.Width, prior_mean = 0, prior_sd = 4)
+second <- update_mean_preview(iris_second$Sepal.Width, prior_mean = first["mean"], prior_sd = first["sd"])
+
+kable(
+  data.frame(
+    stage = c("wide prior", "after first subset", "after second subset"),
+    mean = c(0, unname(first["mean"]), unname(second["mean"])),
+    sd = c(4, unname(first["sd"]), unname(second["sd"]))
+  ),
+  digits = 3
+)
+```
+
+## Multivariate Animal Model In brms
+
+The old chapter ended with the structure of a multivariate animal model. The important model form is:
+
+$$
+\mathbf{Y}
+=
+\mathbf{X}\mathbf{B}
++ \mathbf{Z}\mathbf{U}
++ \mathbf{E}.
+$$
+
+For two traits, `brms` can express this through `mvbind()` and covariance-aware grouping terms:
+
+```{r eval=FALSE}
+library(brms)
+library(cmdstanr)
+library(BGLR)
+library(Matrix)
+
+data(milk, package = "BGLR")
+
+# P, A, D are prepared from the pedigree and milk records.
+# A is the additive relationship matrix for the animals in D.
+
+brmf <- brmsformula(
+  mvbind(milk, fat) ~ 1 +
+    factor(lact) +
+    herd +
+    (1 | g | gr(idA, cov = A)) +
+    (1 | p | gr(id)),
+  data = D,
+  data2 = list(A = A)
+)
+
+get_prior(brmf, data = D, data2 = list(A = A), family = gaussian())
+
+stan_code <- make_stancode(
+  formula = brmf,
+  data = D,
+  data2 = list(A = A),
+  family = gaussian()
+)
+
+mod <- brm(
+  formula = brmf,
+  data = D,
+  data2 = list(A = A),
+  family = gaussian(),
+  backend = "cmdstanr",
+  chains = 4,
+  cores = 4,
+  iter = 2000
+)
+
+vcp <- VarCorr(mod, summary = FALSE)
+G <- vcp$idA$cov
+PE <- vcp$id$cov
+R <- vcp$residual$cov
+P <- G + PE + R
+```
+
+The point here is not to run a large animal model live in the first Bayesian session. The point is to see how the same model components from the animal-model chapter map into a Bayesian `brms` formula.
+
+## Cached Artifacts
+
+For class, expensive Stan fits should be generated ahead of time:
+
+```bash
+Rscript scripts/build-model-artifacts.R --stan
+```
+
+Then the lab can load `.rds` artifacts from `artifacts/models/` instead of fitting live.
+
+```{r}
+artifact_file <- "artifacts/models/bayesian_mean_brms.rds"
+
+if (file.exists(artifact_file)) {
+  artifact <- readRDS(artifact_file)
+  artifact$summary
+} else {
+  "No cached brms artifact found. Use scripts/build-model-artifacts.R --stan to generate it."
+}
+```
+
+## Resources
+
+- [Stan](https://mc-stan.org/)
+- [brms](https://github.com/paul-buerkner/brms)
+- [AnimalModels](https://github.com/cheuerde/AnimalModels)
+- [BayesianAlphabet](https://github.com/cheuerde/BayesianAlphabet)
+
+## Exercises
+
+1. Change the prior standard deviation in the `brms` mean example.
+2. Run the first `brms` model after checking the Stan setup.
+3. Use the first 75 iris rows as the first experiment and the remaining rows as the second.
+4. Inspect `make_stancode()` for the multivariate animal-model formula.
+5. Write down which variance-covariance matrices are represented by `G`, `PE`, and `R`.

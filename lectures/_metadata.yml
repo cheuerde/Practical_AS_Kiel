@@ -1,0 +1,31 @@
+format:
+  revealjs:
+    theme:
+      - default
+      - ../styles/slides.scss
+    width: 1050
+    height: 700
+    margin: 0.08
+    center: false
+    controls: true
+    controls-layout: edges
+    controls-tutorial: false
+    progress: true
+    history: true
+    hash: true
+    slide-number: c/t
+    show-slide-number: all
+    transition: none
+    background-transition: none
+    auto-stretch: true
+    chalkboard: true
+    preview-links: auto
+    code-line-numbers: false
+    code-copy: false
+    include-after-body:
+      - ../assets/theme-switcher.html
+
+execute:
+  echo: true
+  warning: false
+  message: false

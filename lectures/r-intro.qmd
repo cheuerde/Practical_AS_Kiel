@@ -1,0 +1,200 @@
+---
+title: "Introduction to R"
+subtitle: "Advanced Statistics Lab"
+author: "Claas Heuer"
+format:
+  revealjs:
+    footer: "[Lab notes](../labs/r-intro.html)"
+---
+
+## Why R In This Lab?
+
+R is the working language for reproducing the statistical examples.
+
+We need it for:
+
+- data inspection,
+- model matrices,
+- optimization,
+- animal models,
+- Bayesian models.
+
+::: notes
+Keep this pragmatic. The point is not to sell R as a language. The point is to remove friction before the statistical material begins.
+:::
+
+## The Course Pattern
+
+1. Slides carry the narrative.
+2. Lab notes carry runnable code.
+3. RStudio is used for live execution.
+4. Students rerun the same chunks locally.
+
+## Setup Check
+
+From the repository root:
+
+```bash
+Rscript setup/check.R --minimal
+```
+
+```{r}
+library(ggplot2)
+library(knitr)
+
+theme_set(theme_minimal(base_size = 16))
+```
+
+## Objects
+
+```{r}
+milk_kg <- 31.4
+fat_percent <- 4.2
+
+fat_kg <- milk_kg * fat_percent / 100
+fat_kg
+```
+
+Objects let us name intermediate results and reuse them.
+
+## Vectors
+
+```{r}
+milk <- c(28.1, 31.4, 27.9, 35.2, 33.0)
+herd <- c("A", "A", "B", "B", "B")
+
+mean(milk)
+table(herd)
+milk[milk > 30]
+```
+
+## Data Frames
+
+One row per record. One column per variable.
+
+```{r}
+animals <- data.frame(
+  animal = paste0("cow_", 1:6),
+  herd = c("A", "A", "B", "B", "C", "C"),
+  sire = c("s1", "s1", "s2", "s2", "s3", "s3"),
+  milk_kg = c(28.1, 31.4, 27.9, 35.2, 33.0, 30.5),
+  fat_percent = c(4.1, 4.2, 3.8, 4.5, 4.0, 4.3)
+)
+
+animals
+```
+
+## Inspect First
+
+```{r}
+str(animals)
+summary(animals)
+```
+
+Do this before modelling.
+
+## Filter And Derive
+
+```{r}
+animals[animals$herd == "B", ]
+
+animals$fat_kg <- animals$milk_kg * animals$fat_percent / 100
+animals
+```
+
+## Files
+
+```{r}
+csv_file <- file.path(tempdir(), "animal_records.csv")
+
+write.csv(animals, file = csv_file, row.names = FALSE)
+animals_from_file <- read.csv(csv_file)
+
+head(animals_from_file)
+```
+
+Always inspect after import.
+
+## Matrices
+
+```{r}
+M <- matrix(
+  c(
+    0, 1, 2,
+    1, 1, 0,
+    2, 0, 1,
+    0, 2, 1
+  ),
+  nrow = 4,
+  byrow = TRUE
+)
+
+colnames(M) <- paste0("marker_", 1:3)
+M
+```
+
+## Matrix Operations
+
+```{r}
+colMeans(M)
+crossprod(M)
+```
+
+These operations reappear in regression, genomic prediction, and mixed models.
+
+## Design Matrix
+
+```{r}
+X_herd <- model.matrix(~ herd, data = animals)
+X_herd
+```
+
+A design matrix turns model structure into numbers.
+
+## Visual Checks
+
+```{r}
+ggplot(animals, aes(milk_kg, fat_percent, color = herd)) +
+  geom_point(size = 3) +
+  labs(
+    x = "Milk yield (kg/day)",
+    y = "Fat (%)"
+  )
+```
+
+## Functions
+
+```{r}
+my_mean <- function(y) {
+  n <- length(y)
+  sum_y <- sum(y)
+  sum_y / n
+}
+
+my_mean(animals$milk_kg)
+mean(animals$milk_kg)
+```
+
+## Why Functions Matter
+
+Later in the course:
+
+- an objective function is an R function,
+- a likelihood is an R function,
+- a simulation is usually a function,
+- repeated model checks should be functions.
+
+## Reproducible Script Pattern
+
+1. Load packages.
+2. Read or create data.
+3. Inspect data.
+4. Transform data.
+5. Fit or compute.
+6. Check and plot results.
+
+## Take-Home
+
+The first goal is not advanced R.
+
+The goal is enough R to make the statistical workflow reproducible.

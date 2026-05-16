@@ -1,0 +1,116 @@
+<script>
+(function () {
+  const themes = [
+    { id: "warm", label: "Warm" },
+    { id: "paper", label: "Paper" },
+    { id: "sage", label: "Sage" },
+    { id: "fjord", label: "Fjord" },
+    { id: "rose", label: "Rose" },
+    { id: "graphite", label: "Graphite" },
+    { id: "blackboard", label: "Blackboard" },
+    { id: "dark", label: "Dark" },
+    { id: "contrast", label: "Contrast" }
+  ];
+
+  const storageKey = "practical-as-kiel-theme";
+
+  function getThemeIndex(id) {
+    const index = themes.findIndex((theme) => theme.id === id);
+    return index >= 0 ? index : 0;
+  }
+
+  function readStoredTheme() {
+    try {
+      return localStorage.getItem(storageKey);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeStoredTheme(id) {
+    try {
+      localStorage.setItem(storageKey, id);
+    } catch (error) {
+      return;
+    }
+  }
+
+  function applyTheme(id) {
+    const index = getThemeIndex(id);
+    const theme = themes[index];
+    document.documentElement.dataset.courseTheme = theme.id;
+    document.body.dataset.courseTheme = theme.id;
+    writeStoredTheme(theme.id);
+
+    const select = document.querySelector("[data-theme-select]");
+    if (select) {
+      select.value = theme.id;
+      select.setAttribute("aria-label", `Theme: ${theme.label}`);
+    }
+  }
+
+  function nextTheme() {
+    const current = document.documentElement.dataset.courseTheme || themes[0].id;
+    const index = getThemeIndex(current);
+    applyTheme(themes[(index + 1) % themes.length].id);
+  }
+
+  function createControl() {
+    if (document.querySelector("[data-theme-switcher]")) {
+      return;
+    }
+
+    const control = document.createElement("div");
+    const selectId = "course-theme-select";
+    control.className = "theme-switcher";
+    control.dataset.themeSwitcher = "true";
+
+    const label = document.createElement("label");
+    label.setAttribute("for", selectId);
+    label.textContent = "Theme";
+
+    const select = document.createElement("select");
+    select.id = selectId;
+    select.dataset.themeSelect = "true";
+    select.title = "Change theme";
+
+    themes.forEach(function (theme) {
+      const option = document.createElement("option");
+      option.value = theme.id;
+      option.textContent = theme.label;
+      select.appendChild(option);
+    });
+
+    select.addEventListener("change", function (event) {
+      applyTheme(event.target.value);
+    });
+
+    control.appendChild(label);
+    control.appendChild(select);
+    document.body.appendChild(control);
+  }
+
+  function shouldIgnoreKeypress(event) {
+    const tagName = event.target && event.target.tagName;
+    return event.metaKey || event.ctrlKey || event.altKey ||
+      tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT";
+  }
+
+  function init() {
+    createControl();
+    applyTheme(readStoredTheme() || themes[0].id);
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key.toLowerCase() === "t" && !shouldIgnoreKeypress(event)) {
+        nextTheme();
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>

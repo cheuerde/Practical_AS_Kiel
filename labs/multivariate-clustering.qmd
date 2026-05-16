@@ -1,0 +1,301 @@
+---
+title: "Multivariate Clustering"
+subtitle: "PCA, k-means, and multivariate mixture models"
+format:
+  html:
+    code-fold: false
+---
+
+<div class="view-switch"><a href="../lectures/multivariate-clustering.html">Open slides</a></div>
+
+Multivariate clustering uses several features at once. In animal breeding, a common example is population structure from genotype data: animals may form groups because of breed, line, family, or selection history.
+
+```{r}
+#| include: false
+library(ggplot2)
+library(knitr)
+
+theme_set(theme_minimal(base_size = 13))
+```
+
+## Multivariate Mixture Model
+
+For an observation vector $\mathbf{x}_i \in \mathbb{R}^p$, a multivariate mixture model is
+
+$$
+p(\mathbf{x}_i)
+=
+\sum_{k=1}^K \pi_k f_k(\mathbf{x}_i \mid \boldsymbol{\theta}_k).
+$$
+
+With multivariate normal components,
+
+$$
+f_k(\mathbf{x}_i \mid \boldsymbol{\theta}_k)
+=
+N_p(\mathbf{x}_i \mid \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k).
+$$
+
+The squared Mahalanobis distance to component $k$ is
+
+$$
+d_{ik}^2
+=
+(\mathbf{x}_i - \boldsymbol{\mu}_k)'
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf{x}_i - \boldsymbol{\mu}_k).
+$$
+
+For two features, equal-density contours are ellipses.
+
+## Simulate Population Structure
+
+We simulate marker genotypes for three related but distinct lines. The labels are kept only for checking the clustering result.
+
+```{r}
+simulate_structured_genotypes <- function(n_per_line = c(70, 70, 70), n_markers = 450, seed = 2026) {
+  set.seed(seed)
+  base_frequency <- runif(n_markers, min = 0.15, max = 0.45)
+  line_shift <- c(-0.06, 0.00, 0.07)
+
+  marker_list <- lapply(seq_along(n_per_line), function(line) {
+    p <- base_frequency + line_shift[line] + rnorm(n_markers, mean = 0, sd = 0.015)
+    p <- pmin(pmax(p, 0.02), 0.98)
+    sapply(p, function(marker_p) rbinom(n_per_line[line], size = 2, prob = marker_p))
+  })
+
+  list(
+    M = do.call(rbind, marker_list),
+    line = factor(rep(paste("line", LETTERS[seq_along(n_per_line)]), n_per_line))
+  )
+}
+
+geno <- simulate_structured_genotypes()
+
+dim(geno$M)
+table(geno$line)
+```
+
+## PCA As Feature Compression
+
+Principal component analysis summarizes many correlated marker columns into orthogonal axes:
+
+$$
+\mathbf{X}
+=
+\mathbf{U}\mathbf{D}\mathbf{V}'.
+$$
+
+The principal component scores are in $\mathbf{U}\mathbf{D}$.
+
+```{r}
+pca <- prcomp(geno$M, center = TRUE, scale. = TRUE)
+
+pc_data <- data.frame(
+  PC1 = pca$x[, 1],
+  PC2 = pca$x[, 2],
+  PC3 = pca$x[, 3],
+  line = geno$line
+)
+
+variance_explained <- pca$sdev^2 / sum(pca$sdev^2)
+
+kable(
+  data.frame(
+    component = paste0("PC", 1:6),
+    variance_explained = variance_explained[1:6],
+    cumulative = cumsum(variance_explained)[1:6]
+  ),
+  digits = 3
+)
+```
+
+```{r}
+ggplot(pc_data, aes(PC1, PC2, color = line)) +
+  geom_point(alpha = 0.8) +
+  scale_color_manual(values = c("#0c6773", "#c46a2b", "#7a6f42")) +
+  labs(x = "PC1", y = "PC2", color = "Known line")
+```
+
+## K-Means Clustering
+
+K-means assigns observations to the closest cluster center by minimizing within-cluster squared distances:
+
+$$
+\sum_{k=1}^K \sum_{i:z_i=k}
+\left\lVert \mathbf{x}_i - \boldsymbol{\mu}_k \right\rVert^2.
+$$
+
+```{r}
+set.seed(2026)
+
+km <- kmeans(pc_data[, c("PC1", "PC2", "PC3")], centers = 3, nstart = 50)
+pc_data$kmeans_cluster <- factor(km$cluster)
+
+kable(table(cluster = pc_data$kmeans_cluster, line = pc_data$line))
+```
+
+```{r}
+ggplot(pc_data, aes(PC1, PC2, color = kmeans_cluster)) +
+  geom_point(alpha = 0.8) +
+  scale_color_manual(values = c("#0c6773", "#c46a2b", "#7a6f42")) +
+  labs(x = "PC1", y = "PC2", color = "K-means")
+```
+
+## Multivariate Normal Mixture
+
+A multivariate normal mixture replaces hard nearest-center assignment with probabilistic assignment.
+
+```{r}
+dmvn_density <- function(X, mean, Sigma) {
+  X <- as.matrix(X)
+  p <- ncol(X)
+  Sigma <- Sigma + diag(1e-6, p)
+  centered <- sweep(X, 2, mean, "-")
+  Sigma_inv <- solve(Sigma)
+  quadratic <- rowSums((centered %*% Sigma_inv) * centered)
+  log_det <- as.numeric(determinant(Sigma, logarithm = TRUE)$modulus)
+  exp(-0.5 * (p * log(2 * pi) + log_det + quadratic))
+}
+
+fit_mvn_mixture <- function(X, k = 3, max_iter = 150, tolerance = 1e-6) {
+  X <- as.matrix(X)
+  n <- nrow(X)
+  p <- ncol(X)
+
+  km_init <- kmeans(X, centers = k, nstart = 30)
+  pi <- as.numeric(table(factor(km_init$cluster, levels = seq_len(k)))) / n
+  mu <- do.call(rbind, lapply(seq_len(k), function(j) colMeans(X[km_init$cluster == j, , drop = FALSE])))
+  Sigma <- lapply(seq_len(k), function(j) {
+    cov(X[km_init$cluster == j, , drop = FALSE]) + diag(1e-6, p)
+  })
+
+  loglik <- rep(NA_real_, max_iter)
+
+  for (iteration in seq_len(max_iter)) {
+    density <- vapply(seq_len(k), function(j) pi[j] * dmvn_density(X, mu[j, ], Sigma[[j]]), numeric(n))
+    responsibility <- density / rowSums(density)
+
+    nk <- colSums(responsibility)
+    pi <- nk / n
+
+    for (j in seq_len(k)) {
+      mu[j, ] <- colSums(X * responsibility[, j]) / nk[j]
+      centered <- sweep(X, 2, mu[j, ], "-")
+      Sigma[[j]] <- crossprod(centered * sqrt(responsibility[, j])) / nk[j] + diag(1e-6, p)
+    }
+
+    density_updated <- vapply(seq_len(k), function(j) pi[j] * dmvn_density(X, mu[j, ], Sigma[[j]]), numeric(n))
+    loglik[iteration] <- sum(log(rowSums(density_updated)))
+
+    if (iteration > 1 && abs(loglik[iteration] - loglik[iteration - 1]) < tolerance) {
+      loglik <- loglik[seq_len(iteration)]
+      break
+    }
+  }
+
+  density <- vapply(seq_len(k), function(j) pi[j] * dmvn_density(X, mu[j, ], Sigma[[j]]), numeric(n))
+  responsibility <- density / rowSums(density)
+
+  list(
+    pi = pi,
+    mu = mu,
+    Sigma = Sigma,
+    responsibility = responsibility,
+    cluster = max.col(responsibility),
+    loglik = loglik[length(loglik)]
+  )
+}
+
+X2 <- as.matrix(pc_data[, c("PC1", "PC2")])
+set.seed(2026)
+mvn_fit <- fit_mvn_mixture(X2, k = 3)
+
+pc_data$mvn_cluster <- factor(mvn_fit$cluster)
+pc_data$mvn_uncertainty <- 1 - apply(mvn_fit$responsibility, 1, max)
+
+kable(table(cluster = pc_data$mvn_cluster, line = pc_data$line))
+```
+
+## Ellipses
+
+An observation is inside the 95% ellipse of component $k$ when
+
+$$
+d_{ik}^2 \leq \chi^2_{p, 0.95}.
+$$
+
+```{r}
+ellipse_points <- function(center, Sigma, level = 0.90, n = 200) {
+  angle <- seq(0, 2 * pi, length.out = n)
+  circle <- cbind(cos(angle), sin(angle)) * sqrt(qchisq(level, df = 2))
+  points <- circle %*% chol(Sigma + diag(1e-6, 2))
+  data.frame(
+    PC1 = points[, 1] + center[1],
+    PC2 = points[, 2] + center[2]
+  )
+}
+
+ellipse_data <- do.call(
+  rbind,
+  lapply(seq_len(3), function(j) {
+    out <- ellipse_points(mvn_fit$mu[j, ], mvn_fit$Sigma[[j]], level = 0.90)
+    out$cluster <- factor(j)
+    out
+  })
+)
+
+ggplot(pc_data, aes(PC1, PC2, color = mvn_cluster)) +
+  geom_point(aes(alpha = 1 - mvn_uncertainty)) +
+  geom_path(data = ellipse_data, aes(PC1, PC2, color = cluster), linewidth = 1) +
+  scale_color_manual(values = c("#0c6773", "#c46a2b", "#7a6f42")) +
+  scale_alpha(range = c(0.35, 0.9), guide = "none") +
+  labs(x = "PC1", y = "PC2", color = "Mixture")
+```
+
+## Choosing K
+
+For a full-covariance multivariate normal mixture in $p$ dimensions, the number of free parameters is
+
+$$
+q
+=
+(K - 1)
++ Kp
++ K\frac{p(p + 1)}{2}.
+$$
+
+```{r}
+bic_mvn <- do.call(
+  rbind,
+  lapply(1:5, function(k) {
+    set.seed(100 + k)
+    fit <- fit_mvn_mixture(X2, k = k)
+    p <- ncol(X2)
+    q <- (k - 1) + k * p + k * p * (p + 1) / 2
+    data.frame(
+      components = k,
+      loglik = fit$loglik,
+      bic = -2 * fit$loglik + q * log(nrow(X2))
+    )
+  })
+)
+
+kable(bic_mvn, digits = 2)
+```
+
+```{r}
+ggplot(bic_mvn, aes(components, bic)) +
+  geom_line(color = "#0c6773") +
+  geom_point(size = 2.4, color = "#c46a2b") +
+  scale_x_continuous(breaks = 1:5) +
+  labs(x = "Number of mixture components", y = "BIC")
+```
+
+## Exercises
+
+1. Cluster using only `PC1` and `PC2`. Compare with using `PC1`, `PC2`, and `PC3`.
+2. Increase `n_markers`. Does the PCA separation become clearer?
+3. Change the line shifts in the genotype simulation and rerun the clustering.
+4. Compare k-means and mixture assignments for uncertain observations.
+5. Explain why PCA is often useful before clustering marker data.

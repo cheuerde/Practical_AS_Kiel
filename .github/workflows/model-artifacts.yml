@@ -1,0 +1,94 @@
+name: Build Model Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      stan:
+        description: "Build Stan/brms artifacts"
+        required: true
+        default: true
+        type: boolean
+      install_cmdstan:
+        description: "Install CmdStan if not cached"
+        required: true
+        default: true
+        type: boolean
+      commit_artifacts:
+        description: "Commit generated artifacts back to this branch"
+        required: true
+        default: false
+        type: boolean
+  push:
+    branches:
+      - main
+    paths:
+      - "models/**"
+      - "scripts/build-model-artifacts.R"
+      - "R/packages.R"
+      - "setup/**"
+      - ".github/workflows/model-artifacts.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-artifacts:
+    runs-on: ubuntu-latest
+    env:
+      CMDSTAN_VERSION: "2.36.0"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Cache CmdStan
+        uses: actions/cache@v4
+        with:
+          path: ~/.cmdstan
+          key: cmdstan-${{ runner.os }}-${{ env.CMDSTAN_VERSION }}
+
+      - name: Install R dependencies
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.stan }}" = "true" ]; then
+            if [ "${{ inputs.install_cmdstan }}" = "true" ]; then
+              Rscript setup/install.R --stan --install-cmdstan
+            else
+              Rscript setup/install.R --stan
+            fi
+          else
+            Rscript setup/install.R --minimal
+          fi
+
+      - name: Build model artifacts
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.stan }}" = "true" ]; then
+            Rscript scripts/build-model-artifacts.R --stan
+          else
+            Rscript scripts/build-model-artifacts.R
+          fi
+
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-artifacts
+          path: artifacts/models/
+          if-no-files-found: error
+
+      - name: Commit generated artifacts
+        if: github.event_name == 'workflow_dispatch' && inputs.commit_artifacts == true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/models
+          git diff --cached --quiet || git commit -m "Update generated model artifacts"
+          git push
