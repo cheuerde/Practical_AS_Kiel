@@ -253,17 +253,37 @@ data(airquality)
 dat <- na.omit(airquality[, c("Wind", "Temp", "Month")])
 y <- dat$Wind
 X_temp <- model.matrix(~ Temp, data = dat)
-head(X_temp)
+
+beta_temp <- solve(t(X_temp) %*% X_temp, t(X_temp) %*% y)
+
+data.frame(
+  parameter = rownames(beta_temp),
+  estimate = as.numeric(beta_temp)
+)
+```
+
+## Temperature Fit
+
+```{r}
+dat$pred_lm <- drop(X_temp %*% beta_temp)
+
+ggplot(dat, aes(Temp, Wind)) +
+  geom_point(color = "#0c6773", size = 2) +
+  geom_line(aes(y = pred_lm), color = "#c46a2b", linewidth = 1) +
+  labs(x = "Temperature", y = "Wind")
 ```
 
 ## Multiple Regression
 
 ```{r}
 X_multi <- model.matrix(~ Temp + Month, data = dat)
-head(X_multi)
-```
+beta_multi <- solve(t(X_multi) %*% X_multi, t(X_multi) %*% y)
 
-Design matrices can contain continuous predictors, factors, interactions, and transformations.
+data.frame(
+  parameter = rownames(beta_multi),
+  estimate = as.numeric(beta_multi)
+)
+```
 
 ## Ridge Regression
 
@@ -277,6 +297,52 @@ $$
 + \lambda \boldsymbol{\beta}'\boldsymbol{\beta}
 \right]
 $$
+
+Closed form:
+
+$$
+\widehat{\boldsymbol{\beta}}_{\lambda}
+=
+(\mathbf{X}'\mathbf{X} + \lambda\mathbf{I})^{-1}\mathbf{X}'\mathbf{y}
+$$
+
+## Ridge Coefficient Paths
+
+```{r}
+set.seed(2026)
+n <- 80
+p <- 20
+X <- matrix(rnorm(n * p), nrow = n, ncol = p)
+beta_true <- c(2.5, -2, 1.2, rep(0, p - 3))
+y_ridge <- 12 + X %*% beta_true + rnorm(n, sd = 3)
+
+X_scaled <- scale(X)
+X_ridge <- cbind(Intercept = 1, X_scaled)
+
+ridge_fit <- function(lambda, X, y) {
+  penalty <- diag(ncol(X))
+  penalty[1, 1] <- 0
+  solve(t(X) %*% X + lambda * penalty, t(X) %*% y)
+}
+
+lambdas <- c(0, 1, 10, 100)
+ridge_out <- do.call(
+  rbind,
+  lapply(lambdas, function(lambda) {
+    beta <- ridge_fit(lambda, X_ridge, y_ridge)
+    data.frame(lambda = lambda, coefficient = seq_along(beta) - 1, estimate = as.numeric(beta))
+  })
+)
+```
+
+## Ridge Plot
+
+```{r}
+ggplot(subset(ridge_out, coefficient > 0), aes(lambda, estimate, group = coefficient)) +
+  geom_line(alpha = 0.45, color = "#0c6773") +
+  scale_x_log10(breaks = lambdas[-1]) +
+  labs(x = expression(lambda), y = "Coefficient estimate")
+```
 
 ## Why Ridge Matters Here
 
@@ -305,6 +371,41 @@ $$
 $$
 
 Known variance components turn BLUP into penalized least squares.
+
+## Animal Model Teaching Example {.smaller}
+
+```{r}
+set.seed(2026)
+
+n_animals <- 12
+records_per_animal <- 2
+animal_id <- factor(rep(seq_len(n_animals), each = records_per_animal))
+
+true_u <- rnorm(n_animals, mean = 0, sd = 2.0)
+animal_y <- 30 + true_u[animal_id] + rnorm(length(animal_id), sd = 3.0)
+
+X_animal <- matrix(1, nrow = length(animal_y), ncol = 1)
+Z_animal <- model.matrix(~ animal_id - 1)
+lambda <- 3.0^2 / 2.0^2
+```
+
+## Mixed Model Equations {.smaller}
+
+```{r}
+lhs <- rbind(
+  cbind(t(X_animal) %*% X_animal, t(X_animal) %*% Z_animal),
+  cbind(t(Z_animal) %*% X_animal, t(Z_animal) %*% Z_animal + lambda * diag(n_animals))
+)
+
+rhs <- rbind(t(X_animal) %*% animal_y, t(Z_animal) %*% animal_y)
+solution <- solve(lhs, rhs)
+
+head(data.frame(
+  animal = seq_len(n_animals),
+  true_effect = true_u,
+  blup = solution[-1, 1]
+))
+```
 
 ## Take-Home
 

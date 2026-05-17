@@ -9,7 +9,9 @@ format:
 
 ## Labelled And Unlabelled Views
 
-Clustering learns grouping structure from features without using trusted labels.
+The `iris` data contain features and labels.
+
+For clustering, ignore the labels during fitting.
 
 ```{r}
 library(ggplot2)
@@ -20,12 +22,18 @@ data(iris)
 head(iris)
 ```
 
-For clustering, `Species` is ignored during fitting and used later only as a check.
-
-## Univariate Clustering
+## Features Only
 
 ```{r}
 features <- iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]
+head(features)
+```
+
+## Univariate Clustering
+
+The old lab started by inspecting one feature at a time.
+
+```{r}
 feature_long <- stack(features)
 names(feature_long) <- c("value", "feature")
 
@@ -48,11 +56,27 @@ $$
 
 ```{r}
 set.seed(100)
+
 n <- 1000
 theta <- 0.3
-y <- ifelse(runif(n) < theta, rnorm(n, 5, 1), rnorm(n, 15, 2))
+mu1 <- 5
+mu2 <- 15
+sd1 <- 1
+sd2 <- 2
 
-ggplot(data.frame(y), aes(y)) +
+y <- ifelse(
+  runif(n) < theta,
+  rnorm(n, mean = mu1, sd = sd1),
+  rnorm(n, mean = mu2, sd = sd2)
+)
+
+simulated <- data.frame(x = seq_along(y), y = y)
+```
+
+## Mixture Histogram
+
+```{r}
+ggplot(simulated, aes(y)) +
   geom_histogram(aes(y = after_stat(density)), bins = 50, fill = "white", color = "#263238") +
   geom_density(color = "#c46a2b", linewidth = 1) +
   labs(x = "Simulated trait", y = "Density")
@@ -60,76 +84,139 @@ ggplot(data.frame(y), aes(y)) +
 
 ## A Simple Mixture Fit
 
-Use `kmeans()` first, then estimate normal components.
+The lab uses the same three-step teaching implementation:
+
+1. split with `kmeans()`,
+2. estimate $\lambda_k$, $\mu_k$, and $\sigma_k`,
+3. compute component probabilities.
+
+## Lab Helper: `GetProbNormalMixture()`
 
 ```{r}
 GetProbNormalMixture <- function(y, lambda, mu, sigma) {
-  likelihood <- vapply(seq_along(lambda), function(k) {
-    lambda[k] * dnorm(y, mean = mu[k], sd = sigma[k])
-  }, numeric(length(y)))
+  likelihood <- vapply(
+    seq_along(lambda),
+    function(k) lambda[k] * dnorm(y, mean = mu[k], sd = sigma[k]),
+    numeric(length(y))
+  )
+
   likelihood / rowSums(likelihood)
 }
+```
 
-km <- kmeans(matrix(y, ncol = 1), centers = 2, nstart = 25)
-cluster <- match(km$cluster, order(as.numeric(km$centers)))
-lambda <- as.numeric(tabulate(cluster, nbins = 2)) / length(y)
-mu <- as.numeric(tapply(y, cluster, mean))
-sigma <- as.numeric(tapply(y, cluster, sd))
+## Lab Helper: `RunMixture()` {.smaller}
 
-data.frame(component = 1:2, lambda = lambda, mu = mu, sigma = sigma)
+```{r}
+RunMixture <- function(y, k = 2, seed = 1) {
+  set.seed(seed)
+
+  km <- kmeans(matrix(y, ncol = 1), centers = k, nstart = 25)
+  center_order <- order(as.numeric(km$centers))
+  cluster <- match(km$cluster, center_order)
+
+  lambda <- as.numeric(tabulate(cluster, nbins = k)) / length(y)
+  mu <- as.numeric(tapply(y, cluster, mean))
+  sigma <- as.numeric(tapply(y, cluster, sd))
+  probs <- GetProbNormalMixture(y, lambda = lambda, mu = mu, sigma = sigma)
+
+  dprobs <- as.data.frame(probs)
+  names(dprobs) <- paste0("Component_", seq_len(k))
+  dprobs$x <- seq_along(y)
+  dprobs$y <- y
+  dprobs$cluster <- factor(max.col(probs))
+
+  grid <- seq(min(y) - sd(y), max(y) + sd(y), length.out = 400)
+  density <- do.call(
+    rbind,
+    lapply(seq_len(k), function(component) {
+      data.frame(
+        component = factor(component),
+        y = grid,
+        density = lambda[component] * dnorm(grid, mu[component], sigma[component])
+      )
+    })
+  )
+
+  list(
+    mc = data.frame(component = seq_len(k), lambda = lambda, mu = mu, sigma = sigma),
+    dprobs = dprobs,
+    density = density
+  )
+}
+```
+
+## Fit Simulated Mixture
+
+```{r}
+sim_mixture <- RunMixture(y, k = 2, seed = 242151)
+sim_mixture$mc
 ```
 
 ## Component Densities
 
 ```{r}
-density_grid <- data.frame(y = seq(min(y), max(y), length.out = 400))
-density_grid$component_1 <- lambda[1] * dnorm(density_grid$y, mu[1], sigma[1])
-density_grid$component_2 <- lambda[2] * dnorm(density_grid$y, mu[2], sigma[2])
-density_grid$total <- density_grid$component_1 + density_grid$component_2
-
-ggplot(data.frame(y), aes(y)) +
+ggplot(simulated, aes(y)) +
   geom_histogram(aes(y = after_stat(density)), bins = 50, fill = "white", color = "#263238") +
-  geom_line(data = density_grid, aes(y, total), color = "#0c6773", linewidth = 1.1) +
-  geom_line(data = density_grid, aes(y, component_1), color = "#c46a2b", linetype = "dashed") +
-  geom_line(data = density_grid, aes(y, component_2), color = "#7a6f42", linetype = "dashed") +
-  labs(x = "Simulated trait", y = "Density")
+  geom_line(data = sim_mixture$density, aes(y, density, color = component), linewidth = 1.1) +
+  scale_color_manual(values = c("#0c6773", "#c46a2b")) +
+  labs(x = "Simulated trait", y = "Density", color = "Component")
+```
+
+## Component Probabilities
+
+```{r}
+ggplot(sim_mixture$dprobs, aes(x, y, color = Component_1)) +
+  geom_point(alpha = 0.8) +
+  scale_color_gradient2(low = "#c46a2b", mid = "#fff8ef", high = "#0c6773", midpoint = 0.5) +
+  labs(x = "Observation", y = "Simulated trait", color = "P(component 1)")
 ```
 
 ## Apply To Iris Features
 
 ```{r}
-petal <- iris$Petal.Length
-km_petal <- kmeans(matrix(petal, ncol = 1), centers = 2, nstart = 25)
-cluster_petal <- match(km_petal$cluster, order(as.numeric(km_petal$centers)))
+seed <- 242151
+
+iris_mixtures <- lapply(features, RunMixture, k = 2, seed = seed)
+
+component_summary <- do.call(
+  rbind,
+  lapply(names(iris_mixtures), function(feature) {
+    out <- iris_mixtures[[feature]]$mc
+    out$feature <- feature
+    out[, c("feature", "component", "lambda", "mu", "sigma")]
+  })
+)
+
+component_summary
+```
+
+## Check Against Species Labels
+
+```{r}
+petal_length <- iris_mixtures[["Petal.Length"]]
 
 iris_cluster <- data.frame(
   Petal.Length = iris$Petal.Length,
   Species = iris$Species,
-  cluster = factor(cluster_petal)
+  cluster = petal_length$dprobs$cluster,
+  prob_component_1 = petal_length$dprobs$Component_1
 )
 
+table(cluster = iris_cluster$cluster, species = iris_cluster$Species)
+```
+
+## Petal-Length Clusters
+
+```{r}
 ggplot(iris_cluster, aes(Petal.Length, fill = cluster)) +
   geom_histogram(aes(y = after_stat(density)), bins = 35, alpha = 0.65, position = "identity") +
   scale_fill_manual(values = c("#0c6773", "#c46a2b")) +
   labs(x = "Petal length", y = "Density", fill = "Cluster")
 ```
 
-## Check Against Species Labels
-
-```{r}
-table(
-  cluster = iris_cluster$cluster,
-  species = iris_cluster$Species
-)
-```
-
-Labels are not used for fitting. They are only a sanity check after clustering.
-
 ## Optional Stan Version
 
 The previous implementation used Stan for a proper mixture model.
-
-That is statistically cleaner, but not the simplest first implementation.
 
 ```{r eval=FALSE}
 library(rstan)
@@ -137,9 +224,11 @@ library(rstan)
 fit <- stan(model_code = hcode, data = dat, chains = 1, iter = 2000)
 ```
 
+Keep this as an extension after the Bayesian tooling is working.
+
 ## Exercises
 
-1. Change the simulated mixture means.
-2. Change `theta` and inspect the fitted weights.
-3. Apply the simple mixture fit to another iris feature.
-4. Compare the cluster table with `Species`.
+1. Fit `RunMixture()` to `Sepal.Width`.
+2. Change `k = 3` for `Petal.Length`.
+3. Simulate two components that overlap more strongly.
+4. Compare `Petal.Length` and `Petal.Width`.

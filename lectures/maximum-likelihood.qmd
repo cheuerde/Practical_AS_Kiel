@@ -43,13 +43,33 @@ $$
 -\sum_{i=1}^{n} \log p(y_i \mid \theta)
 $$
 
-## Finding The Mean
+## Normal Distribution
+
+$$
+f(y) = \frac{1}{\sigma \sqrt{2\pi}}
+\exp\left[-\frac{1}{2}\left(\frac{y - \mu}{\sigma}\right)^2\right]
+$$
 
 ```{r}
 library(ggplot2)
 library(knitr)
 theme_set(theme_minimal(base_size = 16))
 
+curve(
+  dnorm(
+    x,
+    mean = 10,
+    sd = 2
+  ),
+  from = 0,
+  to = 20,
+  main = "Normal distribution"
+)
+```
+
+## Finding The Mean
+
+```{r}
 set.seed(2026)
 
 mean = 4.5
@@ -174,7 +194,22 @@ sigma <- array(c(tauA, covAB, covAB, tauB), dim = c(2, 2))
 Y <- rmvnorm(n, c(muA, muB), sigma)
 
 ML <- optim(p, lik, y = Y, method = methods[1])
-ML$par
+
+res <- as.list(ML$par)
+res$covAB <- res$rho * (sqrt(res$tauA) * sqrt(res$tauB))
+```
+
+## Correlation Results
+
+```{r}
+out <- rbind(
+  unlist(res),
+  c(colMeans(Y), var(Y[, 1]), var(Y[, 2]), cor(Y)[1, 2], cov(Y)[1, 2])
+)
+colnames(out) <- names(res)
+rownames(out) <- c("ML", "empirical")
+
+out
 ```
 
 ## Animal Model Likelihood
