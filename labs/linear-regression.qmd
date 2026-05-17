@@ -13,6 +13,26 @@ library(ggplot2)
 library(knitr)
 
 theme_set(theme_minimal(base_size = 13))
+
+residual_square_data <- function(data, x_name, y_name, pred_name, every = 12, scale = 0.35) {
+  keep <- seq(1, nrow(data), by = every)
+  out <- data[keep, , drop = FALSE]
+  residual <- out[[y_name]] - out[[pred_name]]
+
+  x_range <- diff(range(data[[x_name]], na.rm = TRUE))
+  y_range <- diff(range(c(data[[y_name]], data[[pred_name]]), na.rm = TRUE))
+
+  if (!is.finite(x_range) || x_range == 0) x_range <- 1
+  if (!is.finite(y_range) || y_range == 0) y_range <- 1
+
+  side_x <- abs(residual) * (x_range / y_range) * scale
+
+  out$xmin <- out[[x_name]]
+  out$xmax <- out[[x_name]] + side_x
+  out$ymin <- pmin(out[[y_name]], out[[pred_name]])
+  out$ymax <- pmax(out[[y_name]], out[[pred_name]])
+  out
+}
 ```
 
 # Linear Regression
@@ -25,6 +45,9 @@ the mean squared error between predicted and observed values:
 $$
 \hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
 $$
+
+In the plots below, the vertical segments show residuals $e_i = y_i - \hat{y}_i$.
+The shaded squares visualize the contribution of selected residuals to the squared-error criterion.
 
 The vector $x$ contains a "feature" or regression variable that establishes a connection with the observations.
 We can formulate most regression problems in terms of feature matrices and their estimated weights with respect
@@ -87,17 +110,31 @@ pred = X %*% res$par
 
 dat = data.frame(
      y = y,
-     pred = pred,
-     id = seq_along(length(y))
+     pred = as.numeric(pred),
+     id = seq_along(y)
      )
 
-ggplot(dat, aes(y = pred, x = y)) +
- geom_point()
+ggplot(dat, aes(x = y, y = pred)) +
+ geom_point() +
+ geom_abline(intercept = 0, slope = 1, color = "red") +
+ labs(x = "Observed Wind", y = "Predicted Wind")
 
 # plot raw data and insert intercept
+resid_squares = residual_square_data(dat, "id", "y", "pred", every = 12, scale = 0.20)
+
 ggplot(dat, aes(x = id, y = y)) +
+  geom_rect(
+    data = resid_squares,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = "#c46a2b",
+    color = "#c46a2b",
+    alpha = 0.18
+  ) +
+  geom_segment(aes(xend = id, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
-  geom_hline(yintercept = res$par, color = "red")
+  geom_hline(yintercept = res$par, color = "red") +
+  labs(x = "Observation", y = "Wind")
 ```
 
 ## Adding Features to the Design Matrix: Multiple Linear Regression
@@ -129,7 +166,8 @@ colnames(X) = c("Intercept", "Temp")
 
 # plot Wind vs Temp
 ggplot(airquality, aes(x = Temp, y = Wind)) +
-  geom_point()
+  geom_point() +
+  labs(x = "Temp", y = "Wind", title = "Wind vs Temp")
 
 # we can use the same function as before for finding the optimum feature weights
 mse <- function(par, y, X) {
@@ -166,17 +204,31 @@ pred = X %*% res$par
 dat = data.frame(
      Wind = y,
      Temp = airquality$Temp,
-     pred = pred,
+     pred = as.numeric(pred),
      id = 1:length(y)
      )
 
-ggplot(dat, aes(x = pred, y = Wind)) +
- geom_point()
-
 # plot raw data and insert intercept and slope
+resid_squares = residual_square_data(dat, "Temp", "Wind", "pred", every = 12, scale = 0.45)
+
 ggplot(dat, aes(x = Temp, y = Wind)) +
+  geom_rect(
+    data = resid_squares,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = "#c46a2b",
+    color = "#c46a2b",
+    alpha = 0.18
+  ) +
+  geom_segment(aes(xend = Temp, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
-  geom_abline(intercept = res$par[1], slope = res$par[2], color = "red")
+  geom_abline(intercept = res$par[1], slope = res$par[2], color = "red") +
+  labs(x = "Temp", y = "Wind", title = "Wind vs Temp with fitted regression line")
+
+ggplot(dat, aes(x = Wind, y = pred)) +
+ geom_point() +
+ geom_abline(intercept = 0, slope = 1, color = "red") +
+ labs(x = "Observed Wind", y = "Predicted Wind", title = "Observed vs predicted diagnostic")
 ```
 
 ## Ridge Regression
@@ -184,6 +236,73 @@ ggplot(dat, aes(x = Temp, y = Wind)) +
 $$
 \min_{\beta} \left( \sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \right)
 $$
+
+The ridge parameter $\lambda$ controls how much we penalize large marker effects.
+We can visualize the solution space by evaluating the ridge criterion on a grid of $\lambda$ values.
+
+```{r ridge_lambda_visual}
+library(BGLR)
+
+data(wheat)
+
+subset = 1:100
+
+y = wheat.Y[subset,2]
+M = wheat.X[subset,1:300]
+
+M_centered = scale(M, center = TRUE, scale = FALSE)
+y_centered = y - mean(y)
+n_obs = length(y)
+
+fit_ridge_lambda <- function(lambda, y_centered, M_centered) {
+
+  # closed-form ridge solution for a fixed lambda
+  u = solve(
+    crossprod(M_centered) / n_obs + diag(lambda, ncol(M_centered)),
+    crossprod(M_centered, y_centered) / n_obs
+  )
+
+  pred = mean(y) + M_centered %*% u
+  mse = mean((y - pred)**2)
+  penalty = lambda * sum(u**2)
+
+  data.frame(
+    lambda = lambda,
+    mse = mse,
+    penalty = penalty,
+    criteria = mse + penalty,
+    sd_marker_effect = sd(as.numeric(u))
+  )
+
+}
+
+lambda_grid = 10^seq(-5, 1, length.out = 80)
+
+ridge_path = do.call(
+  rbind,
+  lapply(lambda_grid, fit_ridge_lambda, y_centered = y_centered, M_centered = M_centered)
+)
+
+best_lambda = ridge_path[which.min(ridge_path$criteria), ]
+
+kable(best_lambda, digits = 4)
+```
+
+```{r}
+ggplot(ridge_path, aes(x = log10(lambda), y = criteria)) +
+  geom_line(color = "#155f7a", linewidth = 1) +
+  geom_point(data = best_lambda, color = "#c46a2b", size = 3) +
+  labs(x = "log10(lambda)", y = "Ridge criterion")
+```
+
+As $\lambda$ increases, marker effects are shrunk more strongly toward zero.
+
+```{r}
+ggplot(ridge_path, aes(x = log10(lambda), y = sd_marker_effect)) +
+  geom_line(color = "#155f7a", linewidth = 1) +
+  geom_point(data = best_lambda, color = "#c46a2b", size = 3) +
+  labs(x = "log10(lambda)", y = "SD of marker effects")
+```
 
 ```{r ridge, eval=FALSE}
 library(BGLR)

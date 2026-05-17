@@ -7,6 +7,29 @@ format:
     footer: "[Lab notes](../labs/linear-regression.html)"
 ---
 
+```{r}
+#| include: false
+residual_square_data <- function(data, x_name, y_name, pred_name, every = 12, scale = 0.35) {
+  keep <- seq(1, nrow(data), by = every)
+  out <- data[keep, , drop = FALSE]
+  residual <- out[[y_name]] - out[[pred_name]]
+
+  x_range <- diff(range(data[[x_name]], na.rm = TRUE))
+  y_range <- diff(range(c(data[[y_name]], data[[pred_name]]), na.rm = TRUE))
+
+  if (!is.finite(x_range) || x_range == 0) x_range <- 1
+  if (!is.finite(y_range) || y_range == 0) y_range <- 1
+
+  side_x <- abs(residual) * (x_range / y_range) * scale
+
+  out$xmin <- out[[x_name]]
+  out$xmax <- out[[x_name]] + side_x
+  out$ymin <- pmin(out[[y_name]], out[[pred_name]])
+  out$ymax <- pmax(out[[y_name]], out[[pred_name]])
+  out
+}
+```
+
 ## Linear Regression
 
 Linear Regression deals with fitting predicted values based on input features
@@ -18,6 +41,20 @@ the mean squared error between predicted and observed values:
 $$
 \hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
 $$
+
+## Least-Squares Geometry
+
+$$
+e_i = y_i - \hat{y}_i
+$$
+
+$$
+\operatorname{MSE} = \frac{1}{n}\sum_{i=1}^{n} e_i^2
+$$
+
+Vertical segments show residuals.
+
+Shaded squares show selected squared-error contributions.
 
 ## Feature / Design Matrix
 
@@ -92,20 +129,34 @@ pred = X %*% res$par
 
 dat = data.frame(
      y = y,
-     pred = pred,
-     id = seq_along(length(y))
+     pred = as.numeric(pred),
+     id = seq_along(y)
      )
 
-ggplot(dat, aes(y = pred, x = y)) +
- geom_point()
+ggplot(dat, aes(x = y, y = pred)) +
+ geom_point() +
+ geom_abline(intercept = 0, slope = 1, color = "red") +
+ labs(x = "Observed Wind", y = "Predicted Wind")
 ```
 
 ## Raw Data And Intercept
 
 ```{r}
+resid_squares = residual_square_data(dat, "id", "y", "pred", every = 12, scale = 0.20)
+
 ggplot(dat, aes(x = id, y = y)) +
+  geom_rect(
+    data = resid_squares,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = "#c46a2b",
+    color = "#c46a2b",
+    alpha = 0.18
+  ) +
+  geom_segment(aes(xend = id, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
-  geom_hline(yintercept = res$par, color = "red")
+  geom_hline(yintercept = res$par, color = "red") +
+  labs(x = "Observation", y = "Wind")
 ```
 
 ## Multiple Linear Regression
@@ -140,7 +191,8 @@ colnames(X) = c("Intercept", "Temp")
 
 ```{r}
 ggplot(airquality, aes(x = Temp, y = Wind)) +
-  geom_point()
+  geom_point() +
+  labs(x = "Temp", y = "Wind")
 ```
 
 ## Fit Multiple Regression
@@ -168,13 +220,25 @@ pred = X %*% res$par
 dat = data.frame(
      Wind = y,
      Temp = airquality$Temp,
-     pred = pred,
+     pred = as.numeric(pred),
      id = 1:length(y)
      )
 
+resid_squares = residual_square_data(dat, "Temp", "Wind", "pred", every = 12, scale = 0.45)
+
 ggplot(dat, aes(x = Temp, y = Wind)) +
+  geom_rect(
+    data = resid_squares,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = "#c46a2b",
+    color = "#c46a2b",
+    alpha = 0.18
+  ) +
+  geom_segment(aes(xend = Temp, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
-  geom_abline(intercept = res$par[1], slope = res$par[2], color = "red")
+  geom_abline(intercept = res$par[1], slope = res$par[2], color = "red") +
+  labs(x = "Temp", y = "Wind")
 ```
 
 ## Ridge Regression
@@ -182,6 +246,60 @@ ggplot(dat, aes(x = Temp, y = Wind)) +
 $$
 \min_{\beta} \left( \sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \right)
 $$
+
+## Lambda Solution Space {.smaller}
+
+```{r}
+library(BGLR)
+data(wheat)
+
+subset = 1:100
+
+y_ridge = wheat.Y[subset,2]
+M_ridge = wheat.X[subset,1:300]
+
+M_centered = scale(M_ridge, center = TRUE, scale = FALSE)
+y_centered = y_ridge - mean(y_ridge)
+n_obs = length(y_ridge)
+
+fit_ridge_lambda <- function(lambda, y_centered, M_centered) {
+  u = solve(
+    crossprod(M_centered) / n_obs + diag(lambda, ncol(M_centered)),
+    crossprod(M_centered, y_centered) / n_obs
+  )
+
+  pred = mean(y_ridge) + M_centered %*% u
+  mse = mean((y_ridge - pred)**2)
+  penalty = lambda * sum(u**2)
+
+  data.frame(lambda = lambda, mse = mse, penalty = penalty,
+             criteria = mse + penalty, sd_marker_effect = sd(as.numeric(u)))
+}
+
+lambda_grid = 10^seq(-5, 1, length.out = 80)
+ridge_path = do.call(rbind, lapply(lambda_grid, fit_ridge_lambda,
+                                   y_centered = y_centered, M_centered = M_centered))
+best_lambda = ridge_path[which.min(ridge_path$criteria), ]
+best_lambda
+```
+
+## Ridge Criterion
+
+```{r}
+ggplot(ridge_path, aes(x = log10(lambda), y = criteria)) +
+  geom_line(color = "#155f7a", linewidth = 1) +
+  geom_point(data = best_lambda, color = "#c46a2b", size = 3) +
+  labs(x = "log10(lambda)", y = "Ridge criterion")
+```
+
+## Marker Shrinkage
+
+```{r}
+ggplot(ridge_path, aes(x = log10(lambda), y = sd_marker_effect)) +
+  geom_line(color = "#155f7a", linewidth = 1) +
+  geom_point(data = best_lambda, color = "#c46a2b", size = 3) +
+  labs(x = "log10(lambda)", y = "SD of marker effects")
+```
 
 ## Ridge In The Original Lab
 
