@@ -7,7 +7,7 @@ format:
     footer: "[Lab notes](../labs/linear-regression.html)"
 ---
 
-## The Problem
+## A Line Through Data
 
 Choose a line by making vertical distances small.
 
@@ -50,7 +50,7 @@ ggplot(milk_data, aes(feed_kg, milk_kg)) +
 The red vertical segments are residuals. Least squares is just a rule for choosing the line with the smallest squared residuals.
 :::
 
-## Least-Squares Objective
+## The Least-Squares Problem
 
 $$
 \widehat{y}_i = \beta_0 + \beta_1 x_i
@@ -117,7 +117,7 @@ ggplot(loss_grid, aes(intercept, slope, z = sse)) +
   labs(x = "Intercept", y = "Feed response", fill = "SSE")
 ```
 
-## `optim()`
+## Solving It With `optim()`
 
 ```{r}
 fit_optim <- optim(
@@ -246,7 +246,7 @@ mean(y_feed)
 
 The intercept-only least-squares estimate is the sample mean.
 
-## Design Matrices
+## More Design Matrices
 
 ```{r}
 data(airquality)
@@ -256,7 +256,7 @@ X_temp <- model.matrix(~ Temp, data = dat)
 head(X_temp)
 ```
 
-## More Predictors
+## Multiple Regression
 
 ```{r}
 X_multi <- model.matrix(~ Temp + Month, data = dat)
@@ -289,7 +289,7 @@ Shrinkage is the core idea behind:
 - genomic prediction,
 - Bayesian priors.
 
-## Animal Model Bridge {.smaller}
+## Bridge To Animal Models {.smaller}
 
 $$
 \mathbf{y}
@@ -313,3 +313,10 @@ Least squares is optimization first.
 The closed-form solution is a shortcut for this specific objective.
 
 The design matrix is the bridge from simple lines to animal models.
+
+## Exercises
+
+1. Change the candidate intercept and slope.
+2. Make the upper bound on the slope too small.
+3. Compare the closed-form solution with `lm()`.
+4. Add another predictor to the design matrix.

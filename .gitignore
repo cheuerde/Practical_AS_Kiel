@@ -13,6 +13,7 @@ renv/staging/
 !out/*.html
 *_files/
 labs/my_data.csv
+lectures/my_data.csv
 
 
 /.quarto/

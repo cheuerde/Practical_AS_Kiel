@@ -7,13 +7,9 @@ format:
     footer: "[Lab notes](../labs/clustering.html)"
 ---
 
-## Clustering
+## Labelled And Unlabelled Views
 
-Clustering learns grouping structure from unlabelled data.
-
-We have features, but no trusted labels.
-
-## Labelled Example
+Clustering learns grouping structure from features without using trusted labels.
 
 ```{r}
 library(ggplot2)
@@ -24,9 +20,9 @@ data(iris)
 head(iris)
 ```
 
-For clustering, `Species` is ignored during fitting.
+For clustering, `Species` is ignored during fitting and used later only as a check.
 
-## Feature Histograms
+## Univariate Clustering
 
 ```{r}
 features <- iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]
@@ -40,7 +36,7 @@ ggplot(feature_long, aes(value)) +
   labs(x = "Feature value", y = "Density")
 ```
 
-## Mixture Idea
+## Simulate A Two-Component Mixture
 
 $$
 p(x)
@@ -49,14 +45,6 @@ p(x)
 \qquad
 \sum_{k=1}^{K} \lambda_k = 1
 $$
-
-For a normal mixture:
-
-$$
-f_k(x) = N(x \mid \mu_k, \sigma_k^2)
-$$
-
-## Simulate A Mixture
 
 ```{r}
 set.seed(100)
@@ -70,7 +58,7 @@ ggplot(data.frame(y), aes(y)) +
   labs(x = "Simulated trait", y = "Density")
 ```
 
-## Simple Implementation
+## A Simple Mixture Fit
 
 Use `kmeans()` first, then estimate normal components.
 
@@ -91,33 +79,67 @@ sigma <- as.numeric(tapply(y, cluster, sd))
 data.frame(component = 1:2, lambda = lambda, mu = mu, sigma = sigma)
 ```
 
-## Component Probabilities
+## Component Densities
 
 ```{r}
-probs <- GetProbNormalMixture(y, lambda, mu, sigma)
-dprobs <- data.frame(x = seq_along(y), y = y, prob_one = probs[, 1])
+density_grid <- data.frame(y = seq(min(y), max(y), length.out = 400))
+density_grid$component_1 <- lambda[1] * dnorm(density_grid$y, mu[1], sigma[1])
+density_grid$component_2 <- lambda[2] * dnorm(density_grid$y, mu[2], sigma[2])
+density_grid$total <- density_grid$component_1 + density_grid$component_2
 
-ggplot(dprobs, aes(x, y, color = prob_one)) +
-  geom_point(alpha = 0.8) +
-  scale_color_gradient2(low = "#c46a2b", mid = "#fff8ef", high = "#0c6773", midpoint = 0.5) +
-  labs(x = "Observation", y = "Simulated trait", color = "P(component 1)")
+ggplot(data.frame(y), aes(y)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50, fill = "white", color = "#263238") +
+  geom_line(data = density_grid, aes(y, total), color = "#0c6773", linewidth = 1.1) +
+  geom_line(data = density_grid, aes(y, component_1), color = "#c46a2b", linetype = "dashed") +
+  geom_line(data = density_grid, aes(y, component_2), color = "#7a6f42", linetype = "dashed") +
+  labs(x = "Simulated trait", y = "Density")
 ```
 
-## Apply To Iris
+## Apply To Iris Features
 
 ```{r}
 petal <- iris$Petal.Length
 km_petal <- kmeans(matrix(petal, ncol = 1), centers = 2, nstart = 25)
 cluster_petal <- match(km_petal$cluster, order(as.numeric(km_petal$centers)))
 
+iris_cluster <- data.frame(
+  Petal.Length = iris$Petal.Length,
+  Species = iris$Species,
+  cluster = factor(cluster_petal)
+)
+
+ggplot(iris_cluster, aes(Petal.Length, fill = cluster)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 35, alpha = 0.65, position = "identity") +
+  scale_fill_manual(values = c("#0c6773", "#c46a2b")) +
+  labs(x = "Petal length", y = "Density", fill = "Cluster")
+```
+
+## Check Against Species Labels
+
+```{r}
 table(
-  cluster = cluster_petal,
-  species = iris$Species
+  cluster = iris_cluster$cluster,
+  species = iris_cluster$Species
 )
 ```
 
-## Take-Home
+Labels are not used for fitting. They are only a sanity check after clustering.
 
-The old Stan version is useful later.
+## Optional Stan Version
 
-For the first clustering lab, the simple version is enough to understand the idea.
+The previous implementation used Stan for a proper mixture model.
+
+That is statistically cleaner, but not the simplest first implementation.
+
+```{r eval=FALSE}
+library(rstan)
+
+fit <- stan(model_code = hcode, data = dat, chains = 1, iter = 2000)
+```
+
+## Exercises
+
+1. Change the simulated mixture means.
+2. Change `theta` and inspect the fitted weights.
+3. Apply the simple mixture fit to another iris feature.
+4. Compare the cluster table with `Species`.

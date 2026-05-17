@@ -7,7 +7,7 @@ format:
     footer: "[Lab notes](../labs/maximum-likelihood.html)"
 ---
 
-## From Optimization To Likelihood
+## Definition
 
 Optimization asked:
 
@@ -17,7 +17,7 @@ $$
 
 Maximum likelihood chooses $f(\theta)$ from a probability model.
 
-## Likelihood
+## Likelihood And Log-Likelihood
 
 For independent observations:
 
@@ -43,7 +43,7 @@ $$
 -\sum_{i=1}^{n} \log p(y_i \mid \theta)
 $$
 
-## Normal Mean
+## Finding The Mean
 
 ```{r}
 library(ggplot2)
@@ -79,7 +79,7 @@ data.frame(
 )
 ```
 
-## Mean And Standard Deviation
+## Finding Mean And Standard Deviation
 
 ```{r}
 sdlik <- function(x) {
@@ -114,7 +114,7 @@ rbind(
 )
 ```
 
-## Correlation Likelihood {.smaller}
+## Estimating Correlation {.smaller}
 
 ```{r}
 library(mvtnorm)
@@ -177,7 +177,7 @@ ML <- optim(p, lik, y = Y, method = methods[1])
 ML$par
 ```
 
-## Animal Model
+## Animal Model Likelihood
 
 $$
 \mathbf{y}
@@ -263,3 +263,10 @@ The code pattern is:
 1. collect unknowns in `p`,
 2. build the likelihood in `lik()`,
 3. run `optim(p, lik, ...)`.
+
+## Exercises
+
+1. Change starting values in `p`.
+2. Estimate `mu` and `sigma` with `n = 20`.
+3. Change the true value of `rho`.
+4. Change the relationship matrix `A`.

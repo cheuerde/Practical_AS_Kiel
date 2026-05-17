@@ -7,7 +7,7 @@ format:
     footer: "[Lab notes](../labs/multivariate-clustering.html)"
 ---
 
-## Multivariate Clustering
+## Multivariate Mixture Model
 
 Use several features at once.
 
@@ -18,7 +18,7 @@ Animal breeding example:
 - family or line separation,
 - outlier detection.
 
-## Mixture Model
+## Mixture Model Form
 
 For $\mathbf{x}_i \in \mathbb{R}^p$:
 
@@ -41,7 +41,7 @@ $$
 
 For two features, constant $d_{ik}^2$ gives an ellipse.
 
-## Simulate Lines
+## Simulate Population Structure
 
 ```{r}
 library(ggplot2)
@@ -64,7 +64,7 @@ simulate_structured_genotypes <- function(n_per_line = c(70, 70, 70), n_markers 
 geno <- simulate_structured_genotypes()
 ```
 
-## PCA
+## PCA As Feature Compression
 
 $$
 \mathbf{X}
@@ -89,7 +89,7 @@ ggplot(pc_data, aes(PC1, PC2, color = line)) +
   labs(x = "PC1", y = "PC2", color = "Known line")
 ```
 
-## K-Means
+## K-Means Clustering
 
 $$
 \sum_{k=1}^K \sum_{i:z_i=k}
@@ -164,7 +164,7 @@ ellipse_points <- function(center, Sigma, level = 0.90, n = 200) {
 }
 ```
 
-## MVN Mixture
+## Multivariate Normal Mixture
 
 ```{r}
 X2 <- as.matrix(pc_data[, c("PC1", "PC2")])
@@ -177,7 +177,7 @@ pc_data$mvn_uncertainty <- 1 - apply(mvn_fit$responsibility, 1, max)
 table(cluster = pc_data$mvn_cluster, line = pc_data$line)
 ```
 
-## Mixture Ellipses
+## Ellipses
 
 ```{r}
 ellipse_data <- do.call(rbind, lapply(seq_len(3), function(j) {
@@ -205,6 +205,13 @@ $$
 $$
 q = (K - 1) + Kp + K\frac{p(p + 1)}{2}
 $$
+
+## Exercises
+
+1. Change the number of simulated markers.
+2. Cluster with only `PC1` and `PC2`.
+3. Change `k` in the k-means example.
+4. Compare k-means clusters with mixture clusters.
 
 ## Take-Home
 

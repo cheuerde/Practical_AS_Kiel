@@ -7,16 +7,18 @@ format:
     footer: "[Lab notes](../labs/genomic-prediction.html)"
 ---
 
-## Goal
+## Genomic Prediction
 
 Use marker genotypes to predict breeding values.
 
-Two views of the same model:
+Two equivalent views:
 
-- marker effects: estimate $\hat{\mathbf{a}}$,
-- genomic relationships: estimate $\hat{\mathbf{g}}$ directly.
+- estimate marker effects and sum them into GEBV,
+- build genomic relationships and estimate genomic breeding values directly.
 
-## Marker Model
+## Ridge Regression BLUP
+
+Marker model:
 
 $$
 \mathbf{y}
@@ -27,9 +29,7 @@ $$
 $$
 
 $$
-\mathbf{a} \sim N(\mathbf{0}, \mathbf{I}\sigma_a^2),
-\qquad
-\mathbf{e} \sim N(\mathbf{0}, \mathbf{I}\sigma_e^2)
+\mathbf{a} \sim N(\mathbf{0}, \mathbf{I}\sigma_a^2)
 $$
 
 The GEBV is
@@ -38,7 +38,7 @@ $$
 \hat{\mathbf{g}} = \mathbf{Z}\hat{\mathbf{a}}.
 $$
 
-## Simulate Markers
+## Prepare A Wheat-Style Dataset
 
 ```{r}
 library(ggplot2)
@@ -73,7 +73,45 @@ ggplot(data.frame(g_true, y), aes(g_true, y)) +
   labs(x = "True breeding value", y = "Phenotype")
 ```
 
-## Ridge Marker BLUP
+## Genomic Relationship Matrix
+
+$$
+\mathbf{G}
+=
+\frac{\mathbf{Z}\mathbf{Z}'}{\operatorname{mean}(\operatorname{diag}(\mathbf{Z}\mathbf{Z}'))}
+$$
+
+```{r}
+ZZt <- tcrossprod(Z)
+G <- ZZt / mean(diag(ZZt))
+
+g_subset <- as.data.frame(as.table(G[1:35, 1:35]))
+names(g_subset) <- c("animal_1", "animal_2", "relationship")
+
+ggplot(g_subset, aes(animal_1, animal_2, fill = relationship)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#245c73", mid = "#fff8ef", high = "#c46a2b") +
+  coord_equal() +
+  labs(x = NULL, y = NULL, fill = "G")
+```
+
+## Original rrBLUP Implementation
+
+The old lab used `rrBLUP::mixed.solve()`.
+
+```{r eval=FALSE}
+library(rrBLUP)
+
+mod <- mixed.solve(
+  y = y,
+  Z = Z,
+  K = diag(ncol(Z))
+)
+```
+
+Keep it as a compact reference implementation when the package is installed.
+
+## Ridge Marker Model Without Extra Packages
 
 $$
 \hat{\mathbf{a}}
@@ -96,33 +134,10 @@ fit_ridge_marker <- function(y, M_train, M_new = M_train, lambda = 50) {
 
 ridge_fit <- fit_ridge_marker(y, M, lambda = 50)
 g_ridge <- ridge_fit$prediction - ridge_fit$mean
-
 cor(g_ridge, g_true)
 ```
 
-## Genomic Relationship Matrix
-
-$$
-\mathbf{G}
-=
-\frac{\mathbf{Z}\mathbf{Z}'}{\operatorname{mean}\left(\operatorname{diag}(\mathbf{Z}\mathbf{Z}')\right)}
-$$
-
-```{r}
-ZZt <- tcrossprod(Z)
-G <- ZZt / mean(diag(ZZt))
-
-g_subset <- as.data.frame(as.table(G[1:35, 1:35]))
-names(g_subset) <- c("animal_1", "animal_2", "relationship")
-
-ggplot(g_subset, aes(animal_1, animal_2, fill = relationship)) +
-  geom_tile() +
-  scale_fill_gradient2(low = "#245c73", mid = "#fff8ef", high = "#c46a2b") +
-  coord_equal() +
-  labs(x = NULL, y = NULL, fill = "G")
-```
-
-## GBLUP
+## GBLUP Model
 
 $$
 \mathbf{y}
@@ -133,8 +148,6 @@ $$
 \qquad
 \mathbf{g} \sim N(\mathbf{0}, \mathbf{G}\sigma_g^2)
 $$
-
-## Equivalence
 
 ```{r}
 lambda_marker <- 50
@@ -202,8 +215,19 @@ a_j \mid \gamma_j
 + (1 - \gamma_j)\delta_0
 $$
 
-## Take-Home
+## BayesCpi Threshold Model
 
-Genomic prediction is an animal model built from marker similarities.
+For a binary trait, the old lab used a probit threshold model:
 
-Marker BLUP and GBLUP are two computational views of the same prediction problem.
+$$
+p_i = \Phi(\mathbf{x}_i'\boldsymbol{\beta} + \mathbf{z}_i'\mathbf{u})
+$$
+
+The JAGS implementation remains an extension, not a required live dependency.
+
+## Exercises
+
+1. Change `lambda` in the ridge marker model.
+2. Replace simulated data with `BGLR::wheat` if available.
+3. Compare marker BLUP and GBLUP predictions.
+4. Change the number of cross-validation folds.

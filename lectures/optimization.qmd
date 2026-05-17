@@ -7,7 +7,7 @@ format:
     footer: "[Lab notes](../labs/optimization.html)"
 ---
 
-## What Optimization Means Here
+## Formal Definition
 
 Choose values that make a function small or large.
 
@@ -19,7 +19,7 @@ Least squares and likelihood come later.
 Start by demystifying optimization. The students should leave this first section knowing that the topic is not a separate mathematical island. It is the machinery underneath regression, likelihood, and later Bayesian computation.
 :::
 
-## Formal Definition
+## Basic Optimization Problem
 
 <div class="section-kicker"><img src="../assets/icons/optimization-objective.png" alt="" /><span>Objective</span></div>
 
@@ -105,7 +105,7 @@ Use this slide to connect to bounds in `optim(method = "L-BFGS-B")`. We do not n
 Keep coming back to this four-step structure. It is the common language for the rest of the course.
 :::
 
-## First Example: Paddock Area
+## First Example: Fence A Paddock
 
 <div class="section-kicker"><img src="../assets/icons/optimization-model.png" alt="" /><span>Model</span></div>
 
@@ -177,7 +177,7 @@ ggplot(area_grid, aes(width, area)) +
   labs(x = "Paddock width (m)", y = "Area (m2)")
 ```
 
-## `optim()` Minimizes
+## Search With `optim()`
 
 <div class="section-kicker"><img src="../assets/icons/optimization-search.png" alt="" /><span>Search</span></div>
 
@@ -200,7 +200,7 @@ fit_area <- optim(
 data.frame(width = fit_area$par, area = -fit_area$value)
 ```
 
-## Bounds Matter
+## Bound Constraints
 
 <div class="section-kicker"><img src="../assets/icons/optimization-constraints.png" alt="" /><span>Constraints</span></div>
 
@@ -225,7 +225,7 @@ data.frame(
 )
 ```
 
-## What Comes Next
+## Where This Goes Next
 
 <div class="section-kicker"><img src="../assets/icons/optimization-model.png" alt="" /><span>Model</span></div>
 
@@ -240,3 +240,10 @@ Same workflow, statistical objectives:
 ::: notes
 Stop the optimization lecture here. The first statistical example belongs in the least-squares chapter, where it can be introduced visually before the closed-form solution.
 :::
+
+## Exercises
+
+1. Change the amount of fencing.
+2. Change the starting value in `optim()`.
+3. Make the upper bound too tight.
+4. Rewrite the objective for a three-sided fence.
