@@ -7,162 +7,220 @@ format:
     footer: "[Lab notes](../labs/bayesian-inference.html)"
 ---
 
-## Bayes' Theorem
+## Bayes Theorem
 
 $$
-p(\theta \mid y)
-=
-\frac{p(y \mid \theta)p(\theta)}{p(y)}
+p(A|B) = \frac{p(B|A)p(A)}{p(B)}
 $$
 
-For model fitting:
+In statistical modelling:
 
 $$
-p(\theta \mid y) \propto p(y \mid \theta)p(\theta)
+p(\theta|y) = \frac{p(y|\theta)p(\theta)}{p(y)}
 $$
 
-Likelihood times prior gives the fitted Bayesian model.
+## Bayesian vs Frequentist
+
+This is in contrast with a frequentist (maximum likelihood) approach, in which we aim to estimate non-random,
+fixed parameters using the likelihood of the data given those parameters only ($p(y|\theta)$).
+
+The overall likelihood of the data ($p(y)$) only serves as a scaling constant:
+
+$$
+p(\theta|y) \propto p(y|\theta)p(\theta)
+$$
 
 ## Estimating A Normal Mean
 
+In a Bayesian framework, we formulate our problem in terms of the assumed distribution
+of our data (likelihood) and the prior distributions of our parameters we wish to estimate.
+
 $$
-\mathbf{y} \sim N(\mu, \sigma_e^2),
-\qquad
-\mu \sim N(\mu_\text{prior}, \sigma_\text{prior}^2)
+\begin{align}
+\mathbf{y} &\sim \mathbf{N}(\mu, \sigma_{e}^{2}) \\
+\mu &\sim N(\mu_{prior}, \sigma_{prior}^{2})
+\end{align}
 $$
-
-```{r}
-library(ggplot2)
-library(knitr)
-theme_set(theme_minimal(base_size = 16))
-
-data(iris)
-
-data.frame(
-  trait = "Sepal.Width",
-  n = length(iris$Sepal.Width),
-  mean = mean(iris$Sepal.Width),
-  sd = sd(iris$Sepal.Width)
-)
-```
 
 ## brms Mean Example
 
-This is the live pattern. The rendered site keeps it unevaluated so Stan compilation does not block the build.
-
 ```{r eval=FALSE}
 library(brms)
-library(posterior)
+library(ggplot2)
+library(knitr)
+library(tidyverse)
 
+data(iris)
+
+# this gives us the default brms priors
 get_prior(Sepal.Width ~ 1, data = iris)
 
-priors <- set_prior("normal(0, 0.2)", class = "Intercept")
+# set a custom prior for the intercept
+priors = set_prior("normal(0,0.2)", class = "Intercept")
+```
 
-fit <- brm(
-  Sepal.Width ~ 1,
-  data = iris,
-  family = gaussian(),
-  prior = priors,
-  sample_prior = TRUE,
-  backend = "cmdstanr"
+## Fit The Model
+
+```{r eval=FALSE}
+fit <- brm(Sepal.Width ~ 1,
+     data = iris,
+     family = gaussian(),
+     prior = priors,
+     sample_prior = TRUE,
+     silent = 2,
+     refresh = 0
 )
 ```
 
-## Prior Versus Data Preview
+## Prior And Posterior Samples
 
-```{r}
-set.seed(2026)
+```{r eval=FALSE}
+draws = as_draws_array(fit)[,1,, drop = TRUE]
 
-prior_samples <- rnorm(4000, mean = 0, sd = 0.2)
-estimate_samples <- rnorm(
-  4000,
-  mean = mean(iris$Sepal.Width),
-  sd = sd(iris$Sepal.Width) / sqrt(nrow(iris))
+samples = rbind(
+    data.frame(type = "prior",
+               samples = as.numeric(draws[, "prior_Intercept"])),
+    data.frame(type = "posterior",
+               samples = as.numeric(draws[, "b_Intercept"]))
 )
 
-samples <- rbind(
-  data.frame(type = "prior", samples = prior_samples),
-  data.frame(type = "estimate from data", samples = estimate_samples)
+kable(
+  samples %>% group_by(type) %>% summarize(
+    n = n(),
+    mean = mean(samples),
+    sd = sd(samples)
+  ),
+  digits = 3
 )
-
-ggplot(samples, aes(samples, fill = type)) +
-  geom_density(alpha = 0.55) +
-  scale_fill_manual(values = c("prior" = "#526A83", "estimate from data" = "#68855C")) +
-  labs(x = "Mean of Sepal.Width", y = "Density", fill = NULL)
 ```
 
 ## Updating Priors From Existing Evidence
 
-The old lab used a first experiment to inform the prior for a second experiment.
+Bayesian Inference allows us to incorporate actual prior evidence in the estimation
+of parameters.
 
-```{r}
-update_mean_preview <- function(y, prior_mean, prior_sd) {
-  data_sd <- sd(y)
-  n <- length(y)
-  precision <- 1 / prior_sd^2 + n / data_sd^2
-  post_sd <- sqrt(1 / precision)
-  post_mean <- (prior_mean / prior_sd^2 + n * mean(y) / data_sd^2) / precision
-  c(mean = post_mean, sd = post_sd)
-}
+We might have conducted a previous experiment and arrived
+at an estimate of the mean of our observations.
 
-iris_first <- iris[1:50, ]
-iris_second <- iris[51:nrow(iris), ]
+Then we do another experiment of similar setup and want to update our mean estimate.
 
-first <- update_mean_preview(iris_first$Sepal.Width, prior_mean = 0, prior_sd = 4)
-second <- update_mean_preview(iris_second$Sepal.Width, prior_mean = first["mean"], prior_sd = first["sd"])
+## First Experiment
 
-data.frame(
-  stage = c("wide prior", "after first subset", "after second subset"),
-  mean = c(0, unname(first["mean"]), unname(second["mean"])),
-  sd = c(4, unname(first["sd"]), unname(second["sd"]))
+$$
+p(\theta|y)_{FirstExperiment} \propto p(y|\theta)p(\theta)
+$$
+
+Plugging in the posterior from the first experiment as the prior for the second:
+
+$$
+p(\theta|y)_{SecondExperiment} \propto p(y|\theta)p(\theta|y)_{FirstExperiment}
+$$
+
+## Update Prior In R
+
+```{r eval=FALSE}
+iris_first = iris[1:50,]
+
+priors = set_prior("normal(0,4)", class = "Intercept")
+
+fit_first <- brm(Sepal.Width ~ 1,
+     data = iris_first,
+     family = gaussian(),
+     prior = priors,
+     sample_prior = TRUE,
+     silent = 2,
+     refresh = 0
+)
+
+draws_first = as_draws_array(fit_first)[,1,, drop = TRUE]
+```
+
+## Use Posterior As Prior
+
+```{r eval=FALSE}
+samples_first = rbind(
+  data.frame(type = "prior",
+             samples = as.numeric(draws_first[, "prior_Intercept"])),
+  data.frame(type = "posterior",
+             samples = as.numeric(draws_first[, "b_Intercept"]))
+)
+
+mu_prior = mean(samples_first$samples[samples_first$type == "posterior"])
+sd_prior = sd(samples_first$samples[samples_first$type == "posterior"])
+
+priors = set_prior(
+  paste("normal(", mu_prior, ",", sd_prior, ")", sep = ""),
+  class = "Intercept"
 )
 ```
 
 ## Multivariate Animal Model In brms
 
 $$
-\mathbf{Y}
-=
-\mathbf{X}\mathbf{B}
-+ \mathbf{Z}\mathbf{U}
-+ \mathbf{E}
+\mathbf{Y} = \mathbf{XB} + \mathbf{ZU} + \mathbf{E}
 $$
+
+Likelihood:
+
+$$
+\mathbf{Y} \sim \mathbf{MVN}(\mathbf{XB} + \mathbf{ZU}, \boldsymbol{\Sigma}_E)
+$$
+
+## Priors
+
+$$
+\begin{align}
+\mathbf{B} &\sim \mathbf{U}(-Inf,Inf)\\
+\mathbf{U} &\sim \mathbf{MVN}(\mathbf{0}, \boldsymbol{\Sigma}_U) \\
+\boldsymbol{\Sigma}_U &= \mathbf{diag(S)}_U\boldsymbol{\Omega}_U\mathbf{diag(S)}_U \\
+\mathbf{S}_U &\sim \mathbf{Cauchy}(0,5)\\
+\boldsymbol{\Omega}_U &\sim \mathbf{LKJ}(1)
+\end{align}
+$$
+
+## brms Animal Model Formula
 
 ```{r eval=FALSE}
 brmf <- brmsformula(
-  mvbind(milk, fat) ~ 1 +
-    factor(lact) +
-    herd +
-    (1 | g | gr(idA, cov = A)) +
-    (1 | p | gr(id)),
+  mvbind(
+    milk,
+    fat
+  ) ~ 1 +
+  factor(lact) +
+  herd +
+  (1|g|gr(idA, cov = A)) + # additive genetic effect
+  (1|p|gr(id)), # PE effect
   data = D,
   data2 = list(A = A)
 )
-
-get_prior(brmf, data = D, data2 = list(A = A), family = gaussian())
-make_stancode(brmf, data = D, data2 = list(A = A), family = gaussian())
 ```
 
-## Cached Artifacts
+## Check Stan Code
 
-Expensive Stan fits should be generated ahead of time:
+```{r eval=FALSE}
+stanCode <- make_stancode(
+  formula = brmf,
+  data = D,
+  data2 = list(A = A),
+  family = gaussian()
+)
 
-```bash
-Rscript scripts/build-model-artifacts.R --stan
+stanData <- make_standata(
+  formula = brmf,
+  data = D,
+  data2 = list(A = A),
+  family = gaussian()
+)
+
+stanCode
 ```
-
-Then class can load `.rds` artifacts from `artifacts/models/`.
 
 ## Resources
 
-- [Stan](https://mc-stan.org/)
-- [brms](https://github.com/paul-buerkner/brms)
-- [AnimalModels](https://github.com/cheuerde/AnimalModels)
-- [BayesianAlphabet](https://github.com/cheuerde/BayesianAlphabet)
+[Stan](https://mc-stan.org/)
 
-## Exercises
+[brms](https://github.com/paul-buerkner/brms)
 
-1. Change the prior standard deviation in the `brms` mean example.
-2. Run the first `brms` model after checking the Stan setup.
-3. Use the first 75 iris rows as the first experiment.
-4. Inspect `make_stancode()` for the animal-model formula.
+[https://github.com/cheuerde/AnimalModels](https://github.com/cheuerde/AnimalModels)
+
+[https://github.com/cheuerde/BayesianAlphabet](https://github.com/cheuerde/BayesianAlphabet)

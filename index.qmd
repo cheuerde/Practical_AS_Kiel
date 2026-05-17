@@ -94,7 +94,7 @@ Rscript setup/install.R
 Rscript setup/check.R
 ```
 
-This installs the core/applied package set used by the new material:
+This installs the core/applied package set used by the course material:
 
 ```text
 dlookr, ggplot2, knitr, rmarkdown,
@@ -114,7 +114,7 @@ This adds:
 bayesplot, brms, cmdstanr, posterior
 ```
 
-Full dependency installation, including legacy chapter packages and CmdStan, is mostly useful for the instructor machine or for students who want to run archived chapters.
+Full dependency installation, including the original Stan/JAGS/clustering support packages and CmdStan, is mostly useful for the instructor machine or for students who want to run every optional block.
 
 Before running `--all`, install the platform tools above first. The archived JAGS example also needs JAGS itself before `rjags` can be installed. JAGS is not needed for the live `brms`/CmdStan workflow.
 
@@ -133,7 +133,7 @@ Rscript setup/check.R --all
 The legacy and optional package set is:
 
 ```text
-car, emmeans, GGally, htmltools, klippy, lsmeans, lubridate,
+car, ellipse, emmeans, factoextra, GGally, htmltools, klippy, lsmeans, lubridate,
 mixtools, pacman, pander, pedigreemm, prettydoc,
 remotes, rjags, rmdformats, rstan
 ```

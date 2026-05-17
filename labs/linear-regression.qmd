@@ -1,14 +1,11 @@
 ---
-title: "Least Squares"
-subtitle: "Visual fitting, closed-form solutions, and shrinkage"
+title: "Linear Regression"
 format:
   html:
     code-fold: false
 ---
 
 <div class="view-switch"><a href="../lectures/linear-regression.html">Open slides</a></div>
-
-Least squares is the first statistical optimization problem in the course. We choose a line by making the vertical distances from the observed points to the line as small as possible.
 
 ```{r}
 #| include: false
@@ -18,498 +15,298 @@ library(knitr)
 theme_set(theme_minimal(base_size = 13))
 ```
 
-## A Line Through Data
+# Linear Regression
 
-Assume we record concentrate intake and milk yield for a group of cows. We want a simple model for expected milk yield:
-
-$$
-\widehat{y}_i = \beta_0 + \beta_1 x_i.
-$$
-
-```{r}
-set.seed(2026)
-
-milk_data <- data.frame(
-  feed_kg = seq(4, 12, length.out = 36)
-)
-
-milk_data$milk_kg <- 17.5 + 1.65 * milk_data$feed_kg +
-  rnorm(nrow(milk_data), sd = 1.8)
-
-kable(head(milk_data), digits = 2)
-```
-
-Start with a candidate line. The vertical distances from each point to that line are the residuals.
-
-```{r}
-candidate_beta <- c(intercept = 18, slope = 1.5)
-
-milk_data$candidate_pred <- candidate_beta["intercept"] +
-  candidate_beta["slope"] * milk_data$feed_kg
-
-ggplot(milk_data, aes(feed_kg, milk_kg)) +
-  geom_segment(
-    aes(xend = feed_kg, yend = candidate_pred),
-    color = "#b85c38",
-    linewidth = 0.45,
-    alpha = 0.75
-  ) +
-  geom_point(size = 2.4, color = "#155f7a") +
-  geom_line(aes(y = candidate_pred), color = "#8a4f12", linewidth = 1) +
-  labs(
-    x = "Concentrate intake (kg/day)",
-    y = "Milk yield (kg/day)"
-  )
-```
-
-The least-squares line is the line for which the sum of squared vertical distances is smallest.
-
-## The Least-Squares Problem
-
-For a simple line, the unknown parameter vector is
+Linear Regression deals with fitting predicted values based on input features
+and regression weights to observations. In ordinary least squares, we aim to
+find regression weights that minimize
+the mean squared error between predicted and observed values:
 
 $$
-\boldsymbol{\beta} =
-\begin{bmatrix}
-\beta_0 \\
-\beta_1
-\end{bmatrix},
+\hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
 $$
 
-where $\beta_0$ is the intercept and $\beta_1$ is the slope. The objective is the sum of squared errors:
+The vector $x$ contains a "feature" or regression variable that establishes a connection with the observations.
+We can formulate most regression problems in terms of feature matrices and their estimated weights with respect
+to predicting the observations.
 
-$$
-\operatorname{SSE}(\boldsymbol{\beta})
-=
-\sum_{i=1}^{n}
-\left(y_i - \beta_0 - \beta_1 x_i\right)^2.
-$$
+## Feature / Design Matrix
 
-The optimization problem is
+A Feature or Design Matrix maps observations to individual feature criteria.
+The most fundamental feature matrix is a column vector with all 1s, meaning every observation
+has the same expression for that feature. In that case, the feature serves as a mapping to the overall
+mean of the observations.
 
-$$
-\widehat{\boldsymbol{\beta}}
-=
-\operatorname*{arg\,min}_{\boldsymbol{\beta} \in \mathbb{R}^2}
-\sum_{i=1}^{n}
-\left(y_i - \beta_0 - \beta_1 x_i\right)^2.
-$$
+We already know how to estimate the mean of y under the assumption of an underlying
+normal distribution. Now we estimate the mean with a linear regression ("Ordinary Least Squares" = OLS):
 
-```{r}
-sse_feed_model <- function(par, data) {
-  beta_0 <- par[1]
-  beta_1 <- par[2]
-
-  y_hat <- beta_0 + beta_1 * data$feed_kg
-  sum((data$milk_kg - y_hat)^2)
-}
-
-sse_feed_model(candidate_beta, milk_data)
-```
-
-## Grid Search
-
-We can use a grid search to see the objective function. Each point in this grid is one possible line.
-
-```{r}
-loss_grid <- expand.grid(
-  intercept = seq(8, 28, length.out = 90),
-  slope = seq(0.4, 2.8, length.out = 90)
-)
-
-loss_grid$sse <- mapply(
-  FUN = function(intercept, slope) sse_feed_model(c(intercept, slope), milk_data),
-  intercept = loss_grid$intercept,
-  slope = loss_grid$slope
-)
-
-best_grid <- loss_grid[which.min(loss_grid$sse), ]
-
-kable(best_grid, digits = 3)
-```
-
-```{r}
-ggplot(loss_grid, aes(intercept, slope, z = sse)) +
-  geom_contour_filled(bins = 18) +
-  geom_point(
-    data = best_grid,
-    aes(intercept, slope),
-    inherit.aes = FALSE,
-    color = "white",
-    size = 3
-  ) +
-  labs(
-    x = "Intercept",
-    y = "Feed response",
-    fill = "SSE"
-  )
-```
-
-## Solving It With `optim()`
-
-Grid search is useful for teaching, but it becomes inefficient quickly. `optim()` searches the parameter space directly.
-
-```{r}
-fit_optim <- optim(
-  par = c(15, 1),
-  fn = sse_feed_model,
-  data = milk_data,
-  method = "BFGS"
-)
-
-coef_optim <- setNames(fit_optim$par, c("intercept", "slope"))
-
-kable(
-  data.frame(
-    parameter = names(coef_optim),
-    estimate = as.numeric(coef_optim)
-  ),
-  digits = 4
-)
-```
-
-```{r}
-milk_data$optim_pred <- coef_optim["intercept"] + coef_optim["slope"] * milk_data$feed_kg
-
-ggplot(milk_data, aes(feed_kg, milk_kg)) +
-  geom_segment(
-    aes(xend = feed_kg, yend = optim_pred),
-    color = "#b85c38",
-    linewidth = 0.45,
-    alpha = 0.55
-  ) +
-  geom_point(size = 2.4, color = "#155f7a") +
-  geom_line(aes(y = optim_pred), color = "#8a4f12", linewidth = 1) +
-  labs(
-    x = "Concentrate intake (kg/day)",
-    y = "Milk yield (kg/day)"
-  )
-```
-
-## Bound Constraints
-
-Some parameters have natural bounds. For example, a response to additional feed may be constrained to be non-negative in a simple teaching model:
-
-$$
-\begin{aligned}
-\widehat{\boldsymbol{\beta}}
-&=
-\operatorname*{arg\,min}_{\boldsymbol{\beta} \in \mathbb{R}^2}
-\sum_{i=1}^{n}
-\left(y_i - \beta_0 - \beta_1 x_i\right)^2 \\
-\text{subject to } 0 &\le \beta_1 \le 4.
-\end{aligned}
-$$
-
-```{r}
-fit_bounded <- optim(
-  par = c(15, 1),
-  fn = sse_feed_model,
-  data = milk_data,
-  method = "L-BFGS-B",
-  lower = c(-Inf, 0),
-  upper = c(Inf, 4)
-)
-
-kable(
-  data.frame(
-    parameter = c("intercept", "slope"),
-    unconstrained = coef_optim,
-    bounded = fit_bounded$par
-  ),
-  digits = 4
-)
-```
-
-Constraints are model assumptions. They can stabilize estimation, but they can also hide problems if the constraint is biologically wrong or too strict.
-
-```{r}
-fit_too_tight <- optim(
-  par = c(15, 1),
-  fn = sse_feed_model,
-  data = milk_data,
-  method = "L-BFGS-B",
-  lower = c(-Inf, 0),
-  upper = c(Inf, 1)
-)
-
-kable(
-  data.frame(
-    parameter = c("intercept", "slope"),
-    unconstrained = coef_optim,
-    too_tight = fit_too_tight$par
-  ),
-  digits = 4
-)
-```
-
-When an estimate lands exactly on a boundary, the boundary itself becomes part of the result and needs interpretation.
-
-## Matrix Form
-
-The same model can be written for all observations at once:
-
-$$
-\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{e}.
-$$
-
-For the simple line, $\mathbf{X}$ has one column of ones for the intercept and one column containing feed intake:
-
-```{r}
-y_feed <- milk_data$milk_kg
-X_feed <- model.matrix(~ feed_kg, data = milk_data)
-
-kable(head(X_feed), digits = 2)
-```
-
-The least-squares objective is
-
-$$
-\widehat{\boldsymbol{\beta}}
-=
-\operatorname*{arg\,min}_{\boldsymbol{\beta}}
-(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})'
-(\mathbf{y} - \mathbf{X}\boldsymbol{\beta}).
-$$
-
-## Closed-Form Solution
-
-For ordinary least squares, we do not need a general optimizer. The normal equations are
-
-$$
-\mathbf{X}'\mathbf{X}\widehat{\boldsymbol{\beta}}
-=
-\mathbf{X}'\mathbf{y}.
-$$
-
-If $\mathbf{X}'\mathbf{X}$ can be inverted, the closed-form solution is
-
-$$
-\widehat{\boldsymbol{\beta}}
-=
-(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y}.
-$$
-
-```{r}
-beta_closed <- solve(t(X_feed) %*% X_feed, t(X_feed) %*% y_feed)
-coef_lm <- coef(lm(milk_kg ~ feed_kg, data = milk_data))
-
-comparison <- data.frame(
-  method = c("optim", "closed form", "lm"),
-  intercept = c(coef_optim["intercept"], beta_closed[1, 1], coef_lm[[1]]),
-  slope = c(coef_optim["slope"], beta_closed[2, 1], coef_lm[["feed_kg"]])
-)
-
-kable(comparison, digits = 4)
-```
-
-`optim()`, the closed-form solution, and `lm()` agree because they solve the same least-squares problem.
-
-## Intercept-Only Model
-
-The intercept-only model is the smallest possible least-squares model:
-
-$$
-y_i = \beta_0 + e_i.
-$$
-
-```{r}
-X_mean <- matrix(1, nrow = length(y_feed), ncol = 1)
-colnames(X_mean) <- "Intercept"
-
-beta_mean <- solve(t(X_mean) %*% X_mean, t(X_mean) %*% y_feed)
-
-kable(
-  data.frame(
-    estimate = as.numeric(beta_mean),
-    empirical_mean = mean(y_feed)
-  ),
-  digits = 3
-)
-```
-
-The intercept-only least-squares estimate is the sample mean.
-
-## More Design Matrices
-
-Design matrices can contain continuous predictors, factors, interactions, and transformations. Here is the same least-squares machinery on the built-in `airquality` data:
-
-```{r}
+```{r design}
+# load example data
 data(airquality)
 
-dat <- na.omit(airquality[, c("Wind", "Temp", "Month")])
-y <- dat$Wind
-X_temp <- model.matrix(~ Temp, data = dat)
+# our response vector is Wind
+y = airquality$Wind
 
-beta_temp <- solve(t(X_temp) %*% X_temp, t(X_temp) %*% y)
+# create a design matrix for the mean
+X = matrix(data = 1, nrow = length(y), ncol = 1)
+colnames(X) = "Intercept"
 
-kable(
-  data.frame(
-    parameter = rownames(beta_temp),
-    estimate = as.numeric(beta_temp)
-  ),
-  digits = 3
-)
+str(X)
+
+# define function to minimize the mean squared error between predicted and observed value
+mse <- function(par, y, X) {
+
+  # the weights are stored in "par", the length of that vector depends
+  # on the number of columns in X (number of features)
+
+  # predicted value
+  pred = X %*% par
+
+  # mean squared error
+  mse = mean((y - pred)**2)
+
+  return(mse)
+
+}
+
+p <- rep(0, ncol(X))
+names(p) <- colnames(X)
+
+res <- optim(
+       par = p,
+       fn = mse,
+       y = y,
+       X = X
+            )
+
+# our solution
+res$par
+
+# plot predicted vs observed
+pred = X %*% res$par
+
+dat = data.frame(
+     y = y,
+     pred = pred,
+     id = seq_along(length(y))
+     )
+
+ggplot(dat, aes(y = pred, x = y)) +
+ geom_point()
+
+# plot raw data and insert intercept
+ggplot(dat, aes(x = id, y = y)) +
+  geom_point() +
+  geom_hline(yintercept = res$par, color = "red")
 ```
 
-```{r}
-dat$pred_lm <- drop(X_temp %*% beta_temp)
+## Adding Features to the Design Matrix: Multiple Linear Regression
 
-ggplot(dat, aes(Temp, Wind)) +
-  geom_point(color = "#0c6773", size = 2) +
-  geom_line(aes(y = pred_lm), color = "#c46a2b", linewidth = 1) +
-  labs(x = "Temperature", y = "Wind")
-```
+When there is more than one feature in the design matrix we call that Multiple Linear Regression.
+The overall principle of the problem remains the same: We aim to minimize the mean squared error
+of our predictions.
 
-## Multiple Regression
+```{r design_multi}
+# load example data
+data(airquality)
 
-```{r}
-X_multi <- model.matrix(~ Temp + Month, data = dat)
-beta_multi <- solve(t(X_multi) %*% X_multi, t(X_multi) %*% y)
+# our response vector is Wind
+y = airquality$Wind
 
-kable(
-  data.frame(parameter = rownames(beta_multi), estimate = as.numeric(beta_multi)),
-  digits = 3
-)
+# now we also want another feature: Temp
+temp = airquality$Temp
+
+# create a design matrix for the mean
+X = matrix(data = 1, nrow = length(y), ncol = 1)
+
+# add temperature as a feature to our design matrix
+X = cbind(
+   X,
+   temp
+   )
+
+colnames(X) = c("Intercept", "Temp")
+
+# plot Wind vs Temp
+ggplot(airquality, aes(x = Temp, y = Wind)) +
+  geom_point()
+
+# we can use the same function as before for finding the optimum feature weights
+mse <- function(par, y, X) {
+
+  # the weights are stored in "par", the length of that vector depends
+  # on the number of columns in X (number of features)
+
+  # predicted value
+  pred = X %*% par
+
+  # mean squared error
+  mse = mean((y - pred)**2)
+
+  return(mse)
+
+}
+
+p <- rep(0, ncol(X))
+names(p) <- colnames(X)
+
+res <- optim(
+       par = p,
+       fn = mse,
+       y = y,
+       X = X
+            )
+
+# our solution
+res$par
+
+# plot predicted vs observed
+pred = X %*% res$par
+
+dat = data.frame(
+     Wind = y,
+     Temp = airquality$Temp,
+     pred = pred,
+     id = 1:length(y)
+     )
+
+ggplot(dat, aes(x = pred, y = Wind)) +
+ geom_point()
+
+# plot raw data and insert intercept and slope
+ggplot(dat, aes(x = Temp, y = Wind)) +
+  geom_point() +
+  geom_abline(intercept = res$par[1], slope = res$par[2], color = "red")
 ```
 
 ## Ridge Regression
 
-Ridge regression adds a penalty to shrink coefficients:
-
 $$
-\widehat{\boldsymbol{\beta}}_{\lambda}
-=
-\operatorname*{arg\,min}_{\boldsymbol{\beta}}
-\left[
-(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})'
-(\mathbf{y} - \mathbf{X}\boldsymbol{\beta})
-+ \lambda \boldsymbol{\beta}'\boldsymbol{\beta}
-\right].
+\min_{\beta} \left( \sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \right)
 $$
 
-The closed-form ridge solution is
+```{r ridge, eval=FALSE}
+library(BGLR)
+data(wheat)
 
-$$
-\widehat{\boldsymbol{\beta}}_{\lambda}
-=
-(\mathbf{X}'\mathbf{X} + \lambda\mathbf{I})^{-1}\mathbf{X}'\mathbf{y}.
-$$
+subset = 1:100
 
-```{r}
-set.seed(2026)
-n <- 80
-p <- 20
-X <- matrix(rnorm(n * p), nrow = n, ncol = p)
-beta_true <- c(2.5, -2, 1.2, rep(0, p - 3))
-y_ridge <- 12 + X %*% beta_true + rnorm(n, sd = 3)
+y = wheat.Y[subset,2]
 
-X_scaled <- scale(X)
-X_ridge <- cbind(Intercept = 1, X_scaled)
+M = wheat.X
 
-ridge_fit <- function(lambda, X, y) {
-  penalty <- diag(ncol(X))
-  penalty[1, 1] <- 0
-  solve(t(X) %*% X + lambda * penalty, t(X) %*% y)
+# take a subset of columns
+M = M[subset,1:300]
+
+# design matrix for fixed effects (no shrinkage)
+X = matrix(data = 1, nrow = length(y), ncol = 1)
+colnames(X) = "intercept"
+
+# we can use the same function as before for finding the optimum feature weights
+mse_ridge <- function(par, y, M, X) {
+
+  # the weights are stored in "par", the length of that vector depends
+  # on the number of columns in X (number of features)
+
+  # get expectation from fixed effects
+  b = par[1:ncol(X)]
+  mu = X %*% b
+
+  # predicted value
+  u = par[(ncol(X) + 1):(length(par) - 1)]
+  pred = mu + M %*% u
+
+  # mean squared error
+  mse = mean((y - pred)**2)
+
+  ridge_param = par[length(par)]
+
+  # ridge penalty
+  ridge = ridge_param * sum(u**2)
+
+  criteria = mse + ridge
+
+  # force ridge parameter to be between  > 0
+  if(ridge_param < 0) {
+    criteria = 9999999
+  }
+
+  return(criteria)
+
 }
 
-lambdas <- c(0, 1, 10, 100)
-ridge_out <- do.call(
-  rbind,
-  lapply(lambdas, function(lambda) {
-    beta <- ridge_fit(lambda, X_ridge, y_ridge)
-    data.frame(lambda = lambda, coefficient = seq_along(beta) - 1, estimate = as.numeric(beta))
-  })
+# initialize
+p <- c(rep(0, ncol(X) + ncol(M)), runif(1))
+
+# give names for p
+names(p) <- c(colnames(X), colnames(M), "lambda")
+
+res <- optim(
+       par = p,
+       fn = mse_ridge,
+       y = y,
+       X = X,
+     M = M,
+     control = list(maxit = 20000),
+     method = c(
+      #"Nelder-Mead"
+      #"BFGS"
+      #"CG"
+      "L-BFGS-B"
+      #"SANN"
+      #"Brent"
+            )
 )
 
-ggplot(subset(ridge_out, coefficient > 0), aes(lambda, estimate, group = coefficient)) +
-  geom_line(alpha = 0.45, color = "#0c6773") +
-  scale_x_log10(breaks = lambdas[-1]) +
-  labs(x = expression(lambda), y = "Coefficient estimate")
+# our solution
+res$par
+
+print(paste("Ridge Parameter:", res$par[length(res$par)]))
+
+# plot predicted vs observed
+# get predicted values
+mu = X %*% res$par[1:ncol(X)]
+pred = mu + M %*% res$par[(ncol(X) + 1):(length(res$par) - 1)]
+
+dat = data.frame(
+     y = y,
+     pred = pred,
+     id = 1:length(y)
+     )
+
+ggplot(dat, aes(x = pred, y = y)) +
+ geom_point()
+
+## plot raw data and insert intercept and slope
+#ggplot(dat, aes(x = Temp, y = Wind)) +
+#  geom_point() +
+#  geom_abline(intercept = res$par[1], slope = res$par[2], color = "red")
 ```
 
-## Bridge To Animal Models
+Now we compare the results from the optimization to an equivalent mixed model approach with a single randome effect:
 
-Ridge regression is the fixed-design version of shrinkage. Animal models shrink random effects through covariance assumptions:
+$$\begin{bmatrix} X'X & X'Z \\ Z'X & Z'Z+I\lambda \end{bmatrix} \begin{bmatrix} \beta \\ u \end{bmatrix} = \begin{bmatrix} X'y \\ Z'y \end{bmatrix}$$
 
-$$
-\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\mathbf{u} + \mathbf{e},
-\qquad
-\mathbf{u} \sim N(\mathbf{0}, \mathbf{G}),
-\qquad
-\mathbf{e} \sim N(\mathbf{0}, \mathbf{R}).
-$$
+```{r ridge_mme, eval=FALSE}
+library(rrBLUP)
+mod_rr = mixed.solve(y = y, X = X, Z = M)
 
-If the variance components are known, the BLUP solution can be written as a penalized least-squares problem:
+# ridge parameter from MME
+ridge_mme = mod_rr$Ve / mod_rr$Vu
+# preditions from that model
+pred_mme = X %*% mod_rr$beta + M %*% mod_rr$u
+print(ridge_mme)
 
-$$
-\begin{aligned}
-\widehat{\boldsymbol{\beta}}, \widehat{\mathbf{u}}
-&=
-\operatorname*{arg\,min}_{\boldsymbol{\beta}, \mathbf{u}}
-\Big[
-(\mathbf{y} - \mathbf{X}\boldsymbol{\beta} - \mathbf{Z}\mathbf{u})'
-\mathbf{R}^{-1}
-(\mathbf{y} - \mathbf{X}\boldsymbol{\beta} - \mathbf{Z}\mathbf{u}) \\
-&\qquad\qquad\qquad\qquad
-+ \mathbf{u}'\mathbf{G}^{-1}\mathbf{u}
-\Big].
-\end{aligned}
-$$
+dat = data.frame(
+     y = pred,
+     pred = pred_mme,
+     id = 1:length(y)
+     )
 
-For a small teaching version with unrelated animals and known $\lambda = \sigma_e^2 / \sigma_a^2$, this reduces to the mixed model equations:
-
-$$
-\begin{bmatrix}
-\mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{Z} \\
-\mathbf{Z}'\mathbf{X} & \mathbf{Z}'\mathbf{Z} + \lambda \mathbf{I}
-\end{bmatrix}
-\begin{bmatrix}
-\widehat{\boldsymbol{\beta}} \\
-\widehat{\mathbf{u}}
-\end{bmatrix}
-=
-\begin{bmatrix}
-\mathbf{X}'\mathbf{y} \\
-\mathbf{Z}'\mathbf{y}
-\end{bmatrix}.
-$$
-
-```{r}
-set.seed(2026)
-
-n_animals <- 12
-records_per_animal <- 2
-animal_id <- factor(rep(seq_len(n_animals), each = records_per_animal))
-
-true_u <- rnorm(n_animals, mean = 0, sd = 2.0)
-animal_y <- 30 + true_u[animal_id] + rnorm(length(animal_id), sd = 3.0)
-
-X_animal <- matrix(1, nrow = length(animal_y), ncol = 1)
-Z_animal <- model.matrix(~ animal_id - 1)
-lambda <- 3.0^2 / 2.0^2
-
-lhs <- rbind(
-  cbind(t(X_animal) %*% X_animal, t(X_animal) %*% Z_animal),
-  cbind(t(Z_animal) %*% X_animal, t(Z_animal) %*% Z_animal + lambda * diag(n_animals))
-)
-
-rhs <- rbind(t(X_animal) %*% animal_y, t(Z_animal) %*% animal_y)
-solution <- solve(lhs, rhs)
-
-animal_model_example <- data.frame(
-  animal = seq_len(n_animals),
-  true_effect = true_u,
-  blup = solution[-1, 1]
-)
-
-kable(head(animal_model_example), digits = 3)
+ggplot(dat, aes(x = pred, y = y)) +
+ geom_point()
 ```
 
-## Exercises
+## Advanced Models
 
-1. Change the candidate intercept and slope in the first figure. How do the residuals change?
-2. Make the upper bound on the slope smaller than the unconstrained estimate. How can you tell that the solution is boundary-driven?
-3. Compare `solve(t(X) %*% X, t(X) %*% y)` with `lm()`.
-4. Add `Solar.R` to the multiple regression design matrix.
-5. Standardize `Temp` manually and refit the simple regression.
+[Mixed Model](https://gist.github.com/cheuerde/24b8c7e8010d34b8212b)

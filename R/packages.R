@@ -40,7 +40,9 @@ course_packages <- function(include_applied = TRUE, include_stan = FALSE, includ
 
   legacy <- c(
     "car",
+    "ellipse",
     "emmeans",
+    "factoextra",
     "GGally",
     "htmltools",
     "klippy",

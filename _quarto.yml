@@ -23,7 +23,7 @@ website:
             href: labs/optimization.qmd
           - text: Maximum Likelihood
             href: labs/maximum-likelihood.qmd
-          - text: Least Squares
+          - text: Linear Regression
             href: labs/linear-regression.qmd
           - text: Bayesian Inference
             href: labs/bayesian-inference.qmd
@@ -41,7 +41,7 @@ website:
             href: lectures/optimization.qmd
           - text: Maximum Likelihood
             href: lectures/maximum-likelihood.qmd
-          - text: Least Squares
+          - text: Linear Regression
             href: lectures/linear-regression.qmd
           - text: Bayesian Inference
             href: lectures/bayesian-inference.qmd

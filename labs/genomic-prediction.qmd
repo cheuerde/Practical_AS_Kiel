@@ -1,14 +1,11 @@
 ---
 title: "Genomic Prediction"
-subtitle: "Ridge marker BLUP, GBLUP, cross-validation, and Bayesian alphabet"
 format:
   html:
     code-fold: false
 ---
 
 <div class="view-switch"><a href="../lectures/genomic-prediction.html">Open slides</a></div>
-
-Genomic prediction predicts breeding values from phenotypes and dense SNP marker data. The basic idea from the original lab is that the breeding value of an individual can be recovered by summing marker allele effects.
 
 ```{r}
 #| include: false
@@ -18,395 +15,471 @@ library(knitr)
 theme_set(theme_minimal(base_size = 13))
 ```
 
-## Genomic Prediction
+# Genomic Prediction
 
-Let $\mathbf{M}$ be a marker matrix with genotypes coded as 0, 1, and 2. Let $\hat{\mathbf{a}}$ be a vector of estimated marker effects.
-
-$$
-\hat{\mathbf{g}}
-=
-\mathbf{M}\hat{\mathbf{a}}.
-$$
-
-The genomic estimated breeding value is the sum of the estimated marker effects carried by the individual.
-
-## Ridge Regression BLUP
-
-The marker effects can be estimated directly with a mixed-model view:
+Genomic Prediction entails methods to predict breeding values based on phenotypic
+and molecular (SNP) data.
+The general concept is that the breeding value of an individual can be recovered by
+a linear regression on its genotype scores, i.e.
 
 $$
-\mathbf{y}
-=
-\mu
-+ \mathbf{M}\mathbf{a}
-+ \mathbf{e},
-\qquad
-\mathbf{a} \sim N(\mathbf{0}, \mathbf{I}\sigma_a^2).
+\mathbf{\hat{g}} = \mathbf{M}\mathbf{\hat{a}},
 $$
 
-For genomic prediction, marker genotypes are usually centered by allele frequencies:
+where $\mathbf{M}$ is a matrix of genotype scores in {0,1,2} coding, denoting the copies
+of the major allele of SNP markers the individual carries, and $\mathbf{\hat{a}}$ is a vector
+of average allele effects for those markers.
+
+The estimated breeding value ($\mathbf{\hat{g}}$, EBV) is then the sum of all the average allele
+effects for the marker alleles the individual carries.
+
+# Ridge Regression BLUP
+
+The average allele effects can be estimated directly in a mixed effects model,
+treating the them as random effects:
 
 $$
-p_j = \frac{1}{2n}\sum_{i=1}^{n} m_{ij},
-\qquad
-\bar{m}_{ij} = m_{ij} - 2p_j.
+\mathbf{y} = \mu + \mathbf{M}\mathbf{{a}} + \mathbf{e}
 $$
 
-This makes EBVs deviations from the population mean:
+If the individuals in $\mathbf{M}$ are not representative of the general population (if they are top ranking
+individuals only, for example), we have to adjust the breeding values obtained from the marker effects
+by the population mean. In genomics, the population mean can be descriped by the allele frequencies
+in the general population:
 
 $$
-\hat{\mathbf{g}}
-=
-\bar{\mathbf{M}}\hat{\mathbf{a}}
-=
-\mathbf{M}\hat{\mathbf{a}} - 2\mathbf{p}\hat{\mathbf{a}}.
+p_i =  \frac{\sum_{i = 1}^{p}  m_{b_i}}{n},
 $$
 
-## Prepare A Wheat-Style Dataset
+where $p_i$ denotes the allele frequency of the general population at marker $i$ and $m_{b_i}$ are the marker
+covariates at marker $i$ of the general population.
+Oftentimes, $\mathbf{M}$ is used as being representative of the general population, which is ususally not the case.
 
-The old lab used the `wheat` data from `BGLR`. The evaluated version below uses a simulated wheat-style marker matrix so the rendered site does not require optional genomic packages. The following optional block is the original data path.
+In order to adjust the EBVs from a genomic prediction model to represent the deviations from the population mean,
+we subtract the average EBV of that population:
 
-```{r eval=FALSE}
+$$
+\mathbf{\hat{g}} = \mathbf{M}\mathbf{\hat{a}} - 2\mathbf{p}\mathbf{\hat{a}}
+$$
+
+# GBLUP - an equivalent Ridge Regression Animal Model
+
+Instead of doing regression on the marker covariates directly,
+we can also generate a Gaussian Kernel from those covariates. That kernel
+is commonly referred to as the genomic relationship matrix, and we obtain it
+like this:
+
+$$
+\mathbf{G} = \frac{\bar{\mathbf{M}}\bar{\mathbf{M}}'}{tr(\bar{\mathbf{M}}\bar{\mathbf{M}}') / n},
+$$
+
+where $\bar{\mathbf{M_i}} = \mathbf{M_i} - 2p_i$. The centering of the genotypes guarantees that our
+EBVs reflect a deviation from the general population, and the scaling (division by $tr(\bar{\mathbf{M}}\bar{\mathbf{M}}') / n$)
+that our estimated variance components mimic an additive genetic variance.
+
+The GBLUP model then becomes:
+
+$$
+\mathbf{y} = \mu + \mathbf{g} + \mathbf{e}
+$$
+
+with $\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2}$).
+
+It is important to note that both models, the ridge regression marker model and GBLUP are statistically
+identical and result in the same EBVs. So we can chose the model that is most convenient to fit
+computationally.
+
+# GBLUP examples in R
+
+First we will be preparing a common dataset for the upcoming excercises
+
+```{r gblup_data}
 library(BGLR)
-
-data(wheat)
-y <- wheat.Y[, 1]
-M <- wheat.X
-```
-
-```{r}
-simulate_wheat_like <- function(n = 220, m = 450, n_qtl = 35, h2 = 0.45, seed = 2026) {
-  set.seed(seed)
-  p <- runif(m, min = 0.05, max = 0.50)
-  M <- sapply(p, function(marker_p) rbinom(n, size = 2, prob = marker_p))
-  colnames(M) <- paste0("marker_", seq_len(m))
-
-  qtl <- sample(seq_len(m), size = n_qtl)
-  a <- rep(0, m)
-  a[qtl] <- rnorm(n_qtl, mean = 0, sd = 0.22)
-
-  Mc <- sweep(M, 2, 2 * p, "-")
-  g <- as.numeric(Mc %*% a)
-  e_sd <- sqrt(var(g) * (1 - h2) / h2)
-  y <- 30 + g + rnorm(n, sd = e_sd)
-
-  list(y = y, M = M, p = p, g = g, source = "simulated wheat-style data")
-}
-
-dat <- simulate_wheat_like()
-y <- dat$y
-M <- dat$M
-p <- colMeans(M) / 2
-Mc <- sweep(M, MARGIN = 2, STATS = 2 * p, FUN = "-")
-
-kable(
-  data.frame(
-    source = dat$source,
-    animals = nrow(M),
-    markers = ncol(M),
-    phenotype_mean = mean(y),
-    phenotype_sd = sd(y)
-  ),
-  digits = 3
-)
-```
-
-## Genomic Relationship Matrix
-
-GBLUP uses a genomic relationship matrix:
-
-$$
-\mathbf{G}
-=
-\frac{\bar{\mathbf{M}}\bar{\mathbf{M}}'}
-{\operatorname{mean}\left(\operatorname{diag}(\bar{\mathbf{M}}\bar{\mathbf{M}}')\right)}.
-$$
-
-```{r}
-MMdash <- Mc %*% t(Mc)
-G <- MMdash / mean(diag(MMdash))
-
-g_subset <- as.data.frame(as.table(G[1:45, 1:45]))
-names(g_subset) <- c("animal_1", "animal_2", "relationship")
-
-ggplot(g_subset, aes(animal_1, animal_2, fill = relationship)) +
-  geom_tile() +
-  scale_fill_gradient2(low = "#245c73", mid = "#fff8ef", high = "#c46a2b") +
-  coord_equal() +
-  labs(x = NULL, y = NULL, fill = "G")
-```
-
-## Original rrBLUP Implementation
-
-This is the compact version of the old `rrBLUP::mixed.solve()` workflow. It is useful in class if `rrBLUP` is installed.
-
-```{r eval=FALSE}
 library(rrBLUP)
+library(ggplot2)
+library(knitr)
+library(lattice)
 
-Z <- Mc
-X <- matrix(1, nrow = length(y), ncol = 1)
+# load the "wheat" data set from BGLR
+data(wheat)
 
-mod_rr <- mixed.solve(
-  y = y,
-  X = X,
-  Z = Z,
-  method = "ML"
-)
+# extract one phenotype
+y = wheat.Y[,1]
 
-a_rr <- mod_rr$u
-g_rr <- as.numeric(Z %*% a_rr)
+# the marker covariates
+M = wheat.X
 
-var_a_rr <- mod_rr$Vu
-var_e_rr <- mod_rr$Ve
-var_g_rr <- mod_rr$Vu * mean(diag(MMdash))
+# average allele frequencies ("p")
+p = colMeans(M) / 2
+
+# center our Marker covariates
+Mc = sweep(
+     x = M,
+     MARGIN = 2,
+     FUN = "-",
+     STATS = 2 * p
+     )
+
+# compute G matrix
+MMdash = Mc %*% t(Mc)
+G = MMdash / mean(diag(MMdash))
+
+# look at genomic relationships
+levelplot(G)
 ```
 
-## Ridge Marker Model Without Extra Packages
+With the basic dataset established, we now have many options to fit the ridge regression marker
+or GBLUP model.
 
-For a portable lab version we use the equivalent ridge equations with a fixed shrinkage value:
+## Ridge Regression Marker Model
 
-$$
-\hat{\mathbf{a}}
-=
-\left(\bar{\mathbf{M}}'\bar{\mathbf{M}} + \lambda\mathbf{I}\right)^{-1}
-\bar{\mathbf{M}}'(\mathbf{y} - \bar{y}\mathbf{1}).
-$$
+```{r rrblup}
+# design matrix for random effects (marker covariates become design matrix)
+Z = Mc
 
-```{r}
-fit_marker_ridge <- function(y, Mc, lambda = 50) {
-  y_mean <- mean(y)
-  a_hat <- as.numeric(
-    solve(crossprod(Mc) + diag(lambda, ncol(Mc)), crossprod(Mc, y - y_mean))
-  )
+# design matrix for fixed effects (only intercept)
+X = array(1, dim = c(length(y), 1))
 
-  list(
-    mean = y_mean,
-    marker_effect = a_hat,
-    gebv = as.numeric(Mc %*% a_hat)
-  )
-}
+# fit the model with ML
+mod_rr = mixed.solve(
+         y = y,
+         X = X,
+         Z = Z,
+         method = "ML"
+         )
 
-lambda <- 50
-mod_rr <- fit_marker_ridge(y, Mc, lambda = lambda)
-a_rr <- mod_rr$marker_effect
-g_rr <- mod_rr$gebv
+# extract marker effects
+a_rr = mod_rr$u
 
-kable(
-  data.frame(
-    lambda = lambda,
-    sd_marker_effects = sd(a_rr),
-    sd_gebv = sd(g_rr),
-    cor_true = cor(g_rr, dat$g)
-  ),
-  digits = 3
-)
-```
+# predict breeding values from the model
+g_rr = as.numeric(Z %*% a_rr)
 
-```{r}
-ggplot(data.frame(true = dat$g, ridge = g_rr), aes(true, ridge)) +
-  geom_point(alpha = 0.75, color = "#0c6773") +
-  geom_abline(slope = 1, intercept = 0, color = "#c46a2b") +
-  labs(x = "True breeding value", y = "Ridge marker EBV")
+# extract variance components
+var_a_rr = mod_rr$Vu
+var_e_rr = mod_rr$Ve
+
+# we get the "additive genetic" variance, by rescaling the variance component for
+# the marker effects
+var_g_rr = mod_rr$Vu * mean(diag(MMdash))
 ```
 
 ## GBLUP Model
 
-The equivalent GBLUP model is:
+```{r gblup}
+# fit the model with ML
+mod_gblup = mixed.solve(
+         y = y,
+         K = G, # here we pass the genomic relationship matrix as kernel
+         method = "ML"
+         )
 
-$$
-\mathbf{y}
-=
-\mu
-+ \mathbf{g}
-+ \mathbf{e},
-\qquad
-\mathbf{g} \sim MVN(\mathbf{0}, \mathbf{G}\sigma_g^2).
-$$
+# extract breeding values
+g_gblup = mod_gblup$u
 
-The old lab fitted this with `rrBLUP`:
+# obtain marker effects from a GBLUP model
+MMdash_tmp = MMdash
+diag(MMdash_tmp) = diag(MMdash_tmp) + 0.00001
+a_gblup = as.numeric(t(Mc) %*% solve(MMdash_tmp, g_gblup))
 
-```{r eval=FALSE}
-mod_gblup <- mixed.solve(
-  y = y,
-  K = G,
-  method = "ML"
-)
-
-g_gblup <- mod_gblup$u
-var_g_gblup <- mod_gblup$Vu
-var_e_gblup <- mod_gblup$Ve
+# extract variance components
+var_g_gblup = mod_gblup$Vu
+var_e_gblup = mod_gblup$Ve
 ```
 
-With fixed $\lambda$, the package-free equivalent is:
+## Check equivalence of models
 
-```{r}
-lambda_g <- lambda / mean(diag(MMdash))
-y_centered <- y - mean(y)
+```{r check_equivalence}
+# plot breeding values from both models
+plot(g_rr, g_gblup)
 
-g_gblup <- as.numeric(
-  G %*% solve(G + diag(lambda_g, nrow(G)), y_centered)
-)
+# plot marker effects from both models
+plot(a_rr, a_gblup)
 
-equivalence <- data.frame(
-  marker_model = g_rr,
-  gblup = g_gblup
-)
+# some summaries
+summary(lm(g_rr ~ g_gblup))
+summary(lm(a_rr ~ a_gblup))
 
-kable(
-  data.frame(
-    correlation = cor(equivalence$marker_model, equivalence$gblup),
-    maximum_absolute_difference = max(abs(equivalence$marker_model - equivalence$gblup))
-  ),
-  digits = 6
-)
+# variance components and heritabilities
+vc = rbind(
+         data.frame(
+          model = "Marker Model",
+          var_g = var_g_rr,
+          var_e = var_e_rr,
+          h2 = var_g_rr / (var_g_rr + var_e_rr)
+          ),
+         data.frame(
+          model = "GBLUP",
+          var_g = var_g_gblup,
+          var_e = var_e_gblup,
+          h2 = var_g_gblup / (var_g_gblup + var_e_gblup)
+          )
+         )
+
+kable(vc, digits = 3)
 ```
 
-```{r}
-ggplot(equivalence, aes(marker_model, gblup)) +
-  geom_point(alpha = 0.75, color = "#0c6773") +
-  geom_abline(slope = 1, intercept = 0, color = "#c46a2b") +
-  labs(x = "Ridge marker model", y = "GBLUP")
-```
+## Cross Validation
 
-## Cross-Validation
+In order to assess the performance of our genomic prediction models, we can
+run a cross validation scheme, in which we train marker effects with a subset
+of the data and predict the EBVs of the left out samples based on the training model.
 
-The original lab used repeated fold splits and predicted animals that were masked from the training data.
+```{r cv, eval=FALSE}
+# define function to create cross validation samples
+cCV <- function(y, folds=5, reps=1, matrix=FALSE, seed=NULL) {
 
-```{r}
-cCV <- function(y, folds = 5, reps = 1, seed = NULL) {
-  if (!is.vector(y)) stop("y must be a vector")
-  if (folds < 2) stop("'folds' must be larger than one")
+  if(!is.vector(y)) stop("y must be a vector")
+  if(folds < 2) stop("'folds' must be larger than one")
+  if(reps < 1) reps = 1
 
-  if (is.null(seed)) {
-    seed <- as.integer((as.double(Sys.time()) * 1000 + Sys.getpid()) %% 2^31)
-  }
+  reps = as.integer(reps)
+  folds = as.integer(folds)
 
-  set.seed(seed)
-  observed <- which(!is.na(y))
-  cv_pheno <- vector("list", folds * reps)
-  count <- 0
+  isy <- (1:length(y))[!is.na(y)]
 
-  for (rep in seq_len(reps)) {
-    fold_id <- sample(rep(seq_len(folds), length.out = length(observed)))
+  n_vec <- rep(NA,folds)
+  start <- rep(NA,folds)
+  end <- rep(NA,folds)
 
-    for (fold in seq_len(folds)) {
-      count <- count + 1
-      y_temp <- y
-      y_temp[observed[fold_id == fold]] <- NA
-      cv_pheno[[count]] <- y_temp
+  n_vec[1:(folds-1)] <- round(length(isy)/folds,digits=0)
+  n_vec[folds] <- length(isy) - sum(n_vec[1:(folds-1)])
+
+
+  for(j in 1:folds) {
+
+    if(j==1) {
+
+      start[j] = 1
+
+    } else {
+
+      start[j] = end[j-1]+1
+
     }
+
+    end[j] = sum(n_vec[1:j])
   }
 
-  cv_pheno
+  count=0
+  cv_pheno <- list(folds*reps)
+
+  if(missing(seed)) seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) %% 2^31)
+  set.seed(seed)
+
+  for(i in 1:reps) {
+
+    ids <- sample(isy,length(isy),replace=F)
+
+    for(j in 1:folds) {
+
+      count=count+1
+      y_temp = y
+      y_temp[ids[start[j]:end[j]]] <- NA
+      cv_pheno[[count]] <- y_temp
+
+    }
+
+  }
+
+
+  if(matrix) {
+
+    return(matrix(unlist(cv_pheno),nrow=length(y),ncol=length(cv_pheno),byrow=FALSE))
+
+  } else {
+
+    return(cv_pheno)
+
+  }
+
 }
 
-predict_masked_ridge <- function(y_masked, Mc, lambda = 50) {
-  training <- !is.na(y_masked)
-  validation <- is.na(y_masked)
+# create 5 fold cross validation samples
+cvs = cCV(y, folds = 5, reps = 10)
 
-  fit <- fit_marker_ridge(y_masked[training], Mc[training, , drop = FALSE], lambda = lambda)
-  prediction <- rep(NA_real_, length(y_masked))
-  prediction[validation] <- fit$mean + as.numeric(Mc[validation, , drop = FALSE] %*% fit$marker_effect)
-  prediction
+# run cross validation
+pred = rep(as.numeric(NA), length(y))
+for(i in 1:length(cvs)) pred[is.na(cvs[[i]])] = mixed.solve(y = cvs[[i]], K = G)$u[is.na(cvs[[i]])]
+
+
+# if we have more than 1 repition, need to use this
+preds = list()
+for(i in 1:length(cvs)) {
+
+  this_pred = mixed.solve(y = cvs[[i]], K = G)$u[is.na(cvs[[i]])]
+  this_y = y[is.na(cvs[[i]])]
+  preds[[i]] = data.frame(pred = this_pred, y = this_y)
+
 }
 
-cvs <- cCV(y, folds = 5, reps = 3, seed = 2026)
+cors = unlist(lapply(preds, function(x) cor(x$pred, x$y)))
 
-preds <- lapply(cvs, function(y_masked) {
-  prediction <- predict_masked_ridge(y_masked, Mc, lambda = lambda)
-  validation <- is.na(y_masked)
-  data.frame(pred = prediction[validation], y = y[validation])
-})
+# Combine all predictions into a single vector if needed
+pred <- unlist(lapply(preds, function(x) x$pred))
 
-cv_out <- do.call(rbind, preds)
+# plot predictes vs observed
+plot(pred, y)
 
-kable(
-  data.frame(
-    prediction_accuracy = cor(cv_out$pred, cv_out$y),
-    bias_slope = coef(lm(pred ~ y, data = cv_out))[2]
-  ),
-  digits = 3
-)
+# prediction accuracy
+cor(pred, y)
+
+# check bias
+summary(lm(pred ~ y))
 ```
 
-```{r}
-ggplot(cv_out, aes(y, pred)) +
-  geom_point(alpha = 0.65, color = "#0c6773") +
-  geom_smooth(method = "lm", se = FALSE, color = "#c46a2b") +
-  labs(x = "Observed phenotype", y = "Cross-validated prediction")
-```
+# Bayesian Alphabet
 
-## Bayesian Alphabet
-
-The Bayesian alphabet changes the prior on marker effects to introduce feature selection. A spike-and-slab prior is:
+A linear mixed model with a series of independent random effects has the following form:
 
 $$
-u_j \sim \pi N(0, \sigma_u^2) + (1 - \pi)\delta_0.
+\mathbf{y} = \mathbf{X\boldsymbol{\beta}} + \mathbf{Z}_{1}\mathbf{u}_1 + \mathbf{Z}_{2}\mathbf{u}_2 + \mathbf{Z}_{3}\mathbf{u}_3 + \dots + \mathbf{Z}_{k}\mathbf{u}_{k} + \mathbf{e},
 $$
 
-Markers assigned to the point mass at zero are effectively excluded. Markers assigned to the normal part can have non-zero effects.
-
-![](../misc/spike_slap.png)
-
-![](../misc/ba_priors.png)
-
-## BayesCpi Threshold Model
-
-For a binary trait, the old lab used a probit threshold model:
+with the joint posterior density
 
 $$
 \begin{aligned}
-\mathbf{y} &\sim \operatorname{Bernoulli}(\mathbf{p})\\
-\mathbf{p} &= \Phi(\mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\mathbf{u}) \\
-\mathbf{u} &\sim \pi N(0,\sigma_u^2) + (1-\pi)\delta_0.
+p(\boldsymbol{\beta},\sigma_{\beta}^2,\mathbf{u}_{1},\sigma_{u_1}^2,\dots,\mathbf{u}_{k},\sigma_{u_{k}}^2, \sigma_{\epsilon}^2 | \mathbf{y})
+&\propto \left\{\prod_{i=1}^{n}N(y_i | \mathbf{x}_{i}' \boldsymbol{\beta} + \sum_{j=1}^{k} \mathbf{z}_{j_i}' \mathbf{u}_{j}, \sigma_{\epsilon}^2) \right\} \\
+&\times N(\boldsymbol{\beta}|0,\mathbf{I}\sigma_{\beta}^2) \prod_{j=1}^{k}N(\mathbf{u}_{j} | 0,\mathbf{I}\sigma_{j}^2) \\
+&\times \prod_{j=1}^{k} \chi^{-2}(\sigma_{j}^2 | S_{j}, df_{j}) \chi^{-2}(\sigma_{\epsilon}^2 | S_{\epsilon}, df_{\epsilon}).
 \end{aligned}
 $$
 
-The JAGS implementation remains useful as a reference, but it should be treated as an extension rather than a required live dependency.
+In the Bayesian Alphabet, the prior distributions on the marker effects is altered to generally generate a sparsity pattern on the
+marker effects, meaning feature selection.
+This feature selection is achieved by using *spike-and-slap* mixture priors. Those priors have a point mass at zero and a
+usually normal slap. Noisance marker effects ideally get absorbed in the point mass at zero, whereas relevant markers
+have a higher mixture probability for the slap, and get a significan effect size.
 
-```{r eval=FALSE}
+![](../misc/spike_slap.png)
+
+{https://fabiandablander.com/r/Spike-and-Slab.html}
+
+![](../misc/ba_priors.png)
+
+{https://xzlab.org/papers/2013_Zhouetal_PG.pdf}
+
+# $BayesC\pi$ - Threshold Model
+
+Binary Traits (0/1) can be modelled with generalized linear models in which the expectation of the observations
+are mapped to a linear predictor comprised of random and fixed effects.
+The likelihood for the data is a Bernoulli distribution in our case, with success probably linked to
+the linear predictor through the probit function:
+
+$$
+\begin{aligned}
+\mathbf{y} &\sim \mathbf{B}(1,\mathbf{p})\\
+\mathbf{p} &= probit(\mathbf{X}\boldsymbol{\beta} + \mathbf{Zu}) \\
+\boldsymbol{\beta} &\sim \mathbf{U}(-Inf,Inf) \\
+\mathbf{u} &\sim \pi N(0,{\sigma_u}^2) + (1-\pi)\delta_0 \\
+\pi &\sim U(0,1) \\
+{\sigma_u}^2 &\sim Gamma(1,0.01)
+\end{aligned}
+$$
+
+The following shows an implmementation of that model in [Jags](https://mcmc-jags.sourceforge.io/):
+
+```{r bayesc, eval=FALSE}
+if (!require("rjags")) install.packages("rjags")
 library(rjags)
 
-BayesCJags <- function(y, Z, threshold = FALSE, niter = 5000, burnin = 2500,
-                       betaPriorAlpha = 2, betaPriorBeta = 5) {
-  modelstringThreshold <- "
+BayesCJags <- function(y, Z, threshold = FALSE, niter = 5000, burnin = 2500, betaPriorAlpha = 2, betaPriorBeta = 5) {
+
+
+  ###############################
+  ### First the model strings ###
+  ###############################
+
+  # probit threshold model
+  modelstringThreshold = "
   model {
     for (i in 1:n) {
       y[i] ~ dbern(prob[i])
-      probit(prob[i]) <- alpha + inprod(X[i,], beta)
+      probit(prob[i]) <- alpha + inprod(X[i,],beta)
     }
     for (j in 1:p) {
       ind[j] ~ dbern(pind)
-      betaT[j] ~ dnorm(0, tau)
+      betaT[j] ~ dnorm(0,tau)
       beta[j] <- ind[j] * betaT[j]
     }
-    tau ~ dgamma(1, 0.001)
-    alpha ~ dnorm(0, 0.0001)
+    tau ~ dgamma(1,0.001)
+    alpha ~ dnorm(0,0.0001)
+    # pind ~ dunif(0,1)
     pind ~ dbeta(betaPriorAlpha, betaPriorBeta)
   }
   "
 
-  data <- list(
-    y = y,
-    X = Z,
-    n = length(y),
-    p = ncol(Z),
-    betaPriorAlpha = betaPriorAlpha,
-    betaPriorBeta = betaPriorBeta
-  )
+  # and the gaussian model
+  modelstringGaussian = "
+  model {
+    for (i in 1:n) {
+      y[i] ~ dnorm(alpha + inprod(X[i,],beta), tauE)
+    }
+    for (j in 1:p) {
+      ind[j] ~ dbern(pind)
+      betaT[j] ~ dnorm(0,tauB)
+      beta[j] <- ind[j] * betaT[j]
+    }
+    tauB ~ dgamma(1,0.001)
+    alpha ~ dnorm(0,0.0001)
+    # pind ~ dunif(0,1)
+    pind ~ dbeta(betaPriorAlpha, betaPriorBeta)
+    tauE ~ dgamma(1, 0.001)
+  }
+  "
 
-  init <- list(alpha = 0, betaT = rep(0, ncol(Z)), pind = 0.5, ind = rep(0, ncol(Z)), tau = 1)
+  # the default (gaussian)
+  modelstring <- modelstringGaussian
+
+  if(threshold) {
+
+    modelstring = modelstringThreshold
+
+  }
+
+
+  # some checks
+  if(!(is.numeric(y) | is.numeric(y) | is.vector(y))) stop("y must be a numeric/integer vector")
+  if(threshold & length(unique(y)) > 2) stop("y must be 0/1 for the threshold model")
+
+  if(!is.matrix(Z)) stop("Z must be a numeric matrix")
+  if(nrow(Z) != length(y)) stop("Z must have as many rows as elements in y")
+
+  # make the data.frame
+  n = length(y)
+  p <- ncol(Z)
+
+  data = list(y = y, X=Z ,n = n,p = p, betaPriorAlpha = betaPriorAlpha, betaPriorBeta = betaPriorBeta)
+  init = list(alpha = 0, betaT = rep(0,p), pind = 0, ind = rep(0,p), tauB = 1)
+  if(!threshold) init$tauE = 1
+
   load.module("glm")
-  model <- jags.model(textConnection(modelstringThreshold), data = data, inits = init)
+  model = jags.model(textConnection(modelstring),
+         data = data, inits = init)
+
+  # burnin
   update(model, n.iter = burnin)
-  coda.samples(model, variable.names = names(init), n.iter = niter - burnin)
+
+  # sampling
+  output = coda.samples(model = model,
+            variable.names = names(init),
+            n.iter = (niter - burnin), thin = 1)
+
+  return(output)
+
 }
+
+# create "binary" trait from our phenotypes
+mu_y = mean(y)
+y_binary = rep(0, length(y))
+y_binary[y > mu_y] = 1
+
+Mc_small = Mc[, 1:50]
+
+# run model
+mod_bcpi <- BayesCJags(y = y_binary, Z = Mc_small, threshold = TRUE, niter = 500, burnin = 250, betaPriorAlpha = 2, betaPriorBeta = 5)
+
+# gaussian response
+mod_bcpi_gaussian <- BayesCJags(y = y, Z = Mc_small, threshold = FALSE, niter = 500, burnin = 250, betaPriorAlpha = 2, betaPriorBeta = 5)
 ```
-
-## Exercises
-
-1. Replace the simulated data with the `BGLR::wheat` data if the package is installed.
-2. Change the marker subset size and inspect runtime.
-3. Compare the marker-model EBVs with GBLUP EBVs.
-4. Increase the number of cross-validation repetitions.
-5. Explain when ridge BLUP and spike-and-slab priors would behave differently.

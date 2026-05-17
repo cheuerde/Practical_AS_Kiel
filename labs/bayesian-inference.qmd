@@ -1,14 +1,11 @@
 ---
 title: "Bayesian Inference"
-subtitle: "Priors, brms, and animal-model patterns"
 format:
   html:
     code-fold: false
 ---
 
 <div class="view-switch"><a href="../lectures/bayesian-inference.html">Open slides</a></div>
-
-Bayesian inference combines the likelihood with prior assumptions. In this lab the focus is practical: specify priors, fit models with `brms`, update priors from previous evidence, and recognize the animal-model structure in a Bayesian formulation.
 
 ```{r}
 #| include: false
@@ -18,296 +15,448 @@ library(knitr)
 theme_set(theme_minimal(base_size = 13))
 ```
 
-## Bayes' Theorem
+# Bayes Theorem
 
 $$
-p(\theta \mid y)
-=
-\frac{p(y \mid \theta)p(\theta)}{p(y)}.
+p(A|B) = \frac{p(B|A)p(A)}{p(B)}
 $$
 
-For model fitting, the denominator is a scaling constant:
+In statistical modelling, the Bayes theorem infers the probability of observing the parameters of interest,
+given our prior beliefs about those parameters and the likelihood of the data given the parameters:
 
 $$
-p(\theta \mid y)
-\propto
-p(y \mid \theta)p(\theta).
+p(\theta|y) = \frac{p(y|\theta)p(\theta)}{p(y)}
 $$
 
-That is enough for this lab: likelihood times prior gives the fitted Bayesian model.
+This is in contrast with a frequentist (maximum likelihood) approach, in which we aim to estimate non-random,
+fixed parameters using the likelihood of the data given those parameters only ($p(y|\theta)$).
 
-## Estimating A Normal Mean
+The overall likelihood of the data ($p(y)$) only serves as a scaling constant and is therefore ignored
+in parameter estimation ($p(\theta|y) \propto p(y|\theta)p(\theta)$)
 
-The original first example estimates the mean of `Sepal.Width` in the `iris` data:
+# Estimating the mean of a normal distribution
+
+In a Bayesian framework, we formulate our problem in terms of the assumed distribution
+of our data (likelihood) and the prior distributions of our parameters we wish to estimate.
+The parameter space (solution space) is only constrained by the prior choice, so it becomes important
+to explore the posterior distribution in an efficient way.
+The available prior distributions depend on the MCMC algorithm being used. [Stan](https://mc-stan.org/) (backend of [brms](https://github.com/paul-buerkner/brms)),
+uses an [HMC sampler](https://mc-stan.org/docs/2_19/reference-manual/hamiltonian-monte-carlo.html) and allows for non-conjugant priors, meaning
+virtually any prior distribution for any parameter can be chosen, regardless of the likelihood function of the data.
 
 $$
-\mathbf{y} \sim N(\mu, \sigma_e^2),
-\qquad
-\mu \sim N(\mu_\text{prior}, \sigma_\text{prior}^2).
+\begin{align}
+\mathbf{y} &\sim \mathbf{N}(\mu, \sigma_{e}^{2}) \\
+\mu &\sim N(\mu_{prior}, \sigma_{prior}^{2})
+\end{align}
 $$
 
-The key teaching point is the role of the prior location and prior standard deviation.
+The probability of our parameters given the data ($p(\mu|y)$) is proportional to the product of the likelihood of the data given our parameters ($p(y|\theta)$,
+which is a normal density function, and the prior likelihood of the parameters ($p(\theta)$), which is a normal density function again, with mean
+and standard deviation reflecting our prior belief in location and our confidence in that location of the mean.
 
-```{r}
-data(iris)
-
-iris_mean <- data.frame(
-  trait = "Sepal.Width",
-  n = length(iris$Sepal.Width),
-  mean = mean(iris$Sepal.Width),
-  sd = sd(iris$Sepal.Width)
-)
-
-kable(iris_mean, digits = 3)
-```
-
-## brms Mean Example
-
-This is the in-class code pattern from the old lab. It is not evaluated during site rendering, because Stan compilation should not block the course website build.
-
-```{r eval=FALSE}
+```{r brms_mean, eval=FALSE}
 library(brms)
-library(posterior)
+library(ggplot2)
+library(knitr)
+library(tidyverse)
 
 data(iris)
 
-# inspect default priors
+# this gives us the default brms priors
 get_prior(Sepal.Width ~ 1, data = iris)
 
-# custom prior for the intercept
-priors <- set_prior("normal(0, 0.2)", class = "Intercept")
+# set a custom prior for the intercept
+# NOTE: the standard deviation in the normal prior lets us specify our strength of belief
+# in the mean specified
+priors = set_prior("normal(0,0.2)", class = "Intercept")
 
-fit <- brm(
-  Sepal.Width ~ 1,
-  data = iris,
-  family = gaussian(),
-  prior = priors,
-  sample_prior = TRUE,
-  backend = "cmdstanr",
-  chains = 2,
-  iter = 1000,
-  seed = 2026,
-  refresh = 0
+fit <- brm(Sepal.Width ~ 1,
+     data = iris,
+     family = gaussian(),
+     prior = priors,
+     sample_prior = TRUE,
+     silent = 2,
+     refresh = 0
 )
 
-draws <- as_draws_array(fit)[, 1, , drop = TRUE]
+# compare prior to posterior
+# extract draws from first chain
+draws = as_draws_array(fit)[,1,, drop = TRUE]
 
-samples <- rbind(
-  data.frame(type = "prior", samples = as.numeric(draws[, "prior_Intercept"])),
-  data.frame(type = "posterior", samples = as.numeric(draws[, "b_Intercept"]))
+samples = rbind(
+    data.frame(
+         type = "prior",
+         samples = as.numeric(draws[, "prior_Intercept"])
+         ),
+    data.frame(
+         type = "posterior",
+         samples = as.numeric(draws[, "b_Intercept"])
+    )
 )
-
-aggregate(samples ~ type, data = samples, FUN = function(x) c(mean = mean(x), sd = sd(x)))
-plot(fit)
-```
-
-For the rendered notes, we use a lightweight preview of the same prior-vs-estimate idea.
-
-```{r}
-set.seed(2026)
-
-prior_samples <- rnorm(4000, mean = 0, sd = 0.2)
-estimate_samples <- rnorm(
-  4000,
-  mean = mean(iris$Sepal.Width),
-  sd = sd(iris$Sepal.Width) / sqrt(nrow(iris))
-)
-
-samples <- rbind(
-  data.frame(type = "prior", samples = prior_samples),
-  data.frame(type = "estimate from data", samples = estimate_samples)
-)
-
-sample_summary <- do.call(
-  rbind,
-  lapply(split(samples$samples, samples$type), function(x) {
-    data.frame(n = length(x), mean = mean(x), sd = sd(x))
-  })
-)
-sample_summary$type <- rownames(sample_summary)
-rownames(sample_summary) <- NULL
 
 kable(
-  sample_summary[, c("type", "n", "mean", "sd")],
-  digits = 3
-)
+      samples %>% group_by(type) %>% summarize(
+                         n = n(),
+                         mean = mean(samples),
+                         sd = sd(samples)
+                         ),
+      digits = 3
+      )
+
+p = ggplot(samples, aes(x = samples)) +
+  geom_density(aes(fill = type)) +
+  scale_fill_manual(values = c('#526A83','#68855C'))
+
+
+p
 ```
 
-```{r}
-ggplot(samples, aes(samples, fill = type)) +
-  geom_density(alpha = 0.55) +
-  scale_fill_manual(values = c("prior" = "#526A83", "estimate from data" = "#68855C")) +
-  labs(x = "Mean of Sepal.Width", y = "Density", fill = NULL)
-```
+## Updating priors from existing evidence
 
-## Updating Priors From Existing Evidence
+Bayesian Inference allows us to incorporate actual prior evidence in the estimation
+of parameters. For example, we might have conducted a previous experiment and we arrived
+at an estimate of the mean of our observations.
+We then do another experiment of similar setup and want to update our mean estimate.
+In that case, we can use the posterior distribution of the mean from the first experiment
+as the prior on that mean for the second experiment:
 
-The old lab used a first experiment to inform the prior for a second experiment. That is the practical Bayesian workflow worth keeping.
+$$
+p(\theta|y)_{FirstExperiment} \propto p(y|\theta)p(\theta)
+$$
 
-```{r eval=FALSE}
+Plugging in the posterior from the first experiment as the prior for the second:
+
+$$
+p(\theta|y)_{SecondExperiment} \propto p(y|\theta)p(\theta|y)_{FirstExperiment}
+$$
+
+```{r brms_mean_update, eval=FALSE}
 library(brms)
-library(posterior)
+library(ggplot2)
+library(knitr)
+library(tidyverse)
 
 data(iris)
 
-iris_first <- iris[1:50, ]
-iris_second <- iris[51:nrow(iris), ]
+# subset first 50 observations
+iris_first = iris[1:50,]
 
-fit_first <- brm(
-  Sepal.Width ~ 1,
-  data = iris_first,
-  family = gaussian(),
-  prior = set_prior("normal(0, 4)", class = "Intercept"),
-  sample_prior = TRUE,
-  backend = "cmdstanr",
-  chains = 2,
-  iter = 1000,
-  seed = 2026,
-  refresh = 0
+# this gives us the default brms priors
+get_prior(Sepal.Width ~ 1, data = iris_first)
+
+# set a "flat" prior, no prior evidence
+priors = set_prior("normal(0,4)", class = "Intercept")
+
+fit_first <- brm(Sepal.Width ~ 1,
+     data = iris_first,
+     family = gaussian(),
+     prior = priors,
+     sample_prior = TRUE,
+     silent = 2,
+     refresh = 0
 )
 
-draws_first <- as_draws_array(fit_first)[, 1, , drop = TRUE]
-mu_prior <- mean(draws_first[, "b_Intercept"])
-sd_prior <- sd(draws_first[, "b_Intercept"])
+# compare prior to posterior
+# extract draws from first chain
+draws_first = as_draws_array(fit_first)[,1,, drop = TRUE]
 
-fit_second <- brm(
-  Sepal.Width ~ 1,
-  data = iris_second,
-  family = gaussian(),
-  prior = set_prior(paste0("normal(", mu_prior, ",", sd_prior, ")"), class = "Intercept"),
-  sample_prior = TRUE,
-  backend = "cmdstanr",
-  chains = 2,
-  iter = 1000,
-  seed = 2026,
-  refresh = 0
+samples_first = rbind(
+          data.frame(
+         type = "prior",
+         samples = as.numeric(draws_first[, "prior_Intercept"])
+         ),
+          data.frame(
+         type = "posterior",
+         samples = as.numeric(draws_first[, "b_Intercept"])
+          )
 )
-```
-
-The same workflow can be demonstrated quickly with normal approximations:
-
-```{r}
-update_mean_preview <- function(y, prior_mean, prior_sd) {
-  data_sd <- sd(y)
-  n <- length(y)
-  precision <- 1 / prior_sd^2 + n / data_sd^2
-  post_sd <- sqrt(1 / precision)
-  post_mean <- (prior_mean / prior_sd^2 + n * mean(y) / data_sd^2) / precision
-  c(mean = post_mean, sd = post_sd)
-}
-
-iris_first <- iris[1:50, ]
-iris_second <- iris[51:nrow(iris), ]
-
-first <- update_mean_preview(iris_first$Sepal.Width, prior_mean = 0, prior_sd = 4)
-second <- update_mean_preview(iris_second$Sepal.Width, prior_mean = first["mean"], prior_sd = first["sd"])
 
 kable(
-  data.frame(
-    stage = c("wide prior", "after first subset", "after second subset"),
-    mean = c(0, unname(first["mean"]), unname(second["mean"])),
-    sd = c(4, unname(first["sd"]), unname(second["sd"]))
-  ),
-  digits = 3
+      samples_first %>% group_by(type) %>% summarize(
+                         n = n(),
+                         mean = mean(samples),
+                         sd = sd(samples)
+                         ),
+      digits = 3
+      )
+
+p_first = ggplot(samples_first, aes(x = samples)) +
+  geom_density(aes(fill = type)) +
+  scale_fill_manual(values = c('#526A83','#68855C'))
+
+p_first
+
+# second experiment, insert prior evidence about the mean
+# get mean and standard deviation from posterior of mean from first experiment
+mu_prior = mean(samples_first$samples[samples_first$type == "posterior"])
+sd_prior = sd(samples_first$samples[samples_first$type == "posterior"])
+priors = set_prior(paste("normal(", mu_prior, ",", sd_prior, ")", sep = ""), class = "Intercept")
+
+# second subset of data: remaining
+iris_second = iris[51:nrow(iris),]
+
+fit_second <- brm(Sepal.Width ~ 1,
+     data = iris_second,
+     family = gaussian(),
+     prior = priors,
+     sample_prior = TRUE,
+     silent = 2,
+     refresh = 0
 )
+
+# compare prior to posterior
+# extract draws from first chain
+draws_second = as_draws_array(fit_second)[,1,, drop = TRUE]
+
+samples_second = rbind(
+    data.frame(
+         type = "prior",
+         samples = as.numeric(draws_second[, "prior_Intercept"])
+         ),
+    data.frame(
+         type = "posterior",
+         samples = as.numeric(draws_second[, "b_Intercept"])
+    )
+)
+
+kable(
+      samples_second %>% group_by(type) %>% summarize(
+                         n = n(),
+                         mean = mean(samples),
+                         sd = sd(samples)
+                         ),
+      digits = 3
+      )
+
+p_second = ggplot(samples_second, aes(x = samples)) +
+  geom_density(aes(fill = type)) +
+  scale_fill_manual(values = c('#526A83','#68855C'))
+
+p_second
 ```
 
-## Multivariate Animal Model In brms
-
-The old chapter ended with the structure of a multivariate animal model. The important model form is:
+# Multivariate Animal Model in brms
 
 $$
-\mathbf{Y}
-=
-\mathbf{X}\mathbf{B}
-+ \mathbf{Z}\mathbf{U}
-+ \mathbf{E}.
+\mathbf{Y} = \mathbf{XB} + \mathbf{ZU} + \mathbf{E}
 $$
 
-For two traits, `brms` can express this through `mvbind()` and covariance-aware grouping terms:
+Likelihood
 
-```{r eval=FALSE}
-library(brms)
-library(cmdstanr)
-library(BGLR)
-library(Matrix)
+$$
+\mathbf{Y} \sim \mathbf{MVN}(\mathbf{XB} + \mathbf{ZU}, \boldsymbol{\Sigma}_E)
+$$
 
-data(milk, package = "BGLR")
+Priors
 
-# P, A, D are prepared from the pedigree and milk records.
-# A is the additive relationship matrix for the animals in D.
+$$
+\begin{align}
+\mathbf{B} &\sim \mathbf{U}(-Inf,Inf)\\
+\mathbf{U} &\sim \mathbf{MVN}(\mathbf{0}, \boldsymbol{\Sigma}_U) \\
+\boldsymbol{\Sigma}_U &= \mathbf{diag(S)}_U\boldsymbol{\Omega}_U\mathbf{diag(S)}_U \\
+\mathbf{S}_U &\sim \mathbf{Cauchy}(0,5)\\
+\boldsymbol{\Omega}_U &\sim \mathbf{LKJ}(1)
+\end{align}
+$$
 
+## Example
+
+```{r brms_bivariate, eval=FALSE}
+library(pacman)
+p_load(brms, cmdstanr, BGLR, pedigreemm, tidyverse)
+
+# only have to be done once
+# install_cmdstan(cores = 6)
+
+# load the BGLR data
+data(milk)
+
+# get pedigree and make A
+P <- pedCow
+
+mids <- P@label
+
+# make subset
+midsIn <- as.character(unique(milk$id))[1:300]
+
+L <- as(t(relfactor(P)), "dgCMatrix")
+
+A <- tcrossprod(L[match(midsIn, mids),])
+rownames(A) <- colnames(A) <- midsIn
+
+A = as(A, "matrix")
+
+# make subset of data
+D <- milk[milk$id %in% midsIn,]
+
+D$idA <- factor(D$id, levels = midsIn)
+D$idP <- as.character(D$id)
+
+##################################################
+### create stand model - just for sanity check ###
+##################################################
+
+# the model formula
 brmf <- brmsformula(
-  mvbind(milk, fat) ~ 1 +
-    factor(lact) +
-    herd +
-    (1 | g | gr(idA, cov = A)) +
-    (1 | p | gr(id)),
-  data = D,
-  data2 = list(A = A)
+        mvbind(
+         milk,
+         fat
+         ) ~ 1 +
+        factor(lact) +
+        herd +
+        (1|g|gr(idA, cov = A)) + # additive genetic effect
+        (1|p|gr(id)), # PE effect
+        data = D,
+        data2 = list(A = A)
+
 )
 
-get_prior(brmf, data = D, data2 = list(A = A), family = gaussian())
+# look at default priors
+get_prior(
+        mvbind(
+         milk,
+         fat
+         ) ~ 1 +
+        factor(lact) +
+        herd +
+        (1|g|gr(idA, cov = A)) + # additive genetic effect
+        (1|p|gr(id)), # PE effect
+        data = D,
+        data2 = list(A = A)
+        )
 
-stan_code <- make_stancode(
-  formula = brmf,
-  data = D,
-  data2 = list(A = A),
-  family = gaussian()
+stanCode <- make_stancode(
+        formula = brmf,
+        data = D,
+        data2 = list(A = A),
+                  # family = poisson("log"), # for a poisson response with log link function
+        family = gaussian()
 )
+
+stanData <- make_standata(
+        formula = brmf,
+        data = D,
+        data2 = list(A = A),
+                  # family = poisson("log"), # for a poisson response with log link function
+        family = gaussian()
+)
+
+# check the stan code
+# this is particularly useful to check the priors that brms imposed on the parameters.
+# the default prior choice by brms follows the stan recommendations for the most part and
+# are excellent!
+stanCode
+
+##########################################
+### brms run - bivariate animal model ###
+##########################################
+
+# more iterations for a more complex model
+niter = 2000
+chains = 5
+cores = 5
+threads = 1
 
 mod <- brm(
-  formula = brmf,
-  data = D,
-  data2 = list(A = A),
-  family = gaussian(),
-  backend = "cmdstanr",
-  chains = 4,
-  cores = 4,
-  iter = 2000
+     formula = brmf,
+     data = D,
+     data2 = list(A = A),
+     family = gaussian(),
+     # family = poisson("log"), # for a poisson response with log link function
+     chains = chains,
+     cores = cores,
+     threads = threading(threads),
+     backend = "cmdstanr",
+     iter = niter
 )
 
+# extract posterior of covariance-matrices
 vcp <- VarCorr(mod, summary = FALSE)
+
+# additive genetic covariance matrix
 G <- vcp$idA$cov
+
+# pe covariance matrix
 PE <- vcp$id$cov
+
+# residucal covariance matrix
 R <- vcp$residual$cov
+
+# phenotypic
 P <- G + PE + R
-```
 
-The point here is not to run a large animal model live in the first Bayesian session. The point is to see how the same model components from the animal-model chapter map into a Bayesian `brms` formula.
+# extract the variance components for the traits
+vA <- matrix(as.numeric(NA), nrow = nrow(G), ncol = 2)
+vP <- matrix(as.numeric(NA), nrow = nrow(G), ncol = 2)
 
-## Cached Artifacts
+colnames(vA) <- colnames(vP) <- c("milk", "fat")
 
-For class, expensive Stan fits should be generated ahead of time:
+# fill matrices with diagonal elements of the var-covar matrix
+for(i in 1:nrow(G)) vA[i,] <- diag(G[i,,])
+for(i in 1:nrow(G)) vP[i,] <- diag(P[i,,])
 
-```bash
-Rscript scripts/build-model-artifacts.R --stan
-```
+# h2
+h2 <- colMeans(vA / vP)
+h2_sd <- apply(vA / vP, 2, sd)
 
-Then the lab can load `.rds` artifacts from `artifacts/models/` instead of fitting live.
+h2Out <- data.frame(
+    Trait = c("milk", "fat"),
+    h2 = h2,
+    h2_sd = h2_sd
+    )
 
-```{r}
-artifact_file <- "artifacts/models/bayesian_mean_brms.rds"
+vAmeans <- colMeans(vA)
+vPmeans <- colMeans(vP)
 
-if (file.exists(artifact_file)) {
-  artifact <- readRDS(artifact_file)
-  artifact$summary
-} else {
-  "No cached brms artifact found. Use scripts/build-model-artifacts.R --stan to generate it."
+
+#######################
+### Breeding Values ###
+#######################
+
+up = ranef(mod, summary = FALSE)
+upA = up$idA
+
+ids <- rownames(upA[1,,])
+idsIn <- ids
+
+out <- list()
+
+# make some predictions
+for(i in 1:length(idsIn)) {
+
+  tmp <- tibble(
+          id = idsIn[i]
+  )
+
+  # now get the blups for this animals
+  thisUp <- upA[,match(idsIn[i], upIds),,drop = TRUE]
+
+  # make prediction
+  tmp <- tmp %>%
+    mutate(
+           milkPred = mean(thisUp[,"milk_Intercept"]),
+           milkPred_PEV = var(thisUp[,"milk_Intercept"]),
+           milkPred_REL = 1 - (milkPred_PEV / vAmeans["milk"]),
+
+           fatPred = mean(thisUp[,"fat_Intercept"]),
+           fatPred_PEV = var(thisUp[,"fat_Intercept"]),
+           fatPred_REL = 1 - (fatPred_PEV / vAmeans["fat"]),
+           )
+
+  out[[i]] <- tmp
+
 }
+
+datPred <- bind_rows(out)
 ```
 
-## Resources
+# Resources
 
-- [Stan](https://mc-stan.org/)
-- [brms](https://github.com/paul-buerkner/brms)
-- [AnimalModels](https://github.com/cheuerde/AnimalModels)
-- [BayesianAlphabet](https://github.com/cheuerde/BayesianAlphabet)
+[Stan](https://mc-stan.org/)
 
-## Exercises
+[brms](https://github.com/paul-buerkner/brms)
 
-1. Change the prior standard deviation in the `brms` mean example.
-2. Run the first `brms` model after checking the Stan setup.
-3. Use the first 75 iris rows as the first experiment and the remaining rows as the second.
-4. Inspect `make_stancode()` for the multivariate animal-model formula.
-5. Write down which variance-covariance matrices are represented by `G`, `PE`, and `R`.
+[https://github.com/cheuerde/AnimalModels](https://github.com/cheuerde/AnimalModels)
+
+[https://github.com/cheuerde/BayesianAlphabet](https://github.com/cheuerde/BayesianAlphabet)
