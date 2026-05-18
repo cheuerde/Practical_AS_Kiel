@@ -62,6 +62,10 @@ p = ggplot(dplot, aes(x = Value)) +
 p
 ```
 
+## Feature Distributions
+
+![](../chapters/Figs/univariate_plot-1.png)
+
 ## Normal Mixture Model
 
 Some features indicate that the data had been generated not from a single normal process, but
@@ -159,7 +163,11 @@ mus = colMeans(out$mu)
 sds = colMeans(out$tau)
 ```
 
-## Mixture Probabilities
+## Fitted Mixture Probabilities
+
+![](../chapters/Figs/gauss_mixture_stan-2.png)
+
+## Mixture Probability Helper
 
 ```{r eval=FALSE}
 GetProbNormalMixture <- function(y, lambda, mu, sigma) {
@@ -193,6 +201,14 @@ sw_mixture = RunMixture(iris$Sepal.Width, k = 2, seed = seed)
 pl_mixture = RunMixture(iris$Petal.Length, k = 2, seed = seed)
 pw_mixture = RunMixture(iris$Petal.Width, k = 2, seed = seed)
 ```
+
+## Iris Mixture Densities
+
+![](../chapters/Figs/gauss_mixture_stan_iris-9.png)
+
+## Iris Mixture Probabilities
+
+![](../chapters/Figs/gauss_mixture_stan_iris-5.png)
 
 ## Inspect Components
 

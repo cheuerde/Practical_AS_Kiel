@@ -37,6 +37,11 @@ data(iris)
 glimpse(iris)
 ```
 
+```{r}
+data(iris)
+kable(head(iris), digits = 2)
+```
+
 Now we treat the features as coming from unlabelled individuals, meaning we dont have information on the grouping factor (Species)
 
 ```{r unlabelled, eval=FALSE}
@@ -45,6 +50,10 @@ data(iris)
 
 # check out features and labels
 glimpse(iris %>% select(-Species))
+```
+
+```{r}
+kable(head(iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]), digits = 2)
 ```
 
 Now we are left with a set of features without associated labels.
@@ -64,6 +73,8 @@ p = ggplot(dplot, aes(x = Value)) +
   facet_wrap(~ Feature)
 p
 ```
+
+![](../chapters/Figs/univariate_plot-1.png)
 
 Some features indicate that the data had been generated not from a single normal process, but
 potentially a series of processes. In that case, we can attempt to cluster the individual observations
@@ -208,6 +219,10 @@ for(i in 1:length(thetas)) {
 
 p
 ```
+
+![](../chapters/Figs/gauss_mixture_stan-2.png)
+
+![](../chapters/Figs/gauss_mixture_stan-3.png)
 
 ### Apply the mixture model to the iris data
 
@@ -376,3 +391,27 @@ sw_mixture$p_density
 pl_mixture$p_density
 pw_mixture$p_density
 ```
+
+![](../chapters/Figs/gauss_mixture_stan_iris-1.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-2.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-3.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-4.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-5.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-6.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-7.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-8.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-9.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-10.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-11.png)
+
+![](../chapters/Figs/gauss_mixture_stan_iris-12.png)

@@ -78,6 +78,8 @@ ggpairs(
 iris_out = iris %>% select(x = Petal.Length, y = Petal.Width, Species)
 ```
 
+![](../chapters/Figs/visutal-1.png)
+
 Next step is to try and recover the Species labels with clustering the two extracted features.
 
 ## Fitting mixture of k multivariate normal
@@ -154,6 +156,31 @@ mm_three$p
 mm_three$p_label
 ```
 
+The rendered preview below uses the same two iris features and shows the grouping geometry without requiring `mixtools` during the website build.
+
+```{r}
+iris_out = data.frame(
+  x = iris$Petal.Length,
+  y = iris$Petal.Width,
+  Species = iris$Species
+)
+
+set.seed(2026)
+km_iris = kmeans(iris_out[, c("x", "y")], centers = 2)
+iris_out$cluster = factor(km_iris$cluster)
+
+ggplot(iris_out, aes(x = x, y = y, color = cluster)) +
+  geom_point(alpha = 0.8) +
+  stat_ellipse(type = "norm", linewidth = 1) +
+  labs(x = "Petal.Length", y = "Petal.Width", color = "Cluster")
+```
+
+```{r}
+ggplot(iris_out, aes(x = x, y = y, color = Species)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "Petal.Length", y = "Petal.Width", color = "Species")
+```
+
 ## Principal Component Clustering
 
 Principal Component Analysis (PCA) is a feature compression method, that
@@ -199,6 +226,46 @@ mm_pca = RunMixtureMVN(x = pca$x[,1], y = pca$x[,2], k = 2, palette = "Dark 3")
 mm_pca$p
 ```
 
+```{r}
+library(BGLR)
+
+data(wheat)
+
+M = wheat.X
+
+pca = prcomp(M, scale = TRUE, center = TRUE)
+spca = summary(pca)
+
+pca_importance = data.frame(
+  PC = seq_along(spca$importance[2,]),
+  proportion = as.numeric(spca$importance[2,]),
+  cumulative = as.numeric(spca$importance[3,])
+)
+
+ggplot(pca_importance[1:30, ], aes(x = PC, y = proportion)) +
+  geom_line(color = "#155f7a") +
+  geom_point(color = "#c46a2b", size = 1.8) +
+  labs(x = "Principal component", y = "Proportion of Variance Explained")
+```
+
+```{r}
+ggplot(pca_importance[1:30, ], aes(x = PC, y = cumulative)) +
+  geom_line(color = "#155f7a") +
+  geom_point(color = "#c46a2b", size = 1.8) +
+  labs(x = "Principal component", y = "Cumulative Proportion")
+```
+
+```{r}
+pca_scores = data.frame(
+  PC1 = pca$x[,1],
+  PC2 = pca$x[,2]
+)
+
+ggplot(pca_scores, aes(x = PC1, y = PC2)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "PC1", y = "PC2")
+```
+
 ## K-Means
 
 K-Means is a clustering technique that minimzes the following function:
@@ -227,4 +294,15 @@ kplot = fviz_cluster(
 )
 
 kplot
+```
+
+```{r}
+set.seed(2026)
+
+kmeans_pca = kmeans(pca$x[,1:2], centers = 2)
+pca_scores$cluster = factor(kmeans_pca$cluster)
+
+ggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "PC1", y = "PC2", color = "Cluster")
 ```

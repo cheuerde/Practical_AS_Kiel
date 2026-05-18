@@ -94,6 +94,10 @@ kable(
 )
 ```
 
+## Prior And Posterior
+
+![](../chapters/Figs/brms_mean-1.png)
+
 ## Updating Priors From Existing Evidence
 
 Bayesian Inference allows us to incorporate actual prior evidence in the estimation
@@ -104,7 +108,7 @@ at an estimate of the mean of our observations.
 
 Then we do another experiment of similar setup and want to update our mean estimate.
 
-## First Experiment
+## Prior Updating
 
 $$
 p(\theta|y)_{FirstExperiment} \propto p(y|\theta)p(\theta)
@@ -153,6 +157,14 @@ priors = set_prior(
   class = "Intercept"
 )
 ```
+
+## First Experiment
+
+![](../chapters/Figs/brms_mean_update-1.png)
+
+## Second Experiment
+
+![](../chapters/Figs/brms_mean_update-2.png)
 
 ## Multivariate Animal Model In brms
 

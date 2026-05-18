@@ -112,6 +112,8 @@ p = ggplot(samples, aes(x = samples)) +
 p
 ```
 
+![](../chapters/Figs/brms_mean-1.png)
+
 ## Updating priors from existing evidence
 
 Bayesian Inference allows us to incorporate actual prior evidence in the estimation
@@ -235,6 +237,10 @@ p_second = ggplot(samples_second, aes(x = samples)) +
 
 p_second
 ```
+
+![](../chapters/Figs/brms_mean_update-1.png)
+
+![](../chapters/Figs/brms_mean_update-2.png)
 
 # Multivariate Animal Model in brms
 

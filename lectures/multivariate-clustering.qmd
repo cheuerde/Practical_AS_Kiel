@@ -70,6 +70,10 @@ ggpairs(
 iris_out = iris %>% select(x = Petal.Length, y = Petal.Width, Species)
 ```
 
+## Pairwise Iris Features
+
+![](../chapters/Figs/visutal-1.png)
+
 ## Fitting Mixture Of k Multivariate Normal
 
 ```{r eval=FALSE}
@@ -113,6 +117,28 @@ for(i in 1:k) {
   p = p + geom_point(data = ellipses, aes(x = a, y = b), color = colors[i], size = 0.8, shape = 8)
   p_label = p_label + geom_point(data = ellipses, aes(x = a, y = b), color = colors[i], size = 0.8, shape = 8)
 }
+```
+
+## Bivariate Clustering Preview
+
+```{r}
+library(ggplot2)
+theme_set(theme_minimal(base_size = 16))
+
+iris_out = data.frame(
+  x = iris$Petal.Length,
+  y = iris$Petal.Width,
+  Species = iris$Species
+)
+
+set.seed(2026)
+km_iris = kmeans(iris_out[, c("x", "y")], centers = 2)
+iris_out$cluster = factor(km_iris$cluster)
+
+ggplot(iris_out, aes(x = x, y = y, color = cluster)) +
+  geom_point(alpha = 0.8) +
+  stat_ellipse(type = "norm", linewidth = 1) +
+  labs(x = "Petal.Length", y = "Petal.Width", color = "Cluster")
 ```
 
 ## Run On Iris Data
@@ -160,6 +186,26 @@ ggplot(data.frame(x = pca$x[,1], y = pca$x[,2]), aes(x = x, y = y)) +
   ylab("PC2")
 ```
 
+## PCA Scatter
+
+```{r}
+library(BGLR)
+
+data(wheat)
+
+M = wheat.X
+pca = prcomp(M, scale = TRUE, center = TRUE)
+
+pca_scores = data.frame(
+  PC1 = pca$x[,1],
+  PC2 = pca$x[,2]
+)
+
+ggplot(pca_scores, aes(x = PC1, y = PC2)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "PC1", y = "PC2")
+```
+
 ## PCA Mixture
 
 ```{r eval=FALSE}
@@ -194,4 +240,17 @@ kplot = fviz_cluster(
 )
 
 kplot
+```
+
+## K-Means Preview
+
+```{r}
+set.seed(2026)
+
+kmeans_pca = kmeans(pca$x[,1:2], centers = 2)
+pca_scores$cluster = factor(kmeans_pca$cluster)
+
+ggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "PC1", y = "PC2", color = "Cluster")
 ```
