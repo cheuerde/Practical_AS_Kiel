@@ -7,6 +7,34 @@ format:
     footer: "[Lab notes](../labs/clustering.html)"
 ---
 
+```{r}
+#| include: false
+mixture_preview <- function(y, k = 2, seed = 242151) {
+  set.seed(seed)
+
+  km <- kmeans(matrix(y, ncol = 1), centers = k, nstart = 25)
+  center_order <- order(as.numeric(km$centers))
+  cluster <- match(km$cluster, center_order)
+
+  lambda <- as.numeric(tabulate(cluster, nbins = k)) / length(y)
+  mu <- as.numeric(tapply(y, cluster, mean))
+  sigma <- as.numeric(tapply(y, cluster, sd))
+
+  grid <- seq(min(y) - sd(y), max(y) + sd(y), length.out = 400)
+
+  do.call(
+    rbind,
+    lapply(seq_len(k), function(component) {
+      data.frame(
+        component = paste("Component", component),
+        Value = grid,
+        density = lambda[component] * dnorm(grid, mu[component], sigma[component])
+      )
+    })
+  )
+}
+```
+
 ## Clustering
 
 Clustering or *Unsupervised Learning* deals with learning grouping structures from *unlabelled*
@@ -185,6 +213,46 @@ sds = colMeans(out$tau)
 
 ![](../chapters/Figs/gauss_mixture_stan-2.png)
 
+## Fitted Mixture Densities
+
+```{r}
+sim_density = rbind(
+  data.frame(
+    component = "Component 1",
+    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),
+    lambda = theta,
+    mu = mu1,
+    sigma = sd1
+  ),
+  data.frame(
+    component = "Component 2",
+    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),
+    lambda = 1 - theta,
+    mu = mu2,
+    sigma = sd2
+  )
+)
+
+sim_density$density = with(sim_density, lambda * dnorm(y, mu, sigma))
+
+ggplot(dplot, aes(x = y)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    bins = 50,
+    fill = "#e8edf0",
+    color = "#374151",
+    linewidth = 0.25
+  ) +
+  geom_line(
+    data = sim_density,
+    aes(x = y, y = density, color = component),
+    linewidth = 1.25,
+    inherit.aes = FALSE
+  ) +
+  scale_color_manual(values = c("Component 1" = "#0b5cad", "Component 2" = "#b3212d")) +
+  labs(x = "y", y = "Density", color = NULL)
+```
+
 ## Mixture Probability Helper
 
 ```{r eval=FALSE}
@@ -222,7 +290,39 @@ pw_mixture = RunMixture(iris$Petal.Width, k = 2, seed = seed)
 
 ## Iris Mixture Densities
 
-![](../chapters/Figs/gauss_mixture_stan_iris-9.png)
+```{r}
+iris_features = iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]
+
+iris_density = do.call(
+  rbind,
+  lapply(names(iris_features), function(feature) {
+    out = mixture_preview(iris_features[[feature]], k = 2, seed = 242151)
+    out$Feature = feature
+    out
+  })
+)
+
+iris_long = stack(iris_features)
+colnames(iris_long) = c("Value", "Feature")
+
+ggplot(iris_long, aes(x = Value)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    bins = 40,
+    fill = "#e8edf0",
+    color = "#374151",
+    linewidth = 0.25
+  ) +
+  geom_line(
+    data = iris_density,
+    aes(x = Value, y = density, color = component),
+    linewidth = 1.15,
+    inherit.aes = FALSE
+  ) +
+  scale_color_manual(values = c("Component 1" = "#0b5cad", "Component 2" = "#b3212d")) +
+  facet_wrap(~ Feature, scales = "free") +
+  labs(x = "Value", y = "Density", color = NULL)
+```
 
 ## Iris Mixture Probabilities
 

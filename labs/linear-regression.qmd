@@ -54,7 +54,7 @@ A small toy plot first isolates what the "squares" in least squares mean.
 #| fig-height: 3.5
 toy_dat = data.frame(
   x = 1:10,
-  y = c(2.1, 2.9, 2.7, 4.0, 4.8, 5.4, 5.1, 6.7, 7.4, 7.9)
+  y = c(2.0, 4.7, 2.6, 5.9, 3.4, 7.2, 4.9, 8.3, 6.1, 9.4)
 )
 
 toy_fit = lm(y ~ x, data = toy_dat)
