@@ -9,6 +9,8 @@ format:
 
 ```{r}
 #| include: false
+library(ggplot2)
+
 residual_square_data <- function(data, x_name, y_name, pred_name, every = 12, scale = 0.35) {
   keep <- seq(1, nrow(data), by = every)
   out <- data[keep, , drop = FALSE]
@@ -52,9 +54,37 @@ $$
 \operatorname{MSE} = \frac{1}{n}\sum_{i=1}^{n} e_i^2
 $$
 
-Vertical segments show residuals.
+The full regression plots show residuals as vertical segments.
 
-Shaded squares show selected squared-error contributions.
+The toy plot isolates the squared-error pieces.
+
+## Toy Least-Squares Piece
+
+```{r}
+toy_dat = data.frame(
+  x = 1:10,
+  y = c(2.1, 2.9, 2.7, 4.0, 4.8, 5.4, 5.1, 6.7, 7.4, 7.9)
+)
+
+toy_fit = lm(y ~ x, data = toy_dat)
+toy_dat$pred = predict(toy_fit)
+
+toy_squares = residual_square_data(toy_dat, "x", "y", "pred", every = 1, scale = 0.55)
+
+ggplot(toy_dat, aes(x = x, y = y)) +
+  geom_rect(
+    data = toy_squares,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = "#c46a2b",
+    color = "#c46a2b",
+    alpha = 0.18
+  ) +
+  geom_segment(aes(xend = x, yend = pred), color = "#155f7a", alpha = 0.65) +
+  geom_point(size = 2.2) +
+  geom_line(aes(y = pred), color = "red", linewidth = 1) +
+  labs(x = "x", y = "y")
+```
 
 ## Feature / Design Matrix
 
@@ -142,17 +172,7 @@ ggplot(dat, aes(x = y, y = pred)) +
 ## Raw Data And Intercept
 
 ```{r}
-resid_squares = residual_square_data(dat, "id", "y", "pred", every = 12, scale = 0.20)
-
 ggplot(dat, aes(x = id, y = y)) +
-  geom_rect(
-    data = resid_squares,
-    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-    inherit.aes = FALSE,
-    fill = "#c46a2b",
-    color = "#c46a2b",
-    alpha = 0.18
-  ) +
   geom_segment(aes(xend = id, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
   geom_hline(yintercept = res$par, color = "red") +
@@ -224,17 +244,7 @@ dat = data.frame(
      id = 1:length(y)
      )
 
-resid_squares = residual_square_data(dat, "Temp", "Wind", "pred", every = 12, scale = 0.45)
-
 ggplot(dat, aes(x = Temp, y = Wind)) +
-  geom_rect(
-    data = resid_squares,
-    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-    inherit.aes = FALSE,
-    fill = "#c46a2b",
-    color = "#c46a2b",
-    alpha = 0.18
-  ) +
   geom_segment(aes(xend = Temp, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
   geom_abline(intercept = res$par[1], slope = res$par[2], color = "red") +

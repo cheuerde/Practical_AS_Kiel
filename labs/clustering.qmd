@@ -69,12 +69,27 @@ try to infer a grouping structure.
 dplot = pivot_longer(iris, -Species, names_to = "Feature", values_to = "Value")
 p = ggplot(dplot, aes(x = Value)) +
   geom_histogram(aes(y = ..density.., fill = Feature), bins = 40) +
-  geom_density() +
+  geom_density(color = "#b3212d", linewidth = 1.1) +
   facet_wrap(~ Feature)
 p
 ```
 
-![](../chapters/Figs/univariate_plot-1.png)
+```{r}
+dplot = stack(iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")])
+colnames(dplot) = c("Value", "Feature")
+
+ggplot(dplot, aes(x = Value)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    bins = 40,
+    fill = "#d9e2e7",
+    color = "#374151",
+    linewidth = 0.25
+  ) +
+  geom_density(color = "#b3212d", linewidth = 1.1) +
+  facet_wrap(~ Feature, scales = "free") +
+  labs(x = "Value", y = "Density")
+```
 
 Some features indicate that the data had been generated not from a single normal process, but
 potentially a series of processes. In that case, we can attempt to cluster the individual observations
@@ -114,7 +129,7 @@ dplot = as.data.frame(dat)
 # plot the raw data
 ggplot(dplot, aes(x = y)) +
   geom_histogram(aes(y = ..density..), bins = 50, fill = "white", color = 1) +
-  geom_density()
+  geom_density(color = "#b3212d", linewidth = 1.1)
 ```
 
 ```{r gauss_mixture_stan_only, eval=FALSE}

@@ -46,8 +46,36 @@ $$
 \hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
 $$
 
-In the plots below, the vertical segments show residuals $e_i = y_i - \hat{y}_i$.
-The shaded squares visualize the contribution of selected residuals to the squared-error criterion.
+In the regression plots below, the vertical segments show residuals $e_i = y_i - \hat{y}_i$.
+A small toy plot first isolates what the "squares" in least squares mean.
+
+```{r least_squares_piece}
+#| fig-width: 6
+#| fig-height: 3.5
+toy_dat = data.frame(
+  x = 1:10,
+  y = c(2.1, 2.9, 2.7, 4.0, 4.8, 5.4, 5.1, 6.7, 7.4, 7.9)
+)
+
+toy_fit = lm(y ~ x, data = toy_dat)
+toy_dat$pred = predict(toy_fit)
+
+toy_squares = residual_square_data(toy_dat, "x", "y", "pred", every = 1, scale = 0.55)
+
+ggplot(toy_dat, aes(x = x, y = y)) +
+  geom_rect(
+    data = toy_squares,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = "#c46a2b",
+    color = "#c46a2b",
+    alpha = 0.18
+  ) +
+  geom_segment(aes(xend = x, yend = pred), color = "#155f7a", alpha = 0.65) +
+  geom_point(size = 2.2) +
+  geom_line(aes(y = pred), color = "red", linewidth = 1) +
+  labs(x = "x", y = "y")
+```
 
 The vector $x$ contains a "feature" or regression variable that establishes a connection with the observations.
 We can formulate most regression problems in terms of feature matrices and their estimated weights with respect
@@ -119,18 +147,7 @@ ggplot(dat, aes(x = y, y = pred)) +
  geom_abline(intercept = 0, slope = 1, color = "red") +
  labs(x = "Observed Wind", y = "Predicted Wind")
 
-# plot raw data and insert intercept
-resid_squares = residual_square_data(dat, "id", "y", "pred", every = 12, scale = 0.20)
-
 ggplot(dat, aes(x = id, y = y)) +
-  geom_rect(
-    data = resid_squares,
-    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-    inherit.aes = FALSE,
-    fill = "#c46a2b",
-    color = "#c46a2b",
-    alpha = 0.18
-  ) +
   geom_segment(aes(xend = id, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
   geom_hline(yintercept = res$par, color = "red") +
@@ -208,18 +225,7 @@ dat = data.frame(
      id = 1:length(y)
      )
 
-# plot raw data and insert intercept and slope
-resid_squares = residual_square_data(dat, "Temp", "Wind", "pred", every = 12, scale = 0.45)
-
 ggplot(dat, aes(x = Temp, y = Wind)) +
-  geom_rect(
-    data = resid_squares,
-    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-    inherit.aes = FALSE,
-    fill = "#c46a2b",
-    color = "#c46a2b",
-    alpha = 0.18
-  ) +
   geom_segment(aes(xend = Temp, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
   geom_abline(intercept = res$par[1], slope = res$par[2], color = "red") +
