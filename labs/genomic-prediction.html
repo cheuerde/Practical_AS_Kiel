@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Genomic Prediction – Advanced Statistics Lab</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fa50015d674dd8cac99390e051cc4d67.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Advanced Statistics Lab</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-labs" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Labs</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-labs">    
+        <li>
+    <a class="dropdown-item" href="../labs/r-intro.html">
+ <span class="dropdown-text">Introduction to R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/optimization.html">
+ <span class="dropdown-text">Optimization</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/maximum-likelihood.html">
+ <span class="dropdown-text">Maximum Likelihood</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/linear-regression.html">
+ <span class="dropdown-text">Linear Regression</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/bayesian-inference.html">
+ <span class="dropdown-text">Bayesian Inference</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/genomic-prediction.html">
+ <span class="dropdown-text">Genomic Prediction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/clustering.html">
+ <span class="dropdown-text">Clustering</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/multivariate-clustering.html">
+ <span class="dropdown-text">Multivariate Clustering</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-slides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Slides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-slides">    
+        <li>
+    <a class="dropdown-item" href="../lectures/r-intro.html">
+ <span class="dropdown-text">Introduction to R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/optimization.html">
+ <span class="dropdown-text">Optimization</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/maximum-likelihood.html">
+ <span class="dropdown-text">Maximum Likelihood</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/linear-regression.html">
+ <span class="dropdown-text">Linear Regression</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/bayesian-inference.html">
+ <span class="dropdown-text">Bayesian Inference</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/genomic-prediction.html">
+ <span class="dropdown-text">Genomic Prediction</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/clustering.html">
+ <span class="dropdown-text">Clustering</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../lectures/multivariate-clustering.html">
+ <span class="dropdown-text">Multivariate Clustering</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#genomic-prediction" id="toc-genomic-prediction" class="nav-link active" data-scroll-target="#genomic-prediction"><span class="header-section-number">1</span> Genomic Prediction</a></li>
+  <li><a href="#ridge-regression-blup" id="toc-ridge-regression-blup" class="nav-link" data-scroll-target="#ridge-regression-blup"><span class="header-section-number">2</span> Ridge Regression BLUP</a></li>
+  <li><a href="#gblup---an-equivalent-ridge-regression-animal-model" id="toc-gblup---an-equivalent-ridge-regression-animal-model" class="nav-link" data-scroll-target="#gblup---an-equivalent-ridge-regression-animal-model"><span class="header-section-number">3</span> GBLUP - an equivalent Ridge Regression Animal Model</a></li>
+  <li><a href="#gblup-examples-in-r" id="toc-gblup-examples-in-r" class="nav-link" data-scroll-target="#gblup-examples-in-r"><span class="header-section-number">4</span> GBLUP examples in R</a>
+  <ul class="collapse">
+  <li><a href="#ridge-regression-marker-model" id="toc-ridge-regression-marker-model" class="nav-link" data-scroll-target="#ridge-regression-marker-model"><span class="header-section-number">4.1</span> Ridge Regression Marker Model</a></li>
+  <li><a href="#gblup-model" id="toc-gblup-model" class="nav-link" data-scroll-target="#gblup-model"><span class="header-section-number">4.2</span> GBLUP Model</a></li>
+  <li><a href="#check-equivalence-of-models" id="toc-check-equivalence-of-models" class="nav-link" data-scroll-target="#check-equivalence-of-models"><span class="header-section-number">4.3</span> Check equivalence of models</a></li>
+  <li><a href="#cross-validation" id="toc-cross-validation" class="nav-link" data-scroll-target="#cross-validation"><span class="header-section-number">4.4</span> Cross Validation</a></li>
+  </ul></li>
+  <li><a href="#bayesian-alphabet" id="toc-bayesian-alphabet" class="nav-link" data-scroll-target="#bayesian-alphabet"><span class="header-section-number">5</span> Bayesian Alphabet</a></li>
+  <li><a href="#bayescpi---threshold-model" id="toc-bayescpi---threshold-model" class="nav-link" data-scroll-target="#bayescpi---threshold-model"><span class="header-section-number">6</span> <span class="math inline">\(BayesC\pi\)</span> - Threshold Model</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/cheuerde/Practical_AS_Kiel/blob/main/labs/genomic-prediction.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/cheuerde/Practical_AS_Kiel/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Genomic Prediction</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="view-switch">
+<a href="../lectures/genomic-prediction.html">Open slides</a>
+</div>
+<section id="genomic-prediction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Genomic Prediction</h1>
+<p>Genomic Prediction entails methods to predict breeding values based on phenotypic and molecular (SNP) data. The general concept is that the breeding value of an individual can be recovered by a linear regression on its genotype scores, i.e.</p>
+<p><span class="math display">\[
+\mathbf{\hat{g}} = \mathbf{M}\mathbf{\hat{a}},
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{M}\)</span> is a matrix of genotype scores in {0,1,2} coding, denoting the copies of the major allele of SNP markers the individual carries, and <span class="math inline">\(\mathbf{\hat{a}}\)</span> is a vector of average allele effects for those markers.</p>
+<p>The estimated breeding value (<span class="math inline">\(\mathbf{\hat{g}}\)</span>, EBV) is then the sum of all the average allele effects for the marker alleles the individual carries.</p>
+</section>
+<section id="ridge-regression-blup" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Ridge Regression BLUP</h1>
+<p>The average allele effects can be estimated directly in a mixed effects model, treating the them as random effects:</p>
+<p><span class="math display">\[
+\mathbf{y} = \mu + \mathbf{M}\mathbf{{a}} + \mathbf{e}
+\]</span></p>
+<p>If the individuals in <span class="math inline">\(\mathbf{M}\)</span> are not representative of the general population (if they are top ranking individuals only, for example), we have to adjust the breeding values obtained from the marker effects by the population mean. In genomics, the population mean can be descriped by the allele frequencies in the general population:</p>
+<p><span class="math display">\[
+p_i =  \frac{\sum_{i = 1}^{p}  m_{b_i}}{n},
+\]</span></p>
+<p>where <span class="math inline">\(p_i\)</span> denotes the allele frequency of the general population at marker <span class="math inline">\(i\)</span> and <span class="math inline">\(m_{b_i}\)</span> are the marker covariates at marker <span class="math inline">\(i\)</span> of the general population. Oftentimes, <span class="math inline">\(\mathbf{M}\)</span> is used as being representative of the general population, which is ususally not the case.</p>
+<p>In order to adjust the EBVs from a genomic prediction model to represent the deviations from the population mean, we subtract the average EBV of that population:</p>
+<p><span class="math display">\[
+\mathbf{\hat{g}} = \mathbf{M}\mathbf{\hat{a}} - 2\mathbf{p}\mathbf{\hat{a}}
+\]</span></p>
+</section>
+<section id="gblup---an-equivalent-ridge-regression-animal-model" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> GBLUP - an equivalent Ridge Regression Animal Model</h1>
+<p>Instead of doing regression on the marker covariates directly, we can also generate a Gaussian Kernel from those covariates. That kernel is commonly referred to as the genomic relationship matrix, and we obtain it like this:</p>
+<p><span class="math display">\[
+\mathbf{G} = \frac{\bar{\mathbf{M}}\bar{\mathbf{M}}'}{tr(\bar{\mathbf{M}}\bar{\mathbf{M}}') / n},
+\]</span></p>
+<p>where <span class="math inline">\(\bar{\mathbf{M_i}} = \mathbf{M_i} - 2p_i\)</span>. The centering of the genotypes guarantees that our EBVs reflect a deviation from the general population, and the scaling (division by <span class="math inline">\(tr(\bar{\mathbf{M}}\bar{\mathbf{M}}') / n\)</span>) that our estimated variance components mimic an additive genetic variance.</p>
+<p>The GBLUP model then becomes:</p>
+<p><span class="math display">\[
+\mathbf{y} = \mu + \mathbf{g} + \mathbf{e}
+\]</span></p>
+<p>with <span class="math inline">\(\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2}\)</span>).</p>
+<p>It is important to note that both models, the ridge regression marker model and GBLUP are statistically identical and result in the same EBVs. So we can chose the model that is most convenient to fit computationally.</p>
+</section>
+<section id="gblup-examples-in-r" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> GBLUP examples in R</h1>
+<p>First we will be preparing a common dataset for the upcoming excercises</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(BGLR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rrBLUP)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lattice)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># load the "wheat" data set from BGLR</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(wheat)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># extract one phenotype</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> wheat.Y[,<span class="dv">1</span>]</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># the marker covariates</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>M <span class="ot">=</span> wheat.X</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># average allele frequencies ("p")</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> <span class="fu">colMeans</span>(M) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># center our Marker covariates</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>Mc <span class="ot">=</span> <span class="fu">sweep</span>(</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">x =</span> M,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">MARGIN =</span> <span class="dv">2</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">FUN =</span> <span class="st">"-"</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">STATS =</span> <span class="dv">2</span> <span class="sc">*</span> p</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>     )</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># compute G matrix</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>MMdash <span class="ot">=</span> Mc <span class="sc">%*%</span> <span class="fu">t</span>(Mc)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>G <span class="ot">=</span> MMdash <span class="sc">/</span> <span class="fu">mean</span>(<span class="fu">diag</span>(MMdash))</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># look at genomic relationships</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">levelplot</span>(G)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="genomic-prediction_files/figure-html/gblup_data-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>With the basic dataset established, we now have many options to fit the ridge regression marker or GBLUP model.</p>
+<section id="ridge-regression-marker-model" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="ridge-regression-marker-model"><span class="header-section-number">4.1</span> Ridge Regression Marker Model</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># design matrix for random effects (marker covariates become design matrix)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Z <span class="ot">=</span> Mc</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># design matrix for fixed effects (only intercept)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X <span class="ot">=</span> <span class="fu">array</span>(<span class="dv">1</span>, <span class="at">dim =</span> <span class="fu">c</span>(<span class="fu">length</span>(y), <span class="dv">1</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model with ML</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>mod_rr <span class="ot">=</span> <span class="fu">mixed.solve</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> y,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">X =</span> X,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">Z =</span> Z,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"ML"</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>         )</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># extract marker effects</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>a_rr <span class="ot">=</span> mod_rr<span class="sc">$</span>u</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># predict breeding values from the model</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>g_rr <span class="ot">=</span> <span class="fu">as.numeric</span>(Z <span class="sc">%*%</span> a_rr)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># extract variance components</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>var_a_rr <span class="ot">=</span> mod_rr<span class="sc">$</span>Vu</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>var_e_rr <span class="ot">=</span> mod_rr<span class="sc">$</span>Ve</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># we get the "additive genetic" variance, by rescaling the variance component for</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># the marker effects</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>var_g_rr <span class="ot">=</span> mod_rr<span class="sc">$</span>Vu <span class="sc">*</span> <span class="fu">mean</span>(<span class="fu">diag</span>(MMdash))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="gblup-model" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="gblup-model"><span class="header-section-number">4.2</span> GBLUP Model</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model with ML</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mod_gblup <span class="ot">=</span> <span class="fu">mixed.solve</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> y,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">K =</span> G, <span class="co"># here we pass the genomic relationship matrix as kernel</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"ML"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>         )</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># extract breeding values</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>g_gblup <span class="ot">=</span> mod_gblup<span class="sc">$</span>u</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># obtain marker effects from a GBLUP model</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>MMdash_tmp <span class="ot">=</span> MMdash</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">diag</span>(MMdash_tmp) <span class="ot">=</span> <span class="fu">diag</span>(MMdash_tmp) <span class="sc">+</span> <span class="fl">0.00001</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>a_gblup <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">t</span>(Mc) <span class="sc">%*%</span> <span class="fu">solve</span>(MMdash_tmp, g_gblup))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># extract variance components</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>var_g_gblup <span class="ot">=</span> mod_gblup<span class="sc">$</span>Vu</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>var_e_gblup <span class="ot">=</span> mod_gblup<span class="sc">$</span>Ve</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="check-equivalence-of-models" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="check-equivalence-of-models"><span class="header-section-number">4.3</span> Check equivalence of models</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot breeding values from both models</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g_rr, g_gblup)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="genomic-prediction_files/figure-html/check_equivalence-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot marker effects from both models</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(a_rr, a_gblup)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="genomic-prediction_files/figure-html/check_equivalence-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># some summaries</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(g_rr <span class="sc">~</span> g_gblup))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = g_rr ~ g_gblup)
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-1.880e-06 -3.197e-07  2.300e-10  2.997e-07  1.278e-06 
+
+Coefficients:
+             Estimate Std. Error  t value Pr(&gt;|t|)    
+(Intercept) 4.354e-16  2.041e-08        0        1    
+g_gblup     1.000e+00  3.618e-08 27638903   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.994e-07 on 597 degrees of freedom
+Multiple R-squared:      1, Adjusted R-squared:      1 
+F-statistic: 7.639e+14 on 1 and 597 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(a_rr <span class="sc">~</span> a_gblup))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = a_rr ~ a_gblup)
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-8.103e-08 -1.415e-08  2.870e-10  1.360e-08  8.062e-08 
+
+Coefficients:
+             Estimate Std. Error   t value Pr(&gt;|t|)    
+(Intercept) 7.978e-10  6.017e-10 1.326e+00    0.185    
+a_gblup     1.000e+00  3.223e-08 3.102e+07   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.15e-08 on 1277 degrees of freedom
+Multiple R-squared:      1, Adjusted R-squared:      1 
+F-statistic: 9.624e+14 on 1 and 1277 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># variance components and heritabilities</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>vc <span class="ot">=</span> <span class="fu">rbind</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">data.frame</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">model =</span> <span class="st">"Marker Model"</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">var_g =</span> var_g_rr,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">var_e =</span> var_e_rr,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">h2 =</span> var_g_rr <span class="sc">/</span> (var_g_rr <span class="sc">+</span> var_e_rr)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>          ),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>         <span class="fu">data.frame</span>(</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">model =</span> <span class="st">"GBLUP"</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">var_g =</span> var_g_gblup,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">var_e =</span> var_e_gblup,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">h2 =</span> var_g_gblup <span class="sc">/</span> (var_g_gblup <span class="sc">+</span> var_e_gblup)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>         )</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(vc, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">model</th>
+<th style="text-align: right;">var_g</th>
+<th style="text-align: right;">var_e</th>
+<th style="text-align: right;">h2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Marker Model</td>
+<td style="text-align: right;">0.605</td>
+<td style="text-align: right;">0.539</td>
+<td style="text-align: right;">0.529</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">GBLUP</td>
+<td style="text-align: right;">0.605</td>
+<td style="text-align: right;">0.539</td>
+<td style="text-align: right;">0.529</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="cross-validation" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="cross-validation"><span class="header-section-number">4.4</span> Cross Validation</h2>
+<p>In order to assess the performance of our genomic prediction models, we can run a cross validation scheme, in which we train marker effects with a subset of the data and predict the EBVs of the left out samples based on the training model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define function to create cross validation samples</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cCV <span class="ot">&lt;-</span> <span class="cf">function</span>(y, <span class="at">folds=</span><span class="dv">5</span>, <span class="at">reps=</span><span class="dv">1</span>, <span class="at">matrix=</span><span class="cn">FALSE</span>, <span class="at">seed=</span><span class="cn">NULL</span>) {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.vector</span>(y)) <span class="fu">stop</span>(<span class="st">"y must be a vector"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(folds <span class="sc">&lt;</span> <span class="dv">2</span>) <span class="fu">stop</span>(<span class="st">"'folds' must be larger than one"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(reps <span class="sc">&lt;</span> <span class="dv">1</span>) reps <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  reps <span class="ot">=</span> <span class="fu">as.integer</span>(reps)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  folds <span class="ot">=</span> <span class="fu">as.integer</span>(folds)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  isy <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(y))[<span class="sc">!</span><span class="fu">is.na</span>(y)]</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  n_vec <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,folds)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  start <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,folds)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  end <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>,folds)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  n_vec[<span class="dv">1</span><span class="sc">:</span>(folds<span class="dv">-1</span>)] <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">length</span>(isy)<span class="sc">/</span>folds,<span class="at">digits=</span><span class="dv">0</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  n_vec[folds] <span class="ot">&lt;-</span> <span class="fu">length</span>(isy) <span class="sc">-</span> <span class="fu">sum</span>(n_vec[<span class="dv">1</span><span class="sc">:</span>(folds<span class="dv">-1</span>)])</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>folds) {</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(j<span class="sc">==</span><span class="dv">1</span>) {</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>      start[j] <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>      start[j] <span class="ot">=</span> end[j<span class="dv">-1</span>]<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    end[j] <span class="ot">=</span> <span class="fu">sum</span>(n_vec[<span class="dv">1</span><span class="sc">:</span>j])</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>  count<span class="ot">=</span><span class="dv">0</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>  cv_pheno <span class="ot">&lt;-</span> <span class="fu">list</span>(folds<span class="sc">*</span>reps)</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">missing</span>(seed)) seed <span class="ot">=</span> <span class="fu">as.integer</span>((<span class="fu">as.double</span>(<span class="fu">Sys.time</span>())<span class="sc">*</span><span class="dv">1000</span><span class="sc">+</span><span class="fu">Sys.getpid</span>()) <span class="sc">%%</span> <span class="dv">2</span><span class="sc">^</span><span class="dv">31</span>)</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>reps) {</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    ids <span class="ot">&lt;-</span> <span class="fu">sample</span>(isy,<span class="fu">length</span>(isy),<span class="at">replace=</span>F)</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>folds) {</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>      count<span class="ot">=</span>count<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>      y_temp <span class="ot">=</span> y</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>      y_temp[ids[start[j]<span class="sc">:</span>end[j]]] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>      cv_pheno[[count]] <span class="ot">&lt;-</span> y_temp</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(matrix) {</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">matrix</span>(<span class="fu">unlist</span>(cv_pheno),<span class="at">nrow=</span><span class="fu">length</span>(y),<span class="at">ncol=</span><span class="fu">length</span>(cv_pheno),<span class="at">byrow=</span><span class="cn">FALSE</span>))</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(cv_pheno)</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a><span class="co"># create 5 fold cross validation samples</span></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>cvs <span class="ot">=</span> <span class="fu">cCV</span>(y, <span class="at">folds =</span> <span class="dv">5</span>, <span class="at">reps =</span> <span class="dv">10</span>)</span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="co"># run cross validation</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">=</span> <span class="fu">rep</span>(<span class="fu">as.numeric</span>(<span class="cn">NA</span>), <span class="fu">length</span>(y))</span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(cvs)) pred[<span class="fu">is.na</span>(cvs[[i]])] <span class="ot">=</span> <span class="fu">mixed.solve</span>(<span class="at">y =</span> cvs[[i]], <span class="at">K =</span> G)<span class="sc">$</span>u[<span class="fu">is.na</span>(cvs[[i]])]</span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a><span class="co"># if we have more than 1 repition, need to use this</span></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(cvs)) {</span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>  this_pred <span class="ot">=</span> <span class="fu">mixed.solve</span>(<span class="at">y =</span> cvs[[i]], <span class="at">K =</span> G)<span class="sc">$</span>u[<span class="fu">is.na</span>(cvs[[i]])]</span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a>  this_y <span class="ot">=</span> y[<span class="fu">is.na</span>(cvs[[i]])]</span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>  preds[[i]] <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">pred =</span> this_pred, <span class="at">y =</span> this_y)</span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>cors <span class="ot">=</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(preds, <span class="cf">function</span>(x) <span class="fu">cor</span>(x<span class="sc">$</span>pred, x<span class="sc">$</span>y)))</span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine all predictions into a single vector if needed</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(preds, <span class="cf">function</span>(x) x<span class="sc">$</span>pred))</span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a><span class="co"># plot predictes vs observed</span></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pred, y)</span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a><span class="co"># prediction accuracy</span></span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(pred, y)</span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a><span class="co"># check bias</span></span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(pred <span class="sc">~</span> y))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="bayesian-alphabet" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Bayesian Alphabet</h1>
+<p>A linear mixed model with a series of independent random effects has the following form:</p>
+<p><span class="math display">\[
+\mathbf{y} = \mathbf{X\boldsymbol{\beta}} + \mathbf{Z}_{1}\mathbf{u}_1 + \mathbf{Z}_{2}\mathbf{u}_2 + \mathbf{Z}_{3}\mathbf{u}_3 + \dots + \mathbf{Z}_{k}\mathbf{u}_{k} + \mathbf{e},
+\]</span></p>
+<p>with the joint posterior density</p>
+<p><span class="math display">\[
+\begin{aligned}
+p(\boldsymbol{\beta},\sigma_{\beta}^2,\mathbf{u}_{1},\sigma_{u_1}^2,\dots,\mathbf{u}_{k},\sigma_{u_{k}}^2, \sigma_{\epsilon}^2 | \mathbf{y})
+&amp;\propto \left\{\prod_{i=1}^{n}N(y_i | \mathbf{x}_{i}' \boldsymbol{\beta} + \sum_{j=1}^{k} \mathbf{z}_{j_i}' \mathbf{u}_{j}, \sigma_{\epsilon}^2) \right\} \\
+&amp;\times N(\boldsymbol{\beta}|0,\mathbf{I}\sigma_{\beta}^2) \prod_{j=1}^{k}N(\mathbf{u}_{j} | 0,\mathbf{I}\sigma_{j}^2) \\
+&amp;\times \prod_{j=1}^{k} \chi^{-2}(\sigma_{j}^2 | S_{j}, df_{j}) \chi^{-2}(\sigma_{\epsilon}^2 | S_{\epsilon}, df_{\epsilon}).
+\end{aligned}
+\]</span></p>
+<p>In the Bayesian Alphabet, the prior distributions on the marker effects is altered to generally generate a sparsity pattern on the marker effects, meaning feature selection. This feature selection is achieved by using <em>spike-and-slap</em> mixture priors. Those priors have a point mass at zero and a usually normal slap. Noisance marker effects ideally get absorbed in the point mass at zero, whereas relevant markers have a higher mixture probability for the slap, and get a significan effect size.</p>
+<p><img src="../misc/spike_slap.png" class="img-fluid"></p>
+<p>{https://fabiandablander.com/r/Spike-and-Slab.html}</p>
+<p><img src="../misc/ba_priors.png" class="img-fluid"></p>
+<p>{https://xzlab.org/papers/2013_Zhouetal_PG.pdf}</p>
+</section>
+<section id="bayescpi---threshold-model" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> <span class="math inline">\(BayesC\pi\)</span> - Threshold Model</h1>
+<p>Binary Traits (0/1) can be modelled with generalized linear models in which the expectation of the observations are mapped to a linear predictor comprised of random and fixed effects. The likelihood for the data is a Bernoulli distribution in our case, with success probably linked to the linear predictor through the probit function:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{y} &amp;\sim \mathbf{B}(1,\mathbf{p})\\
+\mathbf{p} &amp;= probit(\mathbf{X}\boldsymbol{\beta} + \mathbf{Zu}) \\
+\boldsymbol{\beta} &amp;\sim \mathbf{U}(-Inf,Inf) \\
+\mathbf{u} &amp;\sim \pi N(0,{\sigma_u}^2) + (1-\pi)\delta_0 \\
+\pi &amp;\sim U(0,1) \\
+{\sigma_u}^2 &amp;\sim Gamma(1,0.01)
+\end{aligned}
+\]</span></p>
+<p>The following shows an implmementation of that model in <a href="https://mcmc-jags.sourceforge.io/">Jags</a>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"rjags"</span>)) <span class="fu">install.packages</span>(<span class="st">"rjags"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rjags)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>BayesCJags <span class="ot">&lt;-</span> <span class="cf">function</span>(y, Z, <span class="at">threshold =</span> <span class="cn">FALSE</span>, <span class="at">niter =</span> <span class="dv">5000</span>, <span class="at">burnin =</span> <span class="dv">2500</span>, <span class="at">betaPriorAlpha =</span> <span class="dv">2</span>, <span class="at">betaPriorBeta =</span> <span class="dv">5</span>) {</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="do">###############################</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="do">### First the model strings </span><span class="al">###</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="do">###############################</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># probit threshold model</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  modelstringThreshold <span class="ot">=</span> <span class="st">"</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="st">  model {</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="st">    for (i in 1:n) {</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="st">      y[i] ~ dbern(prob[i])</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="st">      probit(prob[i]) &lt;- alpha + inprod(X[i,],beta)</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="st">    for (j in 1:p) {</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="st">      ind[j] ~ dbern(pind)</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="st">      betaT[j] ~ dnorm(0,tau)</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="st">      beta[j] &lt;- ind[j] * betaT[j]</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="st">    tau ~ dgamma(1,0.001)</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="st">    alpha ~ dnorm(0,0.0001)</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="st">    # pind ~ dunif(0,1)</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="st">    pind ~ dbeta(betaPriorAlpha, betaPriorBeta)</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="st">  "</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># and the gaussian model</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  modelstringGaussian <span class="ot">=</span> <span class="st">"</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="st">  model {</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="st">    for (i in 1:n) {</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="st">      y[i] ~ dnorm(alpha + inprod(X[i,],beta), tauE)</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="st">    for (j in 1:p) {</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a><span class="st">      ind[j] ~ dbern(pind)</span></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="st">      betaT[j] ~ dnorm(0,tauB)</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="st">      beta[j] &lt;- ind[j] * betaT[j]</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="st">    tauB ~ dgamma(1,0.001)</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="st">    alpha ~ dnorm(0,0.0001)</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="st">    # pind ~ dunif(0,1)</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a><span class="st">    pind ~ dbeta(betaPriorAlpha, betaPriorBeta)</span></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="st">    tauE ~ dgamma(1, 0.001)</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="st">  "</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># the default (gaussian)</span></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>  modelstring <span class="ot">&lt;-</span> modelstringGaussian</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(threshold) {</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>    modelstring <span class="ot">=</span> modelstringThreshold</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>  <span class="co"># some checks</span></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>(<span class="fu">is.numeric</span>(y) <span class="sc">|</span> <span class="fu">is.numeric</span>(y) <span class="sc">|</span> <span class="fu">is.vector</span>(y))) <span class="fu">stop</span>(<span class="st">"y must be a numeric/integer vector"</span>)</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(threshold <span class="sc">&amp;</span> <span class="fu">length</span>(<span class="fu">unique</span>(y)) <span class="sc">&gt;</span> <span class="dv">2</span>) <span class="fu">stop</span>(<span class="st">"y must be 0/1 for the threshold model"</span>)</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.matrix</span>(Z)) <span class="fu">stop</span>(<span class="st">"Z must be a numeric matrix"</span>)</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(Z) <span class="sc">!=</span> <span class="fu">length</span>(y)) <span class="fu">stop</span>(<span class="st">"Z must have as many rows as elements in y"</span>)</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># make the data.frame</span></span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">=</span> <span class="fu">length</span>(y)</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ncol</span>(Z)</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">=</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">X=</span>Z ,<span class="at">n =</span> n,<span class="at">p =</span> p, <span class="at">betaPriorAlpha =</span> betaPriorAlpha, <span class="at">betaPriorBeta =</span> betaPriorBeta)</span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>  init <span class="ot">=</span> <span class="fu">list</span>(<span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">betaT =</span> <span class="fu">rep</span>(<span class="dv">0</span>,p), <span class="at">pind =</span> <span class="dv">0</span>, <span class="at">ind =</span> <span class="fu">rep</span>(<span class="dv">0</span>,p), <span class="at">tauB =</span> <span class="dv">1</span>)</span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>threshold) init<span class="sc">$</span>tauE <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">load.module</span>(<span class="st">"glm"</span>)</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">=</span> <span class="fu">jags.model</span>(<span class="fu">textConnection</span>(modelstring),</span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> data, <span class="at">inits =</span> init)</span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>  <span class="co"># burnin</span></span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update</span>(model, <span class="at">n.iter =</span> burnin)</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>  <span class="co"># sampling</span></span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">=</span> <span class="fu">coda.samples</span>(<span class="at">model =</span> model,</span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>            <span class="at">variable.names =</span> <span class="fu">names</span>(init),</span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>            <span class="at">n.iter =</span> (niter <span class="sc">-</span> burnin), <span class="at">thin =</span> <span class="dv">1</span>)</span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="co"># create "binary" trait from our phenotypes</span></span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>mu_y <span class="ot">=</span> <span class="fu">mean</span>(y)</span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>y_binary <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">length</span>(y))</span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a>y_binary[y <span class="sc">&gt;</span> mu_y] <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>Mc_small <span class="ot">=</span> Mc[, <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]</span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a><span class="co"># run model</span></span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>mod_bcpi <span class="ot">&lt;-</span> <span class="fu">BayesCJags</span>(<span class="at">y =</span> y_binary, <span class="at">Z =</span> Mc_small, <span class="at">threshold =</span> <span class="cn">TRUE</span>, <span class="at">niter =</span> <span class="dv">500</span>, <span class="at">burnin =</span> <span class="dv">250</span>, <span class="at">betaPriorAlpha =</span> <span class="dv">2</span>, <span class="at">betaPriorBeta =</span> <span class="dv">5</span>)</span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a><span class="co"># gaussian response</span></span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>mod_bcpi_gaussian <span class="ot">&lt;-</span> <span class="fu">BayesCJags</span>(<span class="at">y =</span> y, <span class="at">Z =</span> Mc_small, <span class="at">threshold =</span> <span class="cn">FALSE</span>, <span class="at">niter =</span> <span class="dv">500</span>, <span class="at">burnin =</span> <span class="dv">250</span>, <span class="at">betaPriorAlpha =</span> <span class="dv">2</span>, <span class="at">betaPriorBeta =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+(function () {
+  const themes = [
+    { id: "warm", label: "Warm" },
+    { id: "paper", label: "Paper" },
+    { id: "sage", label: "Sage" },
+    { id: "fjord", label: "Fjord" },
+    { id: "rose", label: "Rose" },
+    { id: "graphite", label: "Graphite" },
+    { id: "blackboard", label: "Blackboard" },
+    { id: "dark", label: "Dark" },
+    { id: "contrast", label: "Contrast" }
+  ];
+
+  const storageKey = "practical-as-kiel-theme";
+
+  function getThemeIndex(id) {
+    const index = themes.findIndex((theme) => theme.id === id);
+    return index >= 0 ? index : 0;
+  }
+
+  function readStoredTheme() {
+    try {
+      return localStorage.getItem(storageKey);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeStoredTheme(id) {
+    try {
+      localStorage.setItem(storageKey, id);
+    } catch (error) {
+      return;
+    }
+  }
+
+  function applyTheme(id) {
+    const index = getThemeIndex(id);
+    const theme = themes[index];
+    document.documentElement.dataset.courseTheme = theme.id;
+    document.body.dataset.courseTheme = theme.id;
+    writeStoredTheme(theme.id);
+
+    const select = document.querySelector("[data-theme-select]");
+    if (select) {
+      select.value = theme.id;
+      select.setAttribute("aria-label", `Theme: ${theme.label}`);
+    }
+  }
+
+  function nextTheme() {
+    const current = document.documentElement.dataset.courseTheme || themes[0].id;
+    const index = getThemeIndex(current);
+    applyTheme(themes[(index + 1) % themes.length].id);
+  }
+
+  function createControl() {
+    if (document.querySelector("[data-theme-switcher]")) {
+      return;
+    }
+
+    const control = document.createElement("div");
+    const selectId = "course-theme-select";
+    control.className = "theme-switcher";
+    control.dataset.themeSwitcher = "true";
+
+    const label = document.createElement("label");
+    label.setAttribute("for", selectId);
+    label.textContent = "Theme";
+
+    const select = document.createElement("select");
+    select.id = selectId;
+    select.dataset.themeSelect = "true";
+    select.title = "Change theme";
+
+    themes.forEach(function (theme) {
+      const option = document.createElement("option");
+      option.value = theme.id;
+      option.textContent = theme.label;
+      select.appendChild(option);
+    });
+
+    select.addEventListener("change", function (event) {
+      applyTheme(event.target.value);
+    });
+
+    control.appendChild(label);
+    control.appendChild(select);
+    document.body.appendChild(control);
+  }
+
+  function shouldIgnoreKeypress(event) {
+    const tagName = event.target && event.target.tagName;
+    return event.metaKey || event.ctrlKey || event.altKey ||
+      tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT";
+  }
+
+  function init() {
+    createControl();
+    applyTheme(readStoredTheme() || themes[0].id);
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key.toLowerCase() === "t" && !shouldIgnoreKeypress(event)) {
+        nextTheme();
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/cheuerde\.github\.io\/Practical_AS_Kiel\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/cheuerde/Practical_AS_Kiel/blob/main/labs/genomic-prediction.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/cheuerde/Practical_AS_Kiel/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

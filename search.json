@@ -1,0 +1,1332 @@
+[
+  {
+    "objectID": "lectures/r-intro.html#get-r",
+    "href": "lectures/r-intro.html#get-r",
+    "title": "Introduction to R",
+    "section": "Get R",
+    "text": "Get R\nFrom CRAN\nRStudio\nUbuntu:\nsudo apt install r-base"
+  },
+  {
+    "objectID": "lectures/r-intro.html#some-introduction-material",
+    "href": "lectures/r-intro.html#some-introduction-material",
+    "title": "Introduction to R",
+    "section": "Some Introduction Material",
+    "text": "Some Introduction Material\nFrom the developers: Introduction to R\nRStudio: Documentation\nR for Data Science"
+  },
+  {
+    "objectID": "lectures/r-intro.html#background",
+    "href": "lectures/r-intro.html#background",
+    "title": "Introduction to R",
+    "section": "Background",
+    "text": "Background\n\nR is a general programming language with a specialization for statistics.\nR is generally used through a REPL and interpreted live.\nFunctional programming paradigm: all about objects and functions.\nMajor appeal: packages, graphics, and scientific workflows.\nMajor drawback: scripts can grow without structure."
+  },
+  {
+    "objectID": "lectures/r-intro.html#assigning-and-manipulating-variables",
+    "href": "lectures/r-intro.html#assigning-and-manipulating-variables",
+    "title": "Introduction to R",
+    "section": "Assigning And Manipulating Variables",
+    "text": "Assigning And Manipulating Variables\nNote: R has two assignment operators, &lt;- and =.\n\nx = 5\nprint(x)\n\n[1] 5\n\nx\n\n[1] 5\n\ny = x\nprint(y)\n\n[1] 5\n\nx = 3\n\nprint(x)\n\n[1] 3\n\nprint(y)\n\n[1] 5"
+  },
+  {
+    "objectID": "lectures/r-intro.html#working-with-data-frames",
+    "href": "lectures/r-intro.html#working-with-data-frames",
+    "title": "Introduction to R",
+    "section": "Working With Data Frames",
+    "text": "Working With Data Frames\n\ndat = data.frame(\n  name = c(\"Adam\", \"Paul\", \"Elly\"),\n  age = c(22, 43, 54)\n)\n\nstr(dat)\n\n'data.frame':   3 obs. of  2 variables:\n $ name: chr  \"Adam\" \"Paul\" \"Elly\"\n $ age : num  22 43 54\n\nnames = dat$name\nages = dat[, \"age\"]\n\nstr(names)\n\n chr [1:3] \"Adam\" \"Paul\" \"Elly\"\n\nstr(ages)\n\n num [1:3] 22 43 54"
+  },
+  {
+    "objectID": "lectures/r-intro.html#subsetting-data-frames",
+    "href": "lectures/r-intro.html#subsetting-data-frames",
+    "title": "Introduction to R",
+    "section": "Subsetting Data Frames",
+    "text": "Subsetting Data Frames\n\ndat[dat$name == \"Paul\", ]\n\n  name age\n2 Paul  43\n\ndat[dat$age %in% c(22, 54), ]\n\n  name age\n1 Adam  22\n3 Elly  54\n\ndat$id = 1:nrow(dat)\ndat[, \"id_2\"] = dat$id + 2\n\nprint(dat)\n\n  name age id id_2\n1 Adam  22  1    3\n2 Paul  43  2    4\n3 Elly  54  3    5\n\ndat$id[dat$name == \"Adam\"] &lt;- 12\nprint(dat)\n\n  name age id id_2\n1 Adam  22 12    3\n2 Paul  43  2    4\n3 Elly  54  3    5"
+  },
+  {
+    "objectID": "lectures/r-intro.html#reading-and-writing-data",
+    "href": "lectures/r-intro.html#reading-and-writing-data",
+    "title": "Introduction to R",
+    "section": "Reading And Writing Data",
+    "text": "Reading And Writing Data\n\ndat = data.frame(\n  name = c(\"Adam\", \"Paul\", \"Elly\"),\n  age = c(22, 43, 54)\n)\n\nwrite.table(dat, file = \"my_data.csv\", row.names = FALSE, sep = \",\")\n\ndat_read = read.table(file = \"my_data.csv\", sep = \",\", header = TRUE)\nstr(dat_read)\n\n'data.frame':   3 obs. of  2 variables:\n $ name: chr  \"Adam\" \"Paul\" \"Elly\"\n $ age : int  22 43 54"
+  },
+  {
+    "objectID": "lectures/r-intro.html#vectors-and-matrices",
+    "href": "lectures/r-intro.html#vectors-and-matrices",
+    "title": "Introduction to R",
+    "section": "Vectors And Matrices",
+    "text": "Vectors And Matrices\n\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\ny = rnorm(10)\nstr(y)\n\n num [1:10] 0.94 -0.422 -0.852 0.782 1.037 ...\n\nD = matrix(data = rnorm(5 * 5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]       [,3]       [,4]       [,5]\n[1,] -2.2153940  1.2068161  0.3856771 -0.7060726  1.2108538\n[2,] -0.2066167  0.6087701 -2.0697038 -0.1029963  0.7491026\n[3,] -0.7123613 -0.6905677  0.3504965 -0.6409511 -0.7333024\n[4,] -1.0628546  0.8516926  0.0163154  0.4327210 -0.8639295\n[5,] -0.4771185  0.1777331  0.9936057  0.4095861  0.4688998\n\nclass(D)\n\n[1] \"matrix\" \"array\""
+  },
+  {
+    "objectID": "lectures/r-intro.html#matrix-helpers",
+    "href": "lectures/r-intro.html#matrix-helpers",
+    "title": "Introduction to R",
+    "section": "Matrix Helpers",
+    "text": "Matrix Helpers\n\nmeans = colMeans(D)\nmeans\n\n[1] -0.9348690  0.4308888 -0.0647218 -0.1215426  0.1663249\n\nd = diag(D)\nd\n\n[1] -2.2153940  0.6087701  0.3504965  0.4327210  0.4688998"
+  },
+  {
+    "objectID": "lectures/r-intro.html#data-exploration-and-visualization",
+    "href": "lectures/r-intro.html#data-exploration-and-visualization",
+    "title": "Introduction to R",
+    "section": "Data Exploration And Visualization",
+    "text": "Data Exploration And Visualization\n\nlibrary(dlookr)\nlibrary(ggplot2)\n\ndata(iris)\nstr(iris)\n\n'data.frame':   150 obs. of  5 variables:\n $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...\n $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...\n $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...\n $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...\n $ Species     : Factor w/ 3 levels \"setosa\",\"versicolor\",..: 1 1 1 1 1 1 1 1 1 1 ...\n\ndlookr::diagnose(iris)\n\n# A tibble: 5 × 6\n  variables    types   missing_count missing_percent unique_count unique_rate\n  &lt;chr&gt;        &lt;chr&gt;           &lt;int&gt;           &lt;dbl&gt;        &lt;int&gt;       &lt;dbl&gt;\n1 Sepal.Length numeric             0               0           35       0.233\n2 Sepal.Width  numeric             0               0           23       0.153\n3 Petal.Length numeric             0               0           43       0.287\n4 Petal.Width  numeric             0               0           22       0.147\n5 Species      factor              0               0            3       0.02"
+  },
+  {
+    "objectID": "lectures/r-intro.html#scatterplot",
+    "href": "lectures/r-intro.html#scatterplot",
+    "title": "Introduction to R",
+    "section": "Scatterplot",
+    "text": "Scatterplot\n\np = ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +\n  geom_point()\n\np"
+  },
+  {
+    "objectID": "lectures/r-intro.html#histogram",
+    "href": "lectures/r-intro.html#histogram",
+    "title": "Introduction to R",
+    "section": "Histogram",
+    "text": "Histogram\n\np2 = ggplot(iris, aes(x = Petal.Length)) +\n  geom_histogram(aes(fill = Species), bins = 20) +\n  facet_wrap(~ Species)\n\np2"
+  },
+  {
+    "objectID": "lectures/r-intro.html#boxplot",
+    "href": "lectures/r-intro.html#boxplot",
+    "title": "Introduction to R",
+    "section": "Boxplot",
+    "text": "Boxplot\n\np3 = ggplot(iris, aes(x = Species, y = Petal.Length, fill = Species)) +\n  geom_boxplot()\n\np3"
+  },
+  {
+    "objectID": "lectures/r-intro.html#writing-functions",
+    "href": "lectures/r-intro.html#writing-functions",
+    "title": "Introduction to R",
+    "section": "Writing Functions",
+    "text": "Writing Functions\nAll operators in R are functions.\n\n?sum\n?`+`\nfix(`+`)"
+  },
+  {
+    "objectID": "lectures/r-intro.html#a-mean-function",
+    "href": "lectures/r-intro.html#a-mean-function",
+    "title": "Introduction to R",
+    "section": "A Mean Function",
+    "text": "A Mean Function\n\nmy_mean_function = function(y) {\n\n  n = length(y)\n  sum = 0\n  for (i in 1:n) sum = sum + y[i]\n\n  mean = sum / n\n\n  return(mean)\n\n}"
+  },
+  {
+    "objectID": "lectures/r-intro.html#use-the-function",
+    "href": "lectures/r-intro.html#use-the-function",
+    "title": "Introduction to R",
+    "section": "Use The Function",
+    "text": "Use The Function\n\nx = rnorm(1000, mean = 23.42, sd = 4)\n\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.52066\n\nmean(x)\n\n[1] 23.52066"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#multivariate-clustering",
+    "href": "lectures/multivariate-clustering.html#multivariate-clustering",
+    "title": "Multivariate Clustering",
+    "section": "Multivariate Clustering",
+    "text": "Multivariate Clustering\nMultivariate Clustering is the extension of univariate clustering (using only one feature for identifying grouping categories), that makes use of more than one feature.\nIn the case of two features, we can apply the same logic of using mixture models to cluster individuals into groups, only that now we fit a mixture of k multivariate normal distributions."
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#mixture-model",
+    "href": "lectures/multivariate-clustering.html#mixture-model",
+    "title": "Multivariate Clustering",
+    "section": "Mixture Model",
+    "text": "Mixture Model\n\\[\np(\\mathbf{x}) = \\sum_{i=1}^{K} \\lambda_i f_i(\\mathbf{x}), ~~~~~~ with \\sum \\boldsymbol{\\lambda} = 1.\n\\]\nMultivariate normal distribution:\n\\[\nf(\\mathbf{x}) \\sim MVN(\\boldsymbol{\\mu}, \\Sigma)\n\\]"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#ellipses",
+    "href": "lectures/multivariate-clustering.html#ellipses",
+    "title": "Multivariate Clustering",
+    "section": "Ellipses",
+    "text": "Ellipses\nIn the bivariate case, the contours of the quntiles of the multivariate normal distributions are ellipses.\nThe ellipse itself can be defined by the quantile which we want to establish, e.g. we want the area in which 95% of the probability mass falls."
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#circle-and-ellipse",
+    "href": "lectures/multivariate-clustering.html#circle-and-ellipse",
+    "title": "Multivariate Clustering",
+    "section": "Circle And Ellipse",
+    "text": "Circle And Ellipse\n\\[\n\\begin{align}\nCircle: & \\frac{(x - \\mu_x)^2}{r^2} + \\frac{(y - \\mu_y)^2}{r^2} = 1 \\\\\nEllipses: & \\frac{(x - \\mu_x)^2}{r_x^2} + \\frac{(y - \\mu_y)^2}{r_y^2} = 1 \\\\\n\\end{align}\n\\]"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#mahalanobis-distance",
+    "href": "lectures/multivariate-clustering.html#mahalanobis-distance",
+    "title": "Multivariate Clustering",
+    "section": "Mahalanobis Distance",
+    "text": "Mahalanobis Distance\nFor the multivariate normal distribution, the squared distance of a data point to the mean in standard deviation units (\\(c^2)\\) can be calculated as:\n\\[\n(\\mathbf{x} - \\boldsymbol{\\mu})'\\Sigma^{-1}(\\mathbf{x} - \\boldsymbol{\\mu}) = c^2.\n\\]"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#explore-pairwise-bivariate-data",
+    "href": "lectures/multivariate-clustering.html#explore-pairwise-bivariate-data",
+    "title": "Multivariate Clustering",
+    "section": "Explore Pairwise Bivariate Data",
+    "text": "Explore Pairwise Bivariate Data\nLets first visualize the features we have got available to the iris data set:\n\nlibrary(pacman)\np_load(ggplot2, knitr, plotly, lubridate, tidyverse, rstan, GGally, BGLR)\n\ndata(iris)\n\nggpairs(\n  iris,\n  columns = 1:4,\n  aes(color = Species)\n  )\n\niris_out = iris %&gt;% select(x = Petal.Length, y = Petal.Width, Species)"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#pairwise-iris-features",
+    "href": "lectures/multivariate-clustering.html#pairwise-iris-features",
+    "title": "Multivariate Clustering",
+    "section": "Pairwise Iris Features",
+    "text": "Pairwise Iris Features"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#fitting-mixture-of-k-multivariate-normal",
+    "href": "lectures/multivariate-clustering.html#fitting-mixture-of-k-multivariate-normal",
+    "title": "Multivariate Clustering",
+    "section": "Fitting Mixture Of k Multivariate Normal",
+    "text": "Fitting Mixture Of k Multivariate Normal\n\np_load(mixtools)\n\nRunMixtureMVN = function(x, y, k = 2, labels = NULL, palette = \"Dark 3\") {\n\nmod = mvnormalmixEM(x = cbind(x,y), k = k)\n\nthetas &lt;- mod$pro\nmus &lt;- mod$mu\nV &lt;- mod$sigma\n\nif(is.null(labels)) labels = \"1\"\n\ndplot = data.frame(\n       x = x,\n       y = y,\n       prob = mod$posterior[,1],\n       labels = labels\n)"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#plot-mixture-ellipses",
+    "href": "lectures/multivariate-clustering.html#plot-mixture-ellipses",
+    "title": "Multivariate Clustering",
+    "section": "Plot Mixture Ellipses",
+    "text": "Plot Mixture Ellipses\n\ncolors = hcl.colors(n = k, palette = palette)\n\np &lt;- ggplot(dplot, aes(x = x, y = y)) +\n  geom_point(alpha = 0.8, aes(color = prob))\n\np_label &lt;- ggplot(dplot, aes(x = x, y = y)) +\n  geom_point(alpha = 0.8, aes(color = labels))\n\nfor(i in 1:k) {\n\n  ellipses &lt;- ellipse(mu = mus[[i]], sigma = V[[i]], alpha = 1-0.999, npoints = 250, newplot = FALSE, draw = FALSE) %&gt;%\n    as.data.frame %&gt;%\n    rename(a = V1, b = V2)\n\n  p = p + geom_point(data = ellipses, aes(x = a, y = b), color = colors[i], size = 0.8, shape = 8)\n  p_label = p_label + geom_point(data = ellipses, aes(x = a, y = b), color = colors[i], size = 0.8, shape = 8)\n}"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#bivariate-clustering-preview",
+    "href": "lectures/multivariate-clustering.html#bivariate-clustering-preview",
+    "title": "Multivariate Clustering",
+    "section": "Bivariate Clustering Preview",
+    "text": "Bivariate Clustering Preview\n\nlibrary(ggplot2)\ntheme_set(theme_minimal(base_size = 16))\n\niris_out = data.frame(\n  x = iris$Petal.Length,\n  y = iris$Petal.Width,\n  Species = iris$Species\n)\n\nset.seed(2026)\nkm_iris = kmeans(iris_out[, c(\"x\", \"y\")], centers = 2)\niris_out$cluster = factor(km_iris$cluster)\n\nggplot(iris_out, aes(x = x, y = y, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  stat_ellipse(type = \"norm\", linewidth = 1) +\n  labs(x = \"Petal.Length\", y = \"Petal.Width\", color = \"Cluster\")"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#run-on-iris-data",
+    "href": "lectures/multivariate-clustering.html#run-on-iris-data",
+    "title": "Multivariate Clustering",
+    "section": "Run On Iris Data",
+    "text": "Run On Iris Data\n\nmm_two = RunMixtureMVN(x = iris_out$x, y = iris_out$y, k = 2, labels = iris_out$Species)\nmm_three = RunMixtureMVN(x = iris_out$x, y = iris_out$y, k = 3, labels = iris_out$Species)\n\nmm_two$p\nmm_two$p_label\n\nmm_three$p\nmm_three$p_label"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#principal-component-clustering",
+    "href": "lectures/multivariate-clustering.html#principal-component-clustering",
+    "title": "Multivariate Clustering",
+    "section": "Principal Component Clustering",
+    "text": "Principal Component Clustering\nPrincipal Component Analysis (PCA) is a feature compression method, that finds transformations of linearly independent features from the total set that are ordered by their importance (variance explained).\n\\[\n\\mathbf{X} = \\mathbf{USV'}\n\\]"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#pcas-for-clustering",
+    "href": "lectures/multivariate-clustering.html#pcas-for-clustering",
+    "title": "Multivariate Clustering",
+    "section": "PCAs For Clustering",
+    "text": "PCAs For Clustering\nWe will be computing the PCAs for a genotype data set, extract the first 2 components and use them to cluster our data using a multivariate mixture model:\n\ndata(wheat)\n\nM = wheat.X\n\npca = prcomp(M, scale = TRUE, center = TRUE)\nspca = summary(pca)\n\nplot(spca$importance[2,], ylab = \"Proportion of Variance Explained\")\nplot(spca$importance[3,], ylab = \"Cumulative Proportion\")\n\nggplot(data.frame(x = pca$x[,1], y = pca$x[,2]), aes(x = x, y = y)) +\n  geom_point() +\n  xlab(\"PC1\") +\n  ylab(\"PC2\")"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#pca-scatter",
+    "href": "lectures/multivariate-clustering.html#pca-scatter",
+    "title": "Multivariate Clustering",
+    "section": "PCA Scatter",
+    "text": "PCA Scatter\n\nlibrary(BGLR)\n\ndata(wheat)\n\nM = wheat.X\npca = prcomp(M, scale = TRUE, center = TRUE)\n\npca_scores = data.frame(\n  PC1 = pca$x[,1],\n  PC2 = pca$x[,2]\n)\n\nggplot(pca_scores, aes(x = PC1, y = PC2)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\")"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#pca-mixture",
+    "href": "lectures/multivariate-clustering.html#pca-mixture",
+    "title": "Multivariate Clustering",
+    "section": "PCA Mixture",
+    "text": "PCA Mixture\n\nmm_pca = RunMixtureMVN(x = pca$x[,1], y = pca$x[,2], k = 2, palette = \"Dark 3\")\n\nmm_pca$p"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#k-means",
+    "href": "lectures/multivariate-clustering.html#k-means",
+    "title": "Multivariate Clustering",
+    "section": "K-Means",
+    "text": "K-Means\nK-Means is a clustering technique that minimzes the following function:\n\\[\nf(x) = \\sum_{i = 1}^{k}\\sum_{j = 1}^{nk}  (x_j - \\mu_i)^2\n\\]"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#k-means-in-r",
+    "href": "lectures/multivariate-clustering.html#k-means-in-r",
+    "title": "Multivariate Clustering",
+    "section": "K-Means In R",
+    "text": "K-Means In R\n\np_load(factoextra)\n\ndat = iris %&gt;% select(-Species)\n\ndat = as.data.frame(M)\n\nkmeans &lt;- kmeans(M, centers = 2)\n\nkplot = fviz_cluster(\n         kmeans,\n         data = dat,\n         ggtheme = theme_minimal()\n)\n\nkplot"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#k-means-preview",
+    "href": "lectures/multivariate-clustering.html#k-means-preview",
+    "title": "Multivariate Clustering",
+    "section": "K-Means Preview",
+    "text": "K-Means Preview\n\nset.seed(2026)\n\nkmeans_pca = kmeans(pca$x[,1:2], centers = 2)\npca_scores$cluster = factor(kmeans_pca$cluster)\n\nggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\", color = \"Cluster\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#linear-regression",
+    "href": "lectures/linear-regression.html#linear-regression",
+    "title": "Linear Regression",
+    "section": "Linear Regression",
+    "text": "Linear Regression\nLinear Regression deals with fitting predicted values based on input features and regression weights to observations.\nIn ordinary least squares, we aim to find regression weights that minimize the mean squared error between predicted and observed values:\n\\[\n\\hat{\\beta} = arg min \\sum_{i = 1}^{n}  (y_i - x_i \\beta_i)^2\n\\]"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#least-squares-geometry",
+    "href": "lectures/linear-regression.html#least-squares-geometry",
+    "title": "Linear Regression",
+    "section": "Least-Squares Geometry",
+    "text": "Least-Squares Geometry\n\\[\ne_i = y_i - \\hat{y}_i\n\\]\n\\[\n\\operatorname{MSE} = \\frac{1}{n}\\sum_{i=1}^{n} e_i^2\n\\]\nThe full regression plots show residuals as vertical segments.\nThe toy plot isolates the squared-error pieces."
+  },
+  {
+    "objectID": "lectures/linear-regression.html#toy-least-squares-piece",
+    "href": "lectures/linear-regression.html#toy-least-squares-piece",
+    "title": "Linear Regression",
+    "section": "Toy Least-Squares Piece",
+    "text": "Toy Least-Squares Piece\n\ntoy_dat = data.frame(\n  x = 1:10,\n  y = c(2.0, 4.7, 2.6, 5.9, 3.4, 7.2, 4.9, 8.3, 6.1, 9.4)\n)\n\ntoy_fit = lm(y ~ x, data = toy_dat)\ntoy_dat$pred = predict(toy_fit)\n\ntoy_squares = residual_square_data(toy_dat, \"x\", \"y\", \"pred\", every = 1, scale = 0.55)\n\nggplot(toy_dat, aes(x = x, y = y)) +\n  geom_rect(\n    data = toy_squares,\n    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),\n    inherit.aes = FALSE,\n    fill = \"#c46a2b\",\n    color = \"#c46a2b\",\n    alpha = 0.18\n  ) +\n  geom_segment(aes(xend = x, yend = pred), color = \"#155f7a\", alpha = 0.65) +\n  geom_point(size = 2.2) +\n  geom_line(aes(y = pred), color = \"red\", linewidth = 1) +\n  labs(x = \"x\", y = \"y\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#feature-design-matrix",
+    "href": "lectures/linear-regression.html#feature-design-matrix",
+    "title": "Linear Regression",
+    "section": "Feature / Design Matrix",
+    "text": "Feature / Design Matrix\nA Feature or Design Matrix maps observations to individual feature criteria.\nThe most fundamental feature matrix is a column vector with all 1s, meaning every observation has the same expression for that feature.\nIn that case, the feature serves as a mapping to the overall mean of the observations."
+  },
+  {
+    "objectID": "lectures/linear-regression.html#estimate-the-mean-with-ols",
+    "href": "lectures/linear-regression.html#estimate-the-mean-with-ols",
+    "title": "Linear Regression",
+    "section": "Estimate The Mean With OLS",
+    "text": "Estimate The Mean With OLS\n\nlibrary(ggplot2)\nlibrary(knitr)\ntheme_set(theme_minimal(base_size = 16))\n\n# load example data\ndata(airquality)\n\n# our response vector is Wind\ny = airquality$Wind\n\n# create a design matrix for the mean\nX = matrix(data = 1, nrow = length(y), ncol = 1)\ncolnames(X) = \"Intercept\"\n\nstr(X)\n\n num [1:153, 1] 1 1 1 1 1 1 1 1 1 1 ...\n - attr(*, \"dimnames\")=List of 2\n  ..$ : NULL\n  ..$ : chr \"Intercept\""
+  },
+  {
+    "objectID": "lectures/linear-regression.html#mse-function",
+    "href": "lectures/linear-regression.html#mse-function",
+    "title": "Linear Regression",
+    "section": "MSE Function",
+    "text": "MSE Function\n\nmse &lt;- function(par, y, X) {\n\n  # the weights are stored in \"par\", the length of that vector depends\n  # on the number of columns in X (number of features)\n\n  # predicted value\n  pred = X %*% par\n\n  # mean squared error\n  mse = mean((y - pred)**2)\n\n  return(mse)\n\n}"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#fit-the-intercept",
+    "href": "lectures/linear-regression.html#fit-the-intercept",
+    "title": "Linear Regression",
+    "section": "Fit The Intercept",
+    "text": "Fit The Intercept\n\np &lt;- rep(0, ncol(X))\nnames(p) &lt;- colnames(X)\n\nres &lt;- optim(\n       par = p,\n       fn = mse,\n       y = y,\n       X = X\n            )\n\n# our solution\nres$par\n\nIntercept \n 9.957812"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#predicted-vs-observed",
+    "href": "lectures/linear-regression.html#predicted-vs-observed",
+    "title": "Linear Regression",
+    "section": "Predicted vs Observed",
+    "text": "Predicted vs Observed\n\npred = X %*% res$par\n\ndat = data.frame(\n     y = y,\n     pred = as.numeric(pred),\n     id = seq_along(y)\n     )\n\nggplot(dat, aes(x = y, y = pred)) +\n geom_point() +\n geom_abline(intercept = 0, slope = 1, color = \"red\") +\n labs(x = \"Observed Wind\", y = \"Predicted Wind\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#raw-data-and-intercept",
+    "href": "lectures/linear-regression.html#raw-data-and-intercept",
+    "title": "Linear Regression",
+    "section": "Raw Data And Intercept",
+    "text": "Raw Data And Intercept\n\nggplot(dat, aes(x = id, y = y)) +\n  geom_segment(aes(xend = id, yend = pred), color = \"#155f7a\", alpha = 0.45) +\n  geom_point() +\n  geom_hline(yintercept = res$par, color = \"red\") +\n  labs(x = \"Observation\", y = \"Wind\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#multiple-linear-regression",
+    "href": "lectures/linear-regression.html#multiple-linear-regression",
+    "title": "Linear Regression",
+    "section": "Multiple Linear Regression",
+    "text": "Multiple Linear Regression\nWhen there is more than one feature in the design matrix we call that Multiple Linear Regression.\nThe overall principle of the problem remains the same: We aim to minimize the mean squared error of our predictions."
+  },
+  {
+    "objectID": "lectures/linear-regression.html#add-temperature",
+    "href": "lectures/linear-regression.html#add-temperature",
+    "title": "Linear Regression",
+    "section": "Add Temperature",
+    "text": "Add Temperature\n\n# our response vector is Wind\ny = airquality$Wind\n\n# now we also want another feature: Temp\ntemp = airquality$Temp\n\n# create a design matrix for the mean\nX = matrix(data = 1, nrow = length(y), ncol = 1)\n\n# add temperature as a feature to our design matrix\nX = cbind(\n   X,\n   temp\n   )\n\ncolnames(X) = c(\"Intercept\", \"Temp\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#wind-vs-temp",
+    "href": "lectures/linear-regression.html#wind-vs-temp",
+    "title": "Linear Regression",
+    "section": "Wind vs Temp",
+    "text": "Wind vs Temp\n\nggplot(airquality, aes(x = Temp, y = Wind)) +\n  geom_point() +\n  labs(x = \"Temp\", y = \"Wind\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#fit-multiple-regression",
+    "href": "lectures/linear-regression.html#fit-multiple-regression",
+    "title": "Linear Regression",
+    "section": "Fit Multiple Regression",
+    "text": "Fit Multiple Regression\n\np &lt;- rep(0, ncol(X))\nnames(p) &lt;- colnames(X)\n\nres &lt;- optim(\n       par = p,\n       fn = mse,\n       y = y,\n       X = X\n            )\n\n# our solution\nres$par\n\n Intercept       Temp \n23.2314500 -0.1704349"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#fitted-slope",
+    "href": "lectures/linear-regression.html#fitted-slope",
+    "title": "Linear Regression",
+    "section": "Fitted Slope",
+    "text": "Fitted Slope\n\npred = X %*% res$par\n\ndat = data.frame(\n     Wind = y,\n     Temp = airquality$Temp,\n     pred = as.numeric(pred),\n     id = 1:length(y)\n     )\n\nggplot(dat, aes(x = Temp, y = Wind)) +\n  geom_segment(aes(xend = Temp, yend = pred), color = \"#155f7a\", alpha = 0.45) +\n  geom_point() +\n  geom_abline(intercept = res$par[1], slope = res$par[2], color = \"red\") +\n  labs(x = \"Temp\", y = \"Wind\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#ridge-regression",
+    "href": "lectures/linear-regression.html#ridge-regression",
+    "title": "Linear Regression",
+    "section": "Ridge Regression",
+    "text": "Ridge Regression\n\\[\n\\min_{\\beta} \\left( \\sum_{i=1}^{n} \\left( y_i - \\beta_0 - \\sum_{j=1}^{p} \\beta_j x_{ij} \\right)^2 + \\lambda \\sum_{j=1}^{p} \\beta_j^2 \\right)\n\\]\nThe ridge parameter \\(\\lambda\\) controls how much we penalize large marker effects. We can visualize the solution space by evaluating the ridge criterion on a grid of \\(\\lambda\\) values."
+  },
+  {
+    "objectID": "lectures/linear-regression.html#closed-form-ridge-solution",
+    "href": "lectures/linear-regression.html#closed-form-ridge-solution",
+    "title": "Linear Regression",
+    "section": "Closed-Form Ridge Solution",
+    "text": "Closed-Form Ridge Solution\nFor a fixed \\(\\lambda\\), ridge regression has an analytical solution.\nIf \\(X = [\\mathbf{1}, M]\\) and the intercept is not penalized:\n\\[\n\\hat{\\beta}_{\\lambda} =\n\\left(X'X + \\lambda P\\right)^{-1}X'y,\n\\qquad\nP =\n\\begin{bmatrix}\n0 & 0 \\\\\n0 & I_p\n\\end{bmatrix}.\n\\]\nWith centered markers and centered response, as in the next code block:\n\\[\n\\hat{u}_{\\lambda} =\n\\left(\\frac{M_c'M_c}{n} + \\lambda I_p\\right)^{-1}\n\\frac{M_c'y_c}{n},\n\\qquad\n\\hat{\\beta}_0 = \\bar{y}.\n\\]"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#lambda-solution-space",
+    "href": "lectures/linear-regression.html#lambda-solution-space",
+    "title": "Linear Regression",
+    "section": "Lambda Solution Space",
+    "text": "Lambda Solution Space\n\nlibrary(BGLR)\ndata(wheat)\n\nsubset = 1:100\n\ny_ridge = wheat.Y[subset,2]\nM_ridge = wheat.X[subset,1:300]\n\nM_centered = scale(M_ridge, center = TRUE, scale = FALSE)\ny_centered = y_ridge - mean(y_ridge)\nn_obs = length(y_ridge)\n\nfit_ridge_lambda &lt;- function(lambda, y_centered, M_centered) {\n  u = solve(\n    crossprod(M_centered) / n_obs + diag(lambda, ncol(M_centered)),\n    crossprod(M_centered, y_centered) / n_obs\n  )\n\n  pred = mean(y_ridge) + M_centered %*% u\n  mse = mean((y_ridge - pred)**2)\n  penalty = lambda * sum(u**2)\n\n  data.frame(lambda = lambda, mse = mse, penalty = penalty,\n             criteria = mse + penalty, sd_marker_effect = sd(as.numeric(u)))\n}\n\nlambda_grid = 10^seq(-5, 1, length.out = 80)\nridge_path = do.call(rbind, lapply(lambda_grid, fit_ridge_lambda,\n                                   y_centered = y_centered, M_centered = M_centered))\nbest_lambda = ridge_path[which.min(ridge_path$criteria), ]\nbest_lambda\n\n  lambda        mse      penalty  criteria sd_marker_effect\n1  1e-05 0.01157643 4.447269e-05 0.0116209        0.1218662"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#ridge-criterion",
+    "href": "lectures/linear-regression.html#ridge-criterion",
+    "title": "Linear Regression",
+    "section": "Ridge Criterion",
+    "text": "Ridge Criterion\n\nggplot(ridge_path, aes(x = log10(lambda), y = criteria)) +\n  geom_line(color = \"#155f7a\", linewidth = 1) +\n  geom_point(data = best_lambda, color = \"#c46a2b\", size = 3) +\n  labs(x = \"log10(lambda)\", y = \"Ridge criterion\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#marker-shrinkage",
+    "href": "lectures/linear-regression.html#marker-shrinkage",
+    "title": "Linear Regression",
+    "section": "Marker Shrinkage",
+    "text": "Marker Shrinkage\n\nggplot(ridge_path, aes(x = log10(lambda), y = sd_marker_effect)) +\n  geom_line(color = \"#155f7a\", linewidth = 1) +\n  geom_point(data = best_lambda, color = \"#c46a2b\", size = 3) +\n  labs(x = \"log10(lambda)\", y = \"SD of marker effects\")"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#ridge-in-the-original-lab",
+    "href": "lectures/linear-regression.html#ridge-in-the-original-lab",
+    "title": "Linear Regression",
+    "section": "Ridge In The Original Lab",
+    "text": "Ridge In The Original Lab\n\nlibrary(BGLR)\ndata(wheat)\n\nsubset = 1:100\n\ny = wheat.Y[subset,2]\nM = wheat.X\nM = M[subset,1:300]\n\nX = matrix(data = 1, nrow = length(y), ncol = 1)\ncolnames(X) = \"intercept\""
+  },
+  {
+    "objectID": "lectures/linear-regression.html#ridge-objective",
+    "href": "lectures/linear-regression.html#ridge-objective",
+    "title": "Linear Regression",
+    "section": "Ridge Objective",
+    "text": "Ridge Objective\n\nmse_ridge &lt;- function(par, y, M, X) {\n\n  b = par[1:ncol(X)]\n  mu = X %*% b\n\n  u = par[(ncol(X) + 1):(length(par) - 1)]\n  pred = mu + M %*% u\n\n  mse = mean((y - pred)**2)\n  ridge_param = par[length(par)]\n  ridge = ridge_param * sum(u**2)\n\n  criteria = mse + ridge\n\n  if(ridge_param &lt; 0) {\n    criteria = 9999999\n  }\n\n  return(criteria)\n}"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#mixed-model-comparison",
+    "href": "lectures/linear-regression.html#mixed-model-comparison",
+    "title": "Linear Regression",
+    "section": "Mixed Model Comparison",
+    "text": "Mixed Model Comparison\nNow we compare the results from the optimization to an equivalent mixed model approach with a single randome effect:\n\\[\\begin{bmatrix} X'X & X'Z \\\\ Z'X & Z'Z+I\\lambda \\end{bmatrix} \\begin{bmatrix} \\beta \\\\ u \\end{bmatrix} = \\begin{bmatrix} X'y \\\\ Z'y \\end{bmatrix}\\]\n\nlibrary(rrBLUP)\nmod_rr = mixed.solve(y = y, X = X, Z = M)\n\nridge_mme = mod_rr$Ve / mod_rr$Vu\npred_mme = X %*% mod_rr$beta + M %*% mod_rr$u"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#advanced-models",
+    "href": "lectures/linear-regression.html#advanced-models",
+    "title": "Linear Regression",
+    "section": "Advanced Models",
+    "text": "Advanced Models\nMixed Model"
+  },
+  {
+    "objectID": "lectures/clustering.html#clustering",
+    "href": "lectures/clustering.html#clustering",
+    "title": "Clustering",
+    "section": "Clustering",
+    "text": "Clustering\nClustering or Unsupervised Learning deals with learning grouping structures from unlabelled data.\nUnlabelled data means the absense of trait or phenotypic observations in a breeding context while having features available on a set of individuals."
+  },
+  {
+    "objectID": "lectures/clustering.html#features-and-labels",
+    "href": "lectures/clustering.html#features-and-labels",
+    "title": "Clustering",
+    "section": "Features And Labels",
+    "text": "Features And Labels\nIllustration on a dataset that contains features and labels.\nThe features here are Sepal.Length,Sepal.Width,Petal.Length and Petal.Width.\nThe labels for those feature observations are the Species."
+  },
+  {
+    "objectID": "lectures/clustering.html#labelled-data",
+    "href": "lectures/clustering.html#labelled-data",
+    "title": "Clustering",
+    "section": "Labelled Data",
+    "text": "Labelled Data\n\nlibrary(pacman)\np_load(ggplot2, knitr, plotly, lubridate, tidyverse, rstan)\n\n# load dataset\ndata(iris)\n\n# check out features and labels\nglimpse(iris)"
+  },
+  {
+    "objectID": "lectures/clustering.html#unlabelled-data",
+    "href": "lectures/clustering.html#unlabelled-data",
+    "title": "Clustering",
+    "section": "Unlabelled Data",
+    "text": "Unlabelled Data\nNow we treat the features as coming from unlabelled individuals, meaning we dont have information on the grouping factor (Species)\n\n# load dataset\ndata(iris)\n\n# check out features and labels\nglimpse(iris %&gt;% select(-Species))"
+  },
+  {
+    "objectID": "lectures/clustering.html#univariate-clustering",
+    "href": "lectures/clustering.html#univariate-clustering",
+    "title": "Clustering",
+    "section": "Univariate Clustering",
+    "text": "Univariate Clustering\nAn initial approach is to investigate the indivudal features in isolation from each other and try to infer a grouping structure.\n\ndplot = pivot_longer(iris, -Species, names_to = \"Feature\", values_to = \"Value\")\np = ggplot(dplot, aes(x = Value)) +\n  geom_histogram(aes(y = ..density.., fill = Feature), bins = 40) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1) +\n  facet_wrap(~ Feature)\np"
+  },
+  {
+    "objectID": "lectures/clustering.html#feature-distributions",
+    "href": "lectures/clustering.html#feature-distributions",
+    "title": "Clustering",
+    "section": "Feature Distributions",
+    "text": "Feature Distributions\n\nlibrary(ggplot2)\ndata(iris)\n\ndplot = stack(iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")])\ncolnames(dplot) = c(\"Value\", \"Feature\")\n\nggplot(dplot, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#d9e2e7\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\")"
+  },
+  {
+    "objectID": "lectures/clustering.html#normal-mixture-model",
+    "href": "lectures/clustering.html#normal-mixture-model",
+    "title": "Clustering",
+    "section": "Normal Mixture Model",
+    "text": "Normal Mixture Model\nSome features indicate that the data had been generated not from a single normal process, but potentially a series of processes.\n\\[\np(\\mathbf{x}) = \\sum_{i=1}^{K} \\lambda_i f_i(\\mathbf{x}), ~~~~~~ with \\sum \\boldsymbol{\\lambda} = 1.\n\\]\nUnivariate normal distribution: \\(f(x) \\sim N(\\mu, \\sigma^2)\\)."
+  },
+  {
+    "objectID": "lectures/clustering.html#simulate-mixture-data",
+    "href": "lectures/clustering.html#simulate-mixture-data",
+    "title": "Clustering",
+    "section": "Simulate Mixture Data",
+    "text": "Simulate Mixture Data\n\nlibrary(ggplot2)\ntheme_set(theme_minimal(base_size = 16))\n\n# some random data\nset.seed(100)\nN &lt;- 1000\n\n# mixture probability for the first component\ntheta &lt;- 0.3\nmu1 &lt;- 5\nmu2 &lt;- 15\nsd1 &lt;- 1\nsd2 &lt;- 2\ny &lt;- ifelse(runif(N) &lt; theta, rnorm(N, mu1, sd1), rnorm(N, mu2, sd2))\n\ndat = list(\n     N = length(y),\n     y = y,\n     k = 2\n)"
+  },
+  {
+    "objectID": "lectures/clustering.html#raw-mixture",
+    "href": "lectures/clustering.html#raw-mixture",
+    "title": "Clustering",
+    "section": "Raw Mixture",
+    "text": "Raw Mixture\n\ndplot = as.data.frame(dat)\n\nggplot(dplot, aes(x = y)) +\n  geom_histogram(aes(y = ..density..), bins = 50, fill = \"white\", color = 1) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1)"
+  },
+  {
+    "objectID": "lectures/clustering.html#stan-mixture-program",
+    "href": "lectures/clustering.html#stan-mixture-program",
+    "title": "Clustering",
+    "section": "Stan Mixture Program",
+    "text": "Stan Mixture Program\n\nhcode =\n\"\ndata {\n    int&lt;lower=1&gt; N;\n    int&lt;lower=1&gt; k;\n    real y[N];\n}\nparameters {\n    simplex[k] theta;\n    real mu[k];\n    real&lt;lower=0&gt; tau[k];\n}\nmodel {\n    real ps[k];\n    for (i in 1:k){\n        mu[i] ~ normal(0, 1.0e+2);\n    }\n    for(i in 1:N){\n        for(j in 1:k){\n            ps[j] &lt;- log(theta[j]) + normal_log(y[i], mu[j], tau[j]);\n        }\n        increment_log_prob(log_sum_exp(ps));\n    }\n    tau ~ cauchy(0,5);\n}\n\""
+  },
+  {
+    "objectID": "lectures/clustering.html#fit-mixture",
+    "href": "lectures/clustering.html#fit-mixture",
+    "title": "Clustering",
+    "section": "Fit Mixture",
+    "text": "Fit Mixture\n\nhlm = stan(\n     model_name = \"Gauss mixture\",\n     model_code = hcode,\n     data = dat,\n     iter = 2000,\n     warmup = 1500,\n     verbose = FALSE,\n     chains = 1\n)\n\nout &lt;- rstan::extract(hlm)\n\nthetas = colMeans(out$theta)\nmus = colMeans(out$mu)\nsds = colMeans(out$tau)"
+  },
+  {
+    "objectID": "lectures/clustering.html#fitted-mixture-probabilities",
+    "href": "lectures/clustering.html#fitted-mixture-probabilities",
+    "title": "Clustering",
+    "section": "Fitted Mixture Probabilities",
+    "text": "Fitted Mixture Probabilities"
+  },
+  {
+    "objectID": "lectures/clustering.html#fitted-mixture-densities",
+    "href": "lectures/clustering.html#fitted-mixture-densities",
+    "title": "Clustering",
+    "section": "Fitted Mixture Densities",
+    "text": "Fitted Mixture Densities\n\nsim_density = rbind(\n  data.frame(\n    component = \"Component 1\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = theta,\n    mu = mu1,\n    sigma = sd1\n  ),\n  data.frame(\n    component = \"Component 2\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = 1 - theta,\n    mu = mu2,\n    sigma = sd2\n  )\n)\n\nsim_density$density = with(sim_density, lambda * dnorm(y, mu, sigma))\n\nggplot(dplot, aes(x = y)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 50,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = sim_density,\n    aes(x = y, y = density, color = component),\n    linewidth = 1.25,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  labs(x = \"y\", y = \"Density\", color = NULL)"
+  },
+  {
+    "objectID": "lectures/clustering.html#mixture-probability-helper",
+    "href": "lectures/clustering.html#mixture-probability-helper",
+    "title": "Clustering",
+    "section": "Mixture Probability Helper",
+    "text": "Mixture Probability Helper\n\nGetProbNormalMixture &lt;- function(y, lambda, mu, sigma) {\n\n  lik &lt;- array(as.numeric(NA), dim = c(length(y), length(lambda)))\n  for(i in 1:length(lambda)) lik[,i] &lt;- lambda[i] * dnorm(y,mu[i],sigma[i])\n  probs &lt;- lik / rowSums(lik)\n  return(probs)\n\n}\n\ndnormLambda &lt;- function(x, lambda, mu , sigma) {\n  return(lambda * dnorm(x, mu, sigma))\n}"
+  },
+  {
+    "objectID": "lectures/clustering.html#apply-to-iris",
+    "href": "lectures/clustering.html#apply-to-iris",
+    "title": "Clustering",
+    "section": "Apply To Iris",
+    "text": "Apply To Iris\nFirst, bring everything together into a function that we can call conviently on different data and different number of mixture components.\n\nRunMixture = function(y, k = 2, niter = 2000, warmup = 1500, seed = NULL) {\n  # stan program, fit, posterior extraction, plots\n}\n\nseed = 242151\n\nsl_mixture = RunMixture(iris$Sepal.Length, k = 2, seed = seed)\nsw_mixture = RunMixture(iris$Sepal.Width, k = 2, seed = seed)\npl_mixture = RunMixture(iris$Petal.Length, k = 2, seed = seed)\npw_mixture = RunMixture(iris$Petal.Width, k = 2, seed = seed)"
+  },
+  {
+    "objectID": "lectures/clustering.html#iris-mixture-densities",
+    "href": "lectures/clustering.html#iris-mixture-densities",
+    "title": "Clustering",
+    "section": "Iris Mixture Densities",
+    "text": "Iris Mixture Densities\n\niris_features = iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")]\n\niris_density = do.call(\n  rbind,\n  lapply(names(iris_features), function(feature) {\n    out = mixture_preview(iris_features[[feature]], k = 2, seed = 242151)\n    out$Feature = feature\n    out\n  })\n)\n\niris_long = stack(iris_features)\ncolnames(iris_long) = c(\"Value\", \"Feature\")\n\nggplot(iris_long, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = iris_density,\n    aes(x = Value, y = density, color = component),\n    linewidth = 1.15,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\", color = NULL)"
+  },
+  {
+    "objectID": "lectures/clustering.html#iris-mixture-probabilities",
+    "href": "lectures/clustering.html#iris-mixture-probabilities",
+    "title": "Clustering",
+    "section": "Iris Mixture Probabilities",
+    "text": "Iris Mixture Probabilities"
+  },
+  {
+    "objectID": "lectures/clustering.html#inspect-components",
+    "href": "lectures/clustering.html#inspect-components",
+    "title": "Clustering",
+    "section": "Inspect Components",
+    "text": "Inspect Components\n\nkable(sl_mixture$mc)\nkable(sw_mixture$mc)\nkable(pl_mixture$mc)\nkable(pw_mixture$mc)\n\nsl_mixture$p_raw\nsw_mixture$p_raw\npl_mixture$p_raw\npw_mixture$p_raw\n\nsl_mixture$p_density\nsw_mixture$p_density\npl_mixture$p_density\npw_mixture$p_density"
+  },
+  {
+    "objectID": "labs/r-intro.html",
+    "href": "labs/r-intro.html",
+    "title": "Introduction to R",
+    "section": "",
+    "text": "Open slides"
+  },
+  {
+    "objectID": "labs/r-intro.html#assigning-and-manipulating-variables",
+    "href": "labs/r-intro.html#assigning-and-manipulating-variables",
+    "title": "Introduction to R",
+    "section": "4.1 Assigning and manipulating variables",
+    "text": "4.1 Assigning and manipulating variables\nNote: R has 2 assignment operator: &lt;- and =. For all relevant porpuses of the tutorial, we can safely use either of those operators interchably.\n\n############################################\n### Assigning and manipulating variables ###\n############################################\n\nx = 5\nprint(x)\n\n[1] 5\n\n# just givng the variable name, will print it to the REPL by default\nx\n\n[1] 5\n\n# assign value from one variable to the next\ny = x\n\n# object did not trigger a copy of \"x\", rather y \"points\" to x\nprint(y)\n\n[1] 5\n\n# change the value of x\nx = 3\n\nprint(x)\n\n[1] 3\n\n# at the moment we changed the value of \"x\", a copy of the old \"x\" was triggered and assigned to \"y\"\nprint(y)\n\n[1] 5"
+  },
+  {
+    "objectID": "labs/r-intro.html#working-with-data-frames",
+    "href": "labs/r-intro.html#working-with-data-frames",
+    "title": "Introduction to R",
+    "section": "4.2 Working with data frames",
+    "text": "4.2 Working with data frames\nOne of the most important object types in R are data.frames. They are rectangular tables with rows and columns, whereas the column can have different types, which is the main differntiator to a matrix, where the column types are all identical.\n\n############################################\n### Assigning and manipulating variables ###\n############################################\n\ndat = data.frame(\n         name = c(\"Adam\", \"Paul\", \"Elly\"),\n         age = c(22, 43, 54)\n         )\n\n# look at general structure\nstr(x)\n\n num 3\n\n# extracting single column and storing in a vector object\nnames = dat$name\n\n# can also be accessed with the bracket operator\nages = dat[, \"age\"]\n\nstr(names)\n\n chr [1:3] \"Adam\" \"Paul\" \"Elly\"\n\nstr(ages)\n\n num [1:3] 22 43 54\n\n# subsetting\ndat[dat$name == \"Paul\",]\n\n\n  \n\n\ndat[dat$age %in% c(22, 54),]\n\n\n  \n\n\n# adding a column to a data frame\ndat$id = 1:nrow(dat)\ndat[, \"id_2\"] = dat$id + 2\n\nprint(dat)\n\n  name age id id_2\n1 Adam  22  1    3\n2 Paul  43  2    4\n3 Elly  54  3    5\n\n# conditional assignment\ndat$id[dat$name == \"Adam\"] &lt;- 12\n\nprint(dat)\n\n  name age id id_2\n1 Adam  22 12    3\n2 Paul  43  2    4\n3 Elly  54  3    5"
+  },
+  {
+    "objectID": "labs/r-intro.html#reading-and-writing-data-fromto-files",
+    "href": "labs/r-intro.html#reading-and-writing-data-fromto-files",
+    "title": "Introduction to R",
+    "section": "4.3 Reading and Writing Data from/to files",
+    "text": "4.3 Reading and Writing Data from/to files\nMost of the time, data is being innput to R from files. However, R has interfaces to most data storage systems out there, including all databases and cloud storages.\n\n###########################\n### Read and Write data ###\n###########################\n\n# create data frame\ndat = data.frame(\n         name = c(\"Adam\", \"Paul\", \"Elly\"),\n         age = c(22, 43, 54)\n         )\nstr(dat)\n\n'data.frame':   3 obs. of  2 variables:\n $ name: chr  \"Adam\" \"Paul\" \"Elly\"\n $ age : num  22 43 54\n\n# write data to disk as csv\nwrite.table(dat, file = \"my_data.csv\", row.names = FALSE, sep = \",\")\n\n# read file back in\ndat_read = read.table(file = \"my_data.csv\", sep = \",\", header = TRUE)\nstr(dat_read)\n\n'data.frame':   3 obs. of  2 variables:\n $ name: chr  \"Adam\" \"Paul\" \"Elly\"\n $ age : int  22 43 54"
+  },
+  {
+    "objectID": "labs/r-intro.html#vectors-and-matrices",
+    "href": "labs/r-intro.html#vectors-and-matrices",
+    "title": "Introduction to R",
+    "section": "4.4 Vectors and Matrices",
+    "text": "4.4 Vectors and Matrices\nIn R, everything is a vector or a list or an array of vectors. A data.frame is a list of vectors of different types, a matrix is a list of vectors of a single type. A scalar is a vector of length 1.\n\n###########################\n### Vectos and Matrices ###\n###########################\n\n# integer vector of length one\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\n# numeric vector\ny = rnorm(10)\nstr(x)\n\n int 1\n\nx\n\n[1] 1\n\n#  matrix\nD = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]       [,3]          [,4]       [,5]\n[1,]  1.2526797 -1.5998992  0.5514994 -1.141255e-01  1.9963268\n[2,] -0.0475952  0.2410510 -1.5821355  4.393511e-06 -1.3373521\n[3,] -1.4216340 -0.1966338 -0.7063919 -6.971917e-01  0.9379761\n[4,] -2.0712443 -0.3269447  0.8974941  8.501566e-01  0.3109446\n[5,]  0.4012008  1.1004449  1.3582636  5.130313e-01 -0.1633946\n\nclass(D)\n\n[1] \"matrix\" \"array\" \n\n# specialized functions can be applied to matrices\nmeans = colMeans(D)\nmeans\n\n[1] -0.3773186 -0.1563964  0.1037459  0.1103750  0.3489002\n\n# extract diagonal\nd = diag(D)\nd\n\n[1]  1.2526797  0.2410510 -0.7063919  0.8501566 -0.1633946"
+  },
+  {
+    "objectID": "labs/r-intro.html#data-exploration-and-visualization",
+    "href": "labs/r-intro.html#data-exploration-and-visualization",
+    "title": "Introduction to R",
+    "section": "4.5 Data Exploration and Visualization",
+    "text": "4.5 Data Exploration and Visualization\nGetting a good overview and understanding of the data sets we work with is very important. Summary statistics and visualizations are important tools here. We will be using dlookr and ggplot2.\n\n##########################################\n### Data Exploration and Visualization ###\n##########################################\n\nif(!require(dlookr)) install.packages('dlookr')\nif(!require(ggplot2)) install.packages('ggplot2')\nlibrary(dlookr, ggplot2)\n\n# load a public data set\ndata(iris)\nstr(iris)\n\n'data.frame':   150 obs. of  5 variables:\n $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...\n $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...\n $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...\n $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...\n $ Species     : Factor w/ 3 levels \"setosa\",\"versicolor\",..: 1 1 1 1 1 1 1 1 1 1 ...\n\n# broad overview of data set\ndlookr::diagnose(iris)\n\n\n  \n\n\n# plot our data\n# scatterplot\np = ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +\n    geom_point()\n\np\n\n\n\n\n\n\n\n# histogram for temp by month\np2 = ggplot(iris, aes(x = Petal.Length)) +\n    geom_histogram(aes(fill = Species), bins = 20) +\n    facet_wrap(~ Species)\n\np2\n\n\n\n\n\n\n\n# boxplot\np3 = ggplot(iris, aes(x = Species, y = Petal.Length, fill = Species)) +\n    geom_boxplot()\n\np3"
+  },
+  {
+    "objectID": "labs/r-intro.html#writing-functions",
+    "href": "labs/r-intro.html#writing-functions",
+    "title": "Introduction to R",
+    "section": "4.6 Writing Functions",
+    "text": "4.6 Writing Functions\nAll operators in R are functions, for instance + is just a special way of calling a function:\n\n# get help for a function\n?sum\n\n# get help for the function '+'\n?`+`\n\n# check the function definition for `+`\nfix(`+`)\n\nA function is an operation on input variables ($f(x)), the function can be anything interpretable by R. For example, this is how we can define a function that computes and returns the empirical mean (average) of a numeric vector:\n\nmy_mean_function = function(y) {\n\n    n = length(y)\n    sum = 0\n    for(i in 1:n) sum = sum + y[i]\n\n    mean = sum / n\n\n    return(mean)\n\n}\n\nWe can now use that function inside R for estimating means on any input vector y for which the the operators + and / are defined.\n\n# generate random vector\nx = rnorm(1000, mean = 23.42, sd = 4)\n\n# calculate mean with our function\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.58817\n\n# compare with R's built in function\nmean(x)\n\n[1] 23.58817"
+  },
+  {
+    "objectID": "labs/multivariate-clustering.html",
+    "href": "labs/multivariate-clustering.html",
+    "title": "Multivariate Clustering",
+    "section": "",
+    "text": "Open slides"
+  },
+  {
+    "objectID": "labs/multivariate-clustering.html#explore-pairwise-bivariate-data",
+    "href": "labs/multivariate-clustering.html#explore-pairwise-bivariate-data",
+    "title": "Multivariate Clustering",
+    "section": "1.1 Explore pairwise bivariate data",
+    "text": "1.1 Explore pairwise bivariate data\nLets first visualize the features we have got available to the iris data set:\n\nlibrary(pacman)\np_load(ggplot2, knitr, plotly, lubridate, tidyverse, rstan, GGally, BGLR)\n\n# load dataset\ndata(iris)\n\nggpairs(\n  iris,\n  columns = 1:4,\n  aes(color = Species)\n  )\n\n# extract most promising features\niris_out = iris %&gt;% select(x = Petal.Length, y = Petal.Width, Species)\n\n\nNext step is to try and recover the Species labels with clustering the two extracted features."
+  },
+  {
+    "objectID": "labs/multivariate-clustering.html#fitting-mixture-of-k-multivariate-normal",
+    "href": "labs/multivariate-clustering.html#fitting-mixture-of-k-multivariate-normal",
+    "title": "Multivariate Clustering",
+    "section": "1.2 Fitting mixture of k multivariate normal",
+    "text": "1.2 Fitting mixture of k multivariate normal\n\np_load(mixtools)\n\n# make function for fitting and plotting multivariate mixtures\nRunMixtureMVN = function(x, y, k = 2, labels = NULL, palette = \"Dark 3\") {\n\nmod = mvnormalmixEM(x = cbind(x,y), k = k)\n\nthetas &lt;- mod$pro\nmus &lt;- mod$mu\nV &lt;- mod$sigma\n\nif(is.null(labels)) labels = \"1\"\n\ndplot = data.frame(\n       x = x,\n       y = y,\n       prob = mod$posterior[,1],\n       labels = labels\n)\n\ncolors = hcl.colors(n = k, palette = palette)\n\n# make a plot\np &lt;- ggplot(dplot, aes(x = x, y = y)) +\n  geom_point(alpha = 0.8, aes(color = prob))\n\n# make label plot\np_label &lt;- ggplot(dplot, aes(x = x, y = y)) +\n  geom_point(alpha = 0.8, aes(color = labels))\n\n# add cluster ellipses\nfor(i in 1:k) {\n\n  ellipses &lt;- ellipse(mu = mus[[i]], sigma = V[[i]], alpha = 1-0.999, npoints = 250, newplot = FALSE, draw = FALSE) %&gt;%\n    as.data.frame %&gt;%\n    rename(a = V1, b = V2)\n\n  p = p + geom_point(data = ellipses, aes(x = a, y = b), color = colors[i], size = 0.8, shape = 8)\n\n  p_label = p_label + geom_point(data = ellipses, aes(x = a, y = b), color = colors[i], size = 0.8, shape = 8)\n\n}\n\np = p + scale_color_continuous(low = \"black\", high = \"red4\", guide = guide_legend(title = \"Probability Cluster\"), limits = c(0,1))\n\nreturn(\n       list(\n      dplot = dplot,\n      p = p,\n      p_label = p_label,\n      mod = mod,\n      thetas = thetas,\n      mus = mus,\n      V = V\n      )\n)\n\n}\n\n# run on iris data\nmm_two = RunMixtureMVN(x = iris_out$x, y = iris_out$y, k = 2, labels = iris_out$Species)\nmm_three = RunMixtureMVN(x = iris_out$x, y = iris_out$y, k = 3, labels = iris_out$Species)\n\n# get the plot\nmm_two$p\nmm_two$p_label\n\nmm_three$p\nmm_three$p_label\n\nThe rendered preview below uses the same two iris features and shows the grouping geometry without requiring mixtools during the website build.\n\niris_out = data.frame(\n  x = iris$Petal.Length,\n  y = iris$Petal.Width,\n  Species = iris$Species\n)\n\nset.seed(2026)\nkm_iris = kmeans(iris_out[, c(\"x\", \"y\")], centers = 2)\niris_out$cluster = factor(km_iris$cluster)\n\nggplot(iris_out, aes(x = x, y = y, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  stat_ellipse(type = \"norm\", linewidth = 1) +\n  labs(x = \"Petal.Length\", y = \"Petal.Width\", color = \"Cluster\")\n\n\n\n\n\n\n\n\n\nggplot(iris_out, aes(x = x, y = y, color = Species)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"Petal.Length\", y = \"Petal.Width\", color = \"Species\")"
+  },
+  {
+    "objectID": "labs/multivariate-clustering.html#principal-component-clustering",
+    "href": "labs/multivariate-clustering.html#principal-component-clustering",
+    "title": "Multivariate Clustering",
+    "section": "1.3 Principal Component Clustering",
+    "text": "1.3 Principal Component Clustering\nPrincipal Component Analysis (PCA) is a feature compression method, that finds transformations of linearly independent features from the total set that are ordered by their importance (variance explained). We can obtain those features using a singular value decomposition:\n\\[\n\\mathbf{X} = \\mathbf{USV'}\n\\]\nwhere the principal components can be extracted from \\(\\mathbf{US}\\) (\\(\\mathbf{S}\\) is a diagonal matrix with the singular values as diagonal elements). The maximum number of principal components from a given feature matrix is equal to its rank. Usually we extract the first 1-10 components for regression or clustering porpuses.\n\n1.3.1 PCAs for clustering\nWe will be computing the PCAs for a genotype data set, extract the first 2 components and use them to cluster our data using a multivariate mixture model:\n\ndata(wheat)\n\nM = wheat.X\n\n# get principal components\npca = prcomp(M, scale = TRUE, center = TRUE)\nspca = summary(pca)\n\n# plot proportion of variance\nplot(spca$importance[2,], ylab = \"Proportion of Variance Explained\")\n\n# plot cumulative importance\nplot(spca$importance[3,], ylab = \"Cumulative Proportion\")\n\n# plot raw components\nggplot(data.frame(x = pca$x[,1], y = pca$x[,2]), aes(x = x, y = y)) + geom_point() + xlab(\"PC1\") + ylab(\"PC2\")\n\n# cluster using our function\nmm_pca = RunMixtureMVN(x = pca$x[,1], y = pca$x[,2], k = 2, palette = \"Dark 3\")\n\nmm_pca$p\n\n\nlibrary(BGLR)\n\ndata(wheat)\n\nM = wheat.X\n\npca = prcomp(M, scale = TRUE, center = TRUE)\nspca = summary(pca)\n\npca_importance = data.frame(\n  PC = seq_along(spca$importance[2,]),\n  proportion = as.numeric(spca$importance[2,]),\n  cumulative = as.numeric(spca$importance[3,])\n)\n\nggplot(pca_importance[1:30, ], aes(x = PC, y = proportion)) +\n  geom_line(color = \"#155f7a\") +\n  geom_point(color = \"#c46a2b\", size = 1.8) +\n  labs(x = \"Principal component\", y = \"Proportion of Variance Explained\")\n\n\n\n\n\n\n\n\n\nggplot(pca_importance[1:30, ], aes(x = PC, y = cumulative)) +\n  geom_line(color = \"#155f7a\") +\n  geom_point(color = \"#c46a2b\", size = 1.8) +\n  labs(x = \"Principal component\", y = \"Cumulative Proportion\")\n\n\n\n\n\n\n\n\n\npca_scores = data.frame(\n  PC1 = pca$x[,1],\n  PC2 = pca$x[,2]\n)\n\nggplot(pca_scores, aes(x = PC1, y = PC2)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\")"
+  },
+  {
+    "objectID": "labs/multivariate-clustering.html#k-means",
+    "href": "labs/multivariate-clustering.html#k-means",
+    "title": "Multivariate Clustering",
+    "section": "1.4 K-Means",
+    "text": "1.4 K-Means\nK-Means is a clustering technique that minimzes the following function:\n\\[\nf(x) = \\sum_{i = 1}^{k}\\sum_{j = 1}^{nk}  (x_j - \\mu_i)^2\n\\]\nwhere elements of \\(x\\) are subsetted into \\(k\\) clusters and we minimize the squared distance between all elements of \\(x\\) within a given cluster and that cluster mean (\\(\\mu_i\\)).\n\np_load(factoextra)\n\ndat = iris %&gt;% select(-Species)\n\ndat = as.data.frame(M)\n\nkmeans &lt;- kmeans(M, centers = 2)\n\n# 3. Visualize\nkplot = fviz_cluster(\n         kmeans,\n         data = dat,\n         ggtheme = theme_minimal()\n)\n\nkplot\n\n\nset.seed(2026)\n\nkmeans_pca = kmeans(pca$x[,1:2], centers = 2)\npca_scores$cluster = factor(kmeans_pca$cluster)\n\nggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\", color = \"Cluster\")"
+  },
+  {
+    "objectID": "labs/linear-regression.html",
+    "href": "labs/linear-regression.html",
+    "title": "Linear Regression",
+    "section": "",
+    "text": "Open slides"
+  },
+  {
+    "objectID": "labs/linear-regression.html#feature-design-matrix",
+    "href": "labs/linear-regression.html#feature-design-matrix",
+    "title": "Linear Regression",
+    "section": "1.1 Feature / Design Matrix",
+    "text": "1.1 Feature / Design Matrix\nA Feature or Design Matrix maps observations to individual feature criteria. The most fundamental feature matrix is a column vector with all 1s, meaning every observation has the same expression for that feature. In that case, the feature serves as a mapping to the overall mean of the observations.\nWe already know how to estimate the mean of y under the assumption of an underlying normal distribution. Now we estimate the mean with a linear regression (“Ordinary Least Squares” = OLS):\n\n# load example data\ndata(airquality)\n\n# our response vector is Wind\ny = airquality$Wind\n\n# create a design matrix for the mean\nX = matrix(data = 1, nrow = length(y), ncol = 1)\ncolnames(X) = \"Intercept\"\n\nstr(X)\n\n num [1:153, 1] 1 1 1 1 1 1 1 1 1 1 ...\n - attr(*, \"dimnames\")=List of 2\n  ..$ : NULL\n  ..$ : chr \"Intercept\"\n\n# define function to minimize the mean squared error between predicted and observed value\nmse &lt;- function(par, y, X) {\n\n  # the weights are stored in \"par\", the length of that vector depends\n  # on the number of columns in X (number of features)\n\n  # predicted value\n  pred = X %*% par\n\n  # mean squared error\n  mse = mean((y - pred)**2)\n\n  return(mse)\n\n}\n\np &lt;- rep(0, ncol(X))\nnames(p) &lt;- colnames(X)\n\nres &lt;- optim(\n       par = p,\n       fn = mse,\n       y = y,\n       X = X\n            )\n\n# our solution\nres$par\n\nIntercept \n 9.957812 \n\n# plot predicted vs observed\npred = X %*% res$par\n\ndat = data.frame(\n     y = y,\n     pred = as.numeric(pred),\n     id = seq_along(y)\n     )\n\nggplot(dat, aes(x = y, y = pred)) +\n geom_point() +\n geom_abline(intercept = 0, slope = 1, color = \"red\") +\n labs(x = \"Observed Wind\", y = \"Predicted Wind\")\n\n\n\n\n\n\n\nggplot(dat, aes(x = id, y = y)) +\n  geom_segment(aes(xend = id, yend = pred), color = \"#155f7a\", alpha = 0.45) +\n  geom_point() +\n  geom_hline(yintercept = res$par, color = \"red\") +\n  labs(x = \"Observation\", y = \"Wind\")"
+  },
+  {
+    "objectID": "labs/linear-regression.html#adding-features-to-the-design-matrix-multiple-linear-regression",
+    "href": "labs/linear-regression.html#adding-features-to-the-design-matrix-multiple-linear-regression",
+    "title": "Linear Regression",
+    "section": "1.2 Adding Features to the Design Matrix: Multiple Linear Regression",
+    "text": "1.2 Adding Features to the Design Matrix: Multiple Linear Regression\nWhen there is more than one feature in the design matrix we call that Multiple Linear Regression. The overall principle of the problem remains the same: We aim to minimize the mean squared error of our predictions.\n\n# load example data\ndata(airquality)\n\n# our response vector is Wind\ny = airquality$Wind\n\n# now we also want another feature: Temp\ntemp = airquality$Temp\n\n# create a design matrix for the mean\nX = matrix(data = 1, nrow = length(y), ncol = 1)\n\n# add temperature as a feature to our design matrix\nX = cbind(\n   X,\n   temp\n   )\n\ncolnames(X) = c(\"Intercept\", \"Temp\")\n\n# plot Wind vs Temp\nggplot(airquality, aes(x = Temp, y = Wind)) +\n  geom_point() +\n  labs(x = \"Temp\", y = \"Wind\", title = \"Wind vs Temp\")\n\n\n\n\n\n\n\n# we can use the same function as before for finding the optimum feature weights\nmse &lt;- function(par, y, X) {\n\n  # the weights are stored in \"par\", the length of that vector depends\n  # on the number of columns in X (number of features)\n\n  # predicted value\n  pred = X %*% par\n\n  # mean squared error\n  mse = mean((y - pred)**2)\n\n  return(mse)\n\n}\n\np &lt;- rep(0, ncol(X))\nnames(p) &lt;- colnames(X)\n\nres &lt;- optim(\n       par = p,\n       fn = mse,\n       y = y,\n       X = X\n            )\n\n# our solution\nres$par\n\n Intercept       Temp \n23.2314500 -0.1704349 \n\n# plot predicted vs observed\npred = X %*% res$par\n\ndat = data.frame(\n     Wind = y,\n     Temp = airquality$Temp,\n     pred = as.numeric(pred),\n     id = 1:length(y)\n     )\n\nggplot(dat, aes(x = Temp, y = Wind)) +\n  geom_segment(aes(xend = Temp, yend = pred), color = \"#155f7a\", alpha = 0.45) +\n  geom_point() +\n  geom_abline(intercept = res$par[1], slope = res$par[2], color = \"red\") +\n  labs(x = \"Temp\", y = \"Wind\", title = \"Wind vs Temp with fitted regression line\")\n\n\n\n\n\n\n\nggplot(dat, aes(x = Wind, y = pred)) +\n geom_point() +\n geom_abline(intercept = 0, slope = 1, color = \"red\") +\n labs(x = \"Observed Wind\", y = \"Predicted Wind\", title = \"Observed vs predicted diagnostic\")"
+  },
+  {
+    "objectID": "labs/linear-regression.html#ridge-regression",
+    "href": "labs/linear-regression.html#ridge-regression",
+    "title": "Linear Regression",
+    "section": "1.3 Ridge Regression",
+    "text": "1.3 Ridge Regression\n\\[\n\\min_{\\beta} \\left( \\sum_{i=1}^{n} \\left( y_i - \\beta_0 - \\sum_{j=1}^{p} \\beta_j x_{ij} \\right)^2 + \\lambda \\sum_{j=1}^{p} \\beta_j^2 \\right)\n\\]\nThe ridge parameter \\(\\lambda\\) controls how much we penalize large marker effects. We can visualize the solution space by evaluating the ridge criterion on a grid of \\(\\lambda\\) values.\nFor a fixed \\(\\lambda\\), ridge regression still has a closed-form solution. If we write the design matrix as \\(X = [\\mathbf{1}, M]\\) and do not penalize the intercept, then\n\\[\n\\hat{\\beta}_{\\lambda} =\n\\left(X'X + \\lambda P\\right)^{-1}X'y,\n\\qquad\nP =\n\\begin{bmatrix}\n0 & 0 \\\\\n0 & I_p\n\\end{bmatrix}.\n\\]\nIn the code below, the marker matrix and response are centered first, so this reduces to\n\\[\n\\hat{u}_{\\lambda} =\n\\left(\\frac{M_c'M_c}{n} + \\lambda I_p\\right)^{-1}\n\\frac{M_c'y_c}{n},\n\\qquad\n\\hat{\\beta}_0 = \\bar{y}.\n\\]\n\nlibrary(BGLR)\n\ndata(wheat)\n\nsubset = 1:100\n\ny = wheat.Y[subset,2]\nM = wheat.X[subset,1:300]\n\nM_centered = scale(M, center = TRUE, scale = FALSE)\ny_centered = y - mean(y)\nn_obs = length(y)\n\nfit_ridge_lambda &lt;- function(lambda, y_centered, M_centered) {\n\n  # closed-form ridge solution for a fixed lambda\n  u = solve(\n    crossprod(M_centered) / n_obs + diag(lambda, ncol(M_centered)),\n    crossprod(M_centered, y_centered) / n_obs\n  )\n\n  pred = mean(y) + M_centered %*% u\n  mse = mean((y - pred)**2)\n  penalty = lambda * sum(u**2)\n\n  data.frame(\n    lambda = lambda,\n    mse = mse,\n    penalty = penalty,\n    criteria = mse + penalty,\n    sd_marker_effect = sd(as.numeric(u))\n  )\n\n}\n\nlambda_grid = 10^seq(-5, 1, length.out = 80)\n\nridge_path = do.call(\n  rbind,\n  lapply(lambda_grid, fit_ridge_lambda, y_centered = y_centered, M_centered = M_centered)\n)\n\nbest_lambda = ridge_path[which.min(ridge_path$criteria), ]\n\nkable(best_lambda, digits = 4)\n\n\n\n\nlambda\nmse\npenalty\ncriteria\nsd_marker_effect\n\n\n\n\n0\n0.0116\n0\n0.0116\n0.1219\n\n\n\n\n\n\nggplot(ridge_path, aes(x = log10(lambda), y = criteria)) +\n  geom_line(color = \"#155f7a\", linewidth = 1) +\n  geom_point(data = best_lambda, color = \"#c46a2b\", size = 3) +\n  labs(x = \"log10(lambda)\", y = \"Ridge criterion\")\n\n\n\n\n\n\n\n\nAs \\(\\lambda\\) increases, marker effects are shrunk more strongly toward zero.\n\nggplot(ridge_path, aes(x = log10(lambda), y = sd_marker_effect)) +\n  geom_line(color = \"#155f7a\", linewidth = 1) +\n  geom_point(data = best_lambda, color = \"#c46a2b\", size = 3) +\n  labs(x = \"log10(lambda)\", y = \"SD of marker effects\")\n\n\n\n\n\n\n\n\n\nlibrary(BGLR)\ndata(wheat)\n\nsubset = 1:100\n\ny = wheat.Y[subset,2]\n\nM = wheat.X\n\n# take a subset of columns\nM = M[subset,1:300]\n\n# design matrix for fixed effects (no shrinkage)\nX = matrix(data = 1, nrow = length(y), ncol = 1)\ncolnames(X) = \"intercept\"\n\n# we can use the same function as before for finding the optimum feature weights\nmse_ridge &lt;- function(par, y, M, X) {\n\n  # the weights are stored in \"par\", the length of that vector depends\n  # on the number of columns in X (number of features)\n\n  # get expectation from fixed effects\n  b = par[1:ncol(X)]\n  mu = X %*% b\n\n  # predicted value\n  u = par[(ncol(X) + 1):(length(par) - 1)]\n  pred = mu + M %*% u\n\n  # mean squared error\n  mse = mean((y - pred)**2)\n\n  ridge_param = par[length(par)]\n\n  # ridge penalty\n  ridge = ridge_param * sum(u**2)\n\n  criteria = mse + ridge\n\n  # force ridge parameter to be between  &gt; 0\n  if(ridge_param &lt; 0) {\n    criteria = 9999999\n  }\n\n  return(criteria)\n\n}\n\n# initialize\np &lt;- c(rep(0, ncol(X) + ncol(M)), runif(1))\n\n# give names for p\nnames(p) &lt;- c(colnames(X), colnames(M), \"lambda\")\n\nres &lt;- optim(\n       par = p,\n       fn = mse_ridge,\n       y = y,\n       X = X,\n     M = M,\n     control = list(maxit = 20000),\n     method = c(\n      #\"Nelder-Mead\"\n      #\"BFGS\"\n      #\"CG\"\n      \"L-BFGS-B\"\n      #\"SANN\"\n      #\"Brent\"\n            )\n)\n\n# our solution\nres$par\n\nprint(paste(\"Ridge Parameter:\", res$par[length(res$par)]))\n\n# plot predicted vs observed\n# get predicted values\nmu = X %*% res$par[1:ncol(X)]\npred = mu + M %*% res$par[(ncol(X) + 1):(length(res$par) - 1)]\n\ndat = data.frame(\n     y = y,\n     pred = pred,\n     id = 1:length(y)\n     )\n\nggplot(dat, aes(x = pred, y = y)) +\n geom_point()\n\n## plot raw data and insert intercept and slope\n#ggplot(dat, aes(x = Temp, y = Wind)) +\n#  geom_point() +\n#  geom_abline(intercept = res$par[1], slope = res$par[2], color = \"red\")\n\nNow we compare the results from the optimization to an equivalent mixed model approach with a single randome effect:\n\\[\\begin{bmatrix} X'X & X'Z \\\\ Z'X & Z'Z+I\\lambda \\end{bmatrix} \\begin{bmatrix} \\beta \\\\ u \\end{bmatrix} = \\begin{bmatrix} X'y \\\\ Z'y \\end{bmatrix}\\]\n\nlibrary(rrBLUP)\nmod_rr = mixed.solve(y = y, X = X, Z = M)\n\n# ridge parameter from MME\nridge_mme = mod_rr$Ve / mod_rr$Vu\n# preditions from that model\npred_mme = X %*% mod_rr$beta + M %*% mod_rr$u\nprint(ridge_mme)\n\ndat = data.frame(\n     y = pred,\n     pred = pred_mme,\n     id = 1:length(y)\n     )\n\nggplot(dat, aes(x = pred, y = y)) +\n geom_point()"
+  },
+  {
+    "objectID": "labs/linear-regression.html#advanced-models",
+    "href": "labs/linear-regression.html#advanced-models",
+    "title": "Linear Regression",
+    "section": "1.4 Advanced Models",
+    "text": "1.4 Advanced Models\nMixed Model"
+  },
+  {
+    "objectID": "labs/clustering.html",
+    "href": "labs/clustering.html",
+    "title": "Clustering",
+    "section": "",
+    "text": "Open slides"
+  },
+  {
+    "objectID": "labs/clustering.html#univariate-clustering",
+    "href": "labs/clustering.html#univariate-clustering",
+    "title": "Clustering",
+    "section": "1.1 Univariate Clustering",
+    "text": "1.1 Univariate Clustering\nAn initial approach is to investigate the indivudal features in isolation from each other and try to infer a grouping structure.\n\ndplot = pivot_longer(iris, -Species, names_to = \"Feature\", values_to = \"Value\")\np = ggplot(dplot, aes(x = Value)) +\n  geom_histogram(aes(y = ..density.., fill = Feature), bins = 40) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1) +\n  facet_wrap(~ Feature)\np\n\n\ndplot = stack(iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")])\ncolnames(dplot) = c(\"Value\", \"Feature\")\n\nggplot(dplot, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#d9e2e7\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\")\n\n\n\n\n\n\n\n\nSome features indicate that the data had been generated not from a single normal process, but potentially a series of processes. In that case, we can attempt to cluster the individual observations by fitting a normal mixture model to one feature at a time.\n\\[\np(\\mathbf{x}) = \\sum_{i=1}^{K} \\lambda_i f_i(\\mathbf{x}), ~~~~~~ with \\sum \\boldsymbol{\\lambda} = 1.\n\\]\nUnivariate normal distribution: \\(f(x) \\sim N(\\mu, \\sigma^2)\\), \\(\\mu\\) is a single location parameter - the mean and \\(\\sigma^2\\) is a common variance component.\n\n1.1.1 Implement the k-mixture model in Stan\n\n# some random data\nset.seed(100)\nN &lt;- 1000\n\n# mixture probability for the first component\ntheta &lt;- 0.3\nmu1 &lt;- 5\nmu2 &lt;- 15\nsd1 &lt;- 1\nsd2 &lt;- 2\ny &lt;- ifelse(runif(N) &lt; theta, rnorm(N, mu1, sd1), rnorm(N, mu2, sd2))\n\ndat = list(\n     N = length(y),\n     y = y,\n     k = 2 # number of mixture components\n)\n\ndplot = as.data.frame(dat)\n\n# plot the raw data\nggplot(dplot, aes(x = y)) +\n  geom_histogram(aes(y = ..density..), bins = 50, fill = \"white\", color = 1) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1)\n\n\n\n\n\n\n\n\n\n# stan program for mixture model of k normal distributions\nhcode =\n\"\ndata {\n    int&lt;lower=1&gt; N;\n    int&lt;lower=1&gt; k;\n    real y[N];\n}\nparameters {\n    simplex[k] theta;\n    real mu[k];\n    real&lt;lower=0&gt; tau[k];\n}\nmodel {\n    real ps[k];\n    for (i in 1:k){\n        mu[i] ~ normal(0, 1.0e+2);\n    }\n    for(i in 1:N){\n        for(j in 1:k){\n            ps[j] &lt;- log(theta[j]) + normal_log(y[i], mu[j], tau[j]);\n        }\n        increment_log_prob(log_sum_exp(ps));\n    }\n    tau ~ cauchy(0,5);\n}\n\"\n\n\nhlm = stan(\n     model_name = \"Gauss mixture\",\n     model_code = hcode,\n     data = dat,\n     iter = 2000,\n     warmup = 1500,\n     verbose = FALSE,\n     chains = 1\n)\n\n# extract the posteriors of our mixture components\nout &lt;- rstan::extract(hlm)\n\n# posterior means\nthetas = colMeans(out$theta)\nmus = colMeans(out$mu)\nsds = colMeans(out$tau)\n\n# small function that gives us the probabilities of every data point to belonging\n# of either of the mixture components\nGetProbNormalMixture &lt;- function(y, lambda, mu, sigma) {\n\n  lik &lt;- array(as.numeric(NA), dim = c(length(y), length(lambda)))\n  for(i in 1:length(lambda)) lik[,i] &lt;- lambda[i] * dnorm(y,mu[i],sigma[i])\n  probs &lt;- lik / rowSums(lik)\n  return(probs)\n\n}\n\n# normal density times constant\ndnormLambda &lt;- function(x, lambda, mu , sigma) {\n\n  return(lambda * dnorm(x, mu, sigma))\n\n}\n\n\nprobs = GetProbNormalMixture(y = y,\n           lambda = thetas,\n           mu = mus,\n           sigma = sds\n           )\n\ndplot = tibble(\n         x = 1:length(y),\n         y = y,\n         prob_one = probs[,1],\n         prob_two = probs[,2]\n         )\n\n# plot the raw data and color by probability of belonging to mixture component one\nggplot(dplot, aes(y = y, x = x)) +\n  geom_point(aes(color = prob_one)) +\n    scale_colour_gradient2(low = 'green', mid = 'blue', high = 'red')\n\n\np &lt;- ggplot(dplot, aes(y))\np &lt;- p + geom_histogram(\n  aes(y = after_stat(density)),\n  bins = 50,\n  fill = \"#e8edf0\",\n  color = \"#374151\",\n  linewidth = 0.25\n)\n\n# add the densitites of the components\ncolors = hcl.colors(n = length(thetas), palette = \"Blue-Red\")\n\n# add the densities\nfor(i in 1:length(thetas)) {\n\n  p &lt;- p + stat_function(\n    fun = dnormLambda,\n    args = list(lambda = thetas[i], mu = mus[i], sigma = sds[i]),\n    color = colors[i],\n    linewidth = 1.25\n  )\n\n}\n\np\n\n\n\nsim_density = rbind(\n  data.frame(\n    component = \"Component 1\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = theta,\n    mu = mu1,\n    sigma = sd1\n  ),\n  data.frame(\n    component = \"Component 2\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = 1 - theta,\n    mu = mu2,\n    sigma = sd2\n  )\n)\n\nsim_density$density = with(sim_density, lambda * dnorm(y, mu, sigma))\n\nggplot(dplot, aes(x = y)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 50,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = sim_density,\n    aes(x = y, y = density, color = component),\n    linewidth = 1.25,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  labs(x = \"y\", y = \"Density\", color = NULL)\n\n\n\n\n\n\n\n\n\n\n1.1.2 Apply the mixture model to the iris data\nFirst, bring everything together into a function that we can call conviently on different data and different number of mixture components\n\n# small function that gives us the probabilities of every data point to belonging\n# of either of the mixture components\nGetProbNormalMixture &lt;- function(y, lambda, mu, sigma) {\n\n  lik &lt;- array(as.numeric(NA), dim = c(length(y), length(lambda)))\n  for(i in 1:length(lambda)) lik[,i] &lt;- lambda[i] * dnorm(y,mu[i],sigma[i])\n  probs &lt;- lik / rowSums(lik)\n  return(probs)\n\n}\n\n# normal density times constant\ndnormLambda &lt;- function(x, lambda, mu , sigma) {\n\n  return(lambda * dnorm(x, mu, sigma))\n\n}\n\n\nRunMixture = function(y, k = 2, niter = 2000, warmup = 1500, seed = NULL) {\n\n# stan program for mixture model of k normal distributions\nhcode =\n\"\ndata {\n    int&lt;lower=1&gt; N;\n    int&lt;lower=1&gt; k;\n    real y[N];\n}\nparameters {\n    simplex[k] theta;\n    real mu[k];\n    real&lt;lower=0&gt; tau[k];\n}\nmodel {\n    real ps[k];\n    for (i in 1:k){\n        mu[i] ~ normal(0, 1.0e+2);\n    }\n    for(i in 1:N){\n        for(j in 1:k){\n            ps[j] &lt;- log(theta[j]) + normal_log(y[i], mu[j], tau[j]);\n        }\n        increment_log_prob(log_sum_exp(ps));\n    }\n    tau ~ cauchy(0,5);\n}\n\"\n\ndat = list(\n     N = length(y),\n     y = y,\n     k = k # number of mixture components\n)\n\n\nhlm = stan(\n     model_name = \"Gauss mixture\",\n     model_code = hcode,\n     data = dat,\n     iter = niter,\n     warmup = warmup,\n     verbose = FALSE,\n     chains = 1,\n     seed = seed\n)\n\n# extract the posteriors of our mixture components\nout &lt;- rstan::extract(hlm)\n\n# posterior means\nthetas = colMeans(out$theta)\nmus = colMeans(out$mu)\nsds = colMeans(out$tau)\n\nmc = tibble(\n      thetas = thetas,\n      mus = mus,\n      sds = sds\n      )\n\n\nprobs = GetProbNormalMixture(y = y,\n           lambda = thetas,\n           mu = mus,\n           sigma = sds\n           )\n\ndprobs = as.data.frame(probs)\ncolnames(dprobs) = paste(\"Component\", 1:k, sep = \"_\")\ndprobs$y = y\ndprobs$x = 1:nrow(dprobs)\n\n# plot the raw data and color by probability of belonging to mixture component one\np_raw = ggplot(dprobs, aes(y = y, x = x)) +\n  geom_point(aes(color = Component_1)) +\n    scale_colour_gradient2(low = 'green', mid = 'blue', high = 'red')\n\n\np &lt;- ggplot(dprobs, aes(y))\np &lt;- p + geom_histogram(\n  aes(y = after_stat(density)),\n  bins = 50,\n  fill = \"#e8edf0\",\n  color = \"#374151\",\n  linewidth = 0.25\n)\n\n# add the densitites of the components\ncolors = hcl.colors(n = length(thetas), palette = \"Blue-Red\")\n\n# add the densities\nfor(i in 1:length(thetas)) {\n\n  p &lt;- p + stat_function(\n    fun = dnormLambda,\n    args = list(lambda = thetas[i], mu = mus[i], sigma = sds[i]),\n    color = colors[i],\n    linewidth = 1.25\n  )\n\n}\n\nprint(p)\n\nreturn(\n       list(\n      mc = mc,\n      dprobs = dprobs,\n      thetas = thetas,\n      mus = mus,\n      sds = sds,\n      p_raw = p_raw,\n      p_density = p\n      )\n       )\n\n}\n\nNow apply the function on the different features of the iris data\n\nseed = 242151\n\n# prepare data for stan run\n\n# pick a feature\nsl_mixture = RunMixture(iris$Sepal.Length, k = 2, seed = seed)\nsw_mixture = RunMixture(iris$Sepal.Width, k = 2, seed = seed)\npl_mixture = RunMixture(iris$Petal.Length, k = 2, seed = seed)\npw_mixture = RunMixture(iris$Petal.Width, k = 2, seed = seed)\n\n# check the different components\nkable(sl_mixture$mc)\nkable(sw_mixture$mc)\nkable(pl_mixture$mc)\nkable(pw_mixture$mc)\n\nsl_mixture$p_raw\nsw_mixture$p_raw\npl_mixture$p_raw\npw_mixture$p_raw\n\nsl_mixture$p_density\nsw_mixture$p_density\npl_mixture$p_density\npw_mixture$p_density\n\n\n\n\n\n\niris_features = iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")]\n\niris_density = do.call(\n  rbind,\n  lapply(names(iris_features), function(feature) {\n    out = mixture_preview(iris_features[[feature]], k = 2, seed = 242151)\n    out$Feature = feature\n    out\n  })\n)\n\niris_long = stack(iris_features)\ncolnames(iris_long) = c(\"Value\", \"Feature\")\n\nggplot(iris_long, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = iris_density,\n    aes(x = Value, y = density, color = component),\n    linewidth = 1.15,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\", color = NULL)"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Advanced Statistics Lab",
+    "section": "",
+    "text": "This is the new Quarto home for the Advanced Statistics lab. The goal is a course format that works in class, on student laptops, and later as a reproducible reference.\nThe old R Markdown chapters are still present under chapters/. New material will move into two connected forms:"
+  },
+  {
+    "objectID": "index.html#course-units",
+    "href": "index.html#course-units",
+    "title": "Advanced Statistics Lab",
+    "section": "1 Course Units",
+    "text": "1 Course Units\n\n\n\nUnit\nLab\nSlides\n\n\n\n\nIntroduction to R\nLab\nSlides\n\n\nOptimization\nLab\nSlides\n\n\nMaximum Likelihood\nLab\nSlides\n\n\nLeast Squares\nLab\nSlides\n\n\nBayesian Inference\nLab\nSlides\n\n\nGenomic Prediction\nLab\nSlides\n\n\nClustering\nLab\nSlides\n\n\nMultivariate Clustering\nLab\nSlides"
+  },
+  {
+    "objectID": "index.html#suggested-class-workflow",
+    "href": "index.html#suggested-class-workflow",
+    "title": "Advanced Statistics Lab",
+    "section": "2 Suggested Class Workflow",
+    "text": "2 Suggested Class Workflow\nUse the slides in a browser for projection, with RStudio open on the matching lab file. Run selected chunks live in RStudio when the class should see the code execute, and let students run the same chunks locally.\nThis keeps the projected material clean while avoiding copy-paste between windows.\nThe theme dropdown at the top changes the visual theme live on both lab pages and slides. The t key cycles through the same themes during presentation."
+  },
+  {
+    "objectID": "index.html#local-setup",
+    "href": "index.html#local-setup",
+    "title": "Advanced Statistics Lab",
+    "section": "3 Local Setup",
+    "text": "3 Local Setup\nInstall R, RStudio, Git, and Quarto before class. Then clone or download this repository and run the package setup from the repository root.\n\n3.1 Install R And RStudio\n\n\n\nPlatform\nR\nRStudio\nExtra tools for brms/Stan\n\n\n\n\nWindows\nInstall R from CRAN.\nInstall RStudio Desktop from Posit.\nInstall Rtools.\n\n\nmacOS\nInstall R from CRAN or with brew install r.\nInstall RStudio Desktop from Posit or with brew install --cask rstudio.\nRun xcode-select --install.\n\n\nUbuntu/Debian Linux\nRun sudo apt update && sudo apt install r-base r-base-dev.\nDownload the Ubuntu/Debian .deb from Posit and install it with sudo apt install ./rstudio-*.deb.\nRun sudo apt install build-essential gfortran libcurl4-openssl-dev libssl-dev libxml2-dev.\n\n\nFedora/RHEL Linux\nRun sudo dnf install R.\nDownload the Fedora/RHEL .rpm from Posit and install it with sudo dnf install ./rstudio-*.rpm.\nRun sudo dnf install gcc gcc-c++ gcc-gfortran make libcurl-devel openssl-devel libxml2-devel.\n\n\n\nQuarto is needed to render the website locally. Install it from quarto.org. On macOS with Homebrew, this is:\nbrew install --cask quarto\nOn Linux, the Quarto download page provides .deb and .rpm installers. On Windows, use the .msi installer.\n\n\n3.2 Install Git\nGit is needed for the recommended course setup because it lets students clone the repository and later pull updates.\n\n\n\nPlatform\nGit install\n\n\n\n\nWindows\nInstall Git for Windows. The default installer options are fine.\n\n\nmacOS\nRun xcode-select --install or install Git with Homebrew: brew install git.\n\n\nUbuntu/Debian Linux\nRun sudo apt update && sudo apt install git.\n\n\nFedora/RHEL Linux\nRun sudo dnf install git.\n\n\n\nAfter installation, check that Git is available:\ngit --version\n\n\n3.3 Get The Course Repository\ngit clone https://github.com/cheuerde/Practical_AS_Kiel.git\ncd Practical_AS_Kiel\nIf you downloaded a ZIP file instead, open a terminal in the extracted Practical_AS_Kiel folder.\n\n\n3.4 Install R Packages\nMinimal packages for the R introduction and the website:\nRscript setup/install.R --minimal\nRscript setup/check.R --minimal\nApplied course packages for the main labs:\nRscript setup/install.R\nRscript setup/check.R\nThis installs the core/applied package set used by the course material:\ndlookr, ggplot2, knitr, rmarkdown,\nBGLR, data.table, DT, lattice, Matrix, mvtnorm, plotly, rrBLUP, tidyverse\nBayesian modelling with brms and Stan:\nRscript setup/install.R --stan --install-cmdstan\nRscript setup/check.R --stan\nThis adds:\nbayesplot, brms, cmdstanr, posterior\nFull dependency installation, including the original Stan/JAGS/clustering support packages and CmdStan, is mostly useful for the instructor machine or for students who want to run every optional block.\nBefore running --all, install the platform tools above first. The archived JAGS example also needs JAGS itself before rjags can be installed. JAGS is not needed for the live brms/CmdStan workflow.\n\n\n\nPlatform\nJAGS install\n\n\n\n\nWindows\nInstall JAGS 4.x from the JAGS project page.\n\n\nmacOS\nRun brew install jags.\n\n\nUbuntu/Debian Linux\nRun sudo apt install jags.\n\n\nFedora/RHEL Linux\nRun sudo dnf install JAGS.\n\n\n\nRscript setup/install.R --all\nRscript setup/check.R --all\nThe legacy and optional package set is:\ncar, ellipse, emmeans, factoextra, GGally, htmltools, klippy, lsmeans, lubridate,\nmixtools, pacman, pander, pedigreemm, prettydoc,\nremotes, rjags, rmdformats, rstan\n\n\n3.5 Render The Website\nAfter installing Quarto:\nquarto render\nThe rendered local landing page is _site/index.html."
+  },
+  {
+    "objectID": "labs/bayesian-inference.html",
+    "href": "labs/bayesian-inference.html",
+    "title": "Bayesian Inference",
+    "section": "",
+    "text": "Open slides"
+  },
+  {
+    "objectID": "labs/bayesian-inference.html#updating-priors-from-existing-evidence",
+    "href": "labs/bayesian-inference.html#updating-priors-from-existing-evidence",
+    "title": "Bayesian Inference",
+    "section": "2.1 Updating priors from existing evidence",
+    "text": "2.1 Updating priors from existing evidence\nBayesian Inference allows us to incorporate actual prior evidence in the estimation of parameters. For example, we might have conducted a previous experiment and we arrived at an estimate of the mean of our observations. We then do another experiment of similar setup and want to update our mean estimate. In that case, we can use the posterior distribution of the mean from the first experiment as the prior on that mean for the second experiment:\n\\[\np(\\theta|y)_{FirstExperiment} \\propto p(y|\\theta)p(\\theta)\n\\]\nPlugging in the posterior from the first experiment as the prior for the second:\n\\[\np(\\theta|y)_{SecondExperiment} \\propto p(y|\\theta)p(\\theta|y)_{FirstExperiment}\n\\]\n\nlibrary(brms)\nlibrary(ggplot2)\nlibrary(knitr)\nlibrary(tidyverse)\n\ndata(iris)\n\n# subset first 50 observations\niris_first = iris[1:50,]\n\n# this gives us the default brms priors\nget_prior(Sepal.Width ~ 1, data = iris_first)\n\n# set a \"flat\" prior, no prior evidence\npriors = set_prior(\"normal(0,4)\", class = \"Intercept\")\n\nfit_first &lt;- brm(Sepal.Width ~ 1,\n     data = iris_first,\n     family = gaussian(),\n     prior = priors,\n     sample_prior = TRUE,\n     silent = 2,\n     refresh = 0\n)\n\n# compare prior to posterior\n# extract draws from first chain\ndraws_first = as_draws_array(fit_first)[,1,, drop = TRUE]\n\nsamples_first = rbind(\n          data.frame(\n         type = \"prior\",\n         samples = as.numeric(draws_first[, \"prior_Intercept\"])\n         ),\n          data.frame(\n         type = \"posterior\",\n         samples = as.numeric(draws_first[, \"b_Intercept\"])\n          )\n)\n\nkable(\n      samples_first %&gt;% group_by(type) %&gt;% summarize(\n                         n = n(),\n                         mean = mean(samples),\n                         sd = sd(samples)\n                         ),\n      digits = 3\n      )\n\np_first = ggplot(samples_first, aes(x = samples)) +\n  geom_density(aes(fill = type)) +\n  scale_fill_manual(values = c('#526A83','#68855C'))\n\np_first\n\n# second experiment, insert prior evidence about the mean\n# get mean and standard deviation from posterior of mean from first experiment\nmu_prior = mean(samples_first$samples[samples_first$type == \"posterior\"])\nsd_prior = sd(samples_first$samples[samples_first$type == \"posterior\"])\npriors = set_prior(paste(\"normal(\", mu_prior, \",\", sd_prior, \")\", sep = \"\"), class = \"Intercept\")\n\n# second subset of data: remaining\niris_second = iris[51:nrow(iris),]\n\nfit_second &lt;- brm(Sepal.Width ~ 1,\n     data = iris_second,\n     family = gaussian(),\n     prior = priors,\n     sample_prior = TRUE,\n     silent = 2,\n     refresh = 0\n)\n\n# compare prior to posterior\n# extract draws from first chain\ndraws_second = as_draws_array(fit_second)[,1,, drop = TRUE]\n\nsamples_second = rbind(\n    data.frame(\n         type = \"prior\",\n         samples = as.numeric(draws_second[, \"prior_Intercept\"])\n         ),\n    data.frame(\n         type = \"posterior\",\n         samples = as.numeric(draws_second[, \"b_Intercept\"])\n    )\n)\n\nkable(\n      samples_second %&gt;% group_by(type) %&gt;% summarize(\n                         n = n(),\n                         mean = mean(samples),\n                         sd = sd(samples)\n                         ),\n      digits = 3\n      )\n\np_second = ggplot(samples_second, aes(x = samples)) +\n  geom_density(aes(fill = type)) +\n  scale_fill_manual(values = c('#526A83','#68855C'))\n\np_second"
+  },
+  {
+    "objectID": "labs/bayesian-inference.html#example",
+    "href": "labs/bayesian-inference.html#example",
+    "title": "Bayesian Inference",
+    "section": "3.1 Example",
+    "text": "3.1 Example\n\nlibrary(pacman)\np_load(brms, cmdstanr, BGLR, pedigreemm, tidyverse)\n\n# only have to be done once\n# install_cmdstan(cores = 6)\n\n# load the BGLR data\ndata(milk)\n\n# get pedigree and make A\nP &lt;- pedCow\n\nmids &lt;- P@label\n\n# make subset\nmidsIn &lt;- as.character(unique(milk$id))[1:300]\n\nL &lt;- as(t(relfactor(P)), \"dgCMatrix\")\n\nA &lt;- tcrossprod(L[match(midsIn, mids),])\nrownames(A) &lt;- colnames(A) &lt;- midsIn\n\nA = as(A, \"matrix\")\n\n# make subset of data\nD &lt;- milk[milk$id %in% midsIn,]\n\nD$idA &lt;- factor(D$id, levels = midsIn)\nD$idP &lt;- as.character(D$id)\n\n##################################################\n### create stand model - just for sanity check ###\n##################################################\n\n# the model formula\nbrmf &lt;- brmsformula(\n        mvbind(\n         milk,\n         fat\n         ) ~ 1 +\n        factor(lact) +\n        herd +\n        (1|g|gr(idA, cov = A)) + # additive genetic effect\n        (1|p|gr(id)), # PE effect\n        data = D,\n        data2 = list(A = A)\n\n)\n\n# look at default priors\nget_prior(\n        mvbind(\n         milk,\n         fat\n         ) ~ 1 +\n        factor(lact) +\n        herd +\n        (1|g|gr(idA, cov = A)) + # additive genetic effect\n        (1|p|gr(id)), # PE effect\n        data = D,\n        data2 = list(A = A)\n        )\n\nstanCode &lt;- make_stancode(\n        formula = brmf,\n        data = D,\n        data2 = list(A = A),\n                  # family = poisson(\"log\"), # for a poisson response with log link function\n        family = gaussian()\n)\n\nstanData &lt;- make_standata(\n        formula = brmf,\n        data = D,\n        data2 = list(A = A),\n                  # family = poisson(\"log\"), # for a poisson response with log link function\n        family = gaussian()\n)\n\n# check the stan code\n# this is particularly useful to check the priors that brms imposed on the parameters.\n# the default prior choice by brms follows the stan recommendations for the most part and\n# are excellent!\nstanCode\n\n##########################################\n### brms run - bivariate animal model ###\n##########################################\n\n# more iterations for a more complex model\nniter = 2000\nchains = 5\ncores = 5\nthreads = 1\n\nmod &lt;- brm(\n     formula = brmf,\n     data = D,\n     data2 = list(A = A),\n     family = gaussian(),\n     # family = poisson(\"log\"), # for a poisson response with log link function\n     chains = chains,\n     cores = cores,\n     threads = threading(threads),\n     backend = \"cmdstanr\",\n     iter = niter\n)\n\n# extract posterior of covariance-matrices\nvcp &lt;- VarCorr(mod, summary = FALSE)\n\n# additive genetic covariance matrix\nG &lt;- vcp$idA$cov\n\n# pe covariance matrix\nPE &lt;- vcp$id$cov\n\n# residucal covariance matrix\nR &lt;- vcp$residual$cov\n\n# phenotypic\nP &lt;- G + PE + R\n\n# extract the variance components for the traits\nvA &lt;- matrix(as.numeric(NA), nrow = nrow(G), ncol = 2)\nvP &lt;- matrix(as.numeric(NA), nrow = nrow(G), ncol = 2)\n\ncolnames(vA) &lt;- colnames(vP) &lt;- c(\"milk\", \"fat\")\n\n# fill matrices with diagonal elements of the var-covar matrix\nfor(i in 1:nrow(G)) vA[i,] &lt;- diag(G[i,,])\nfor(i in 1:nrow(G)) vP[i,] &lt;- diag(P[i,,])\n\n# h2\nh2 &lt;- colMeans(vA / vP)\nh2_sd &lt;- apply(vA / vP, 2, sd)\n\nh2Out &lt;- data.frame(\n    Trait = c(\"milk\", \"fat\"),\n    h2 = h2,\n    h2_sd = h2_sd\n    )\n\nvAmeans &lt;- colMeans(vA)\nvPmeans &lt;- colMeans(vP)\n\n\n#######################\n### Breeding Values ###\n#######################\n\nup = ranef(mod, summary = FALSE)\nupA = up$idA\n\nids &lt;- rownames(upA[1,,])\nidsIn &lt;- ids\n\nout &lt;- list()\n\n# make some predictions\nfor(i in 1:length(idsIn)) {\n\n  tmp &lt;- tibble(\n          id = idsIn[i]\n  )\n\n  # now get the blups for this animals\n  thisUp &lt;- upA[,match(idsIn[i], upIds),,drop = TRUE]\n\n  # make prediction\n  tmp &lt;- tmp %&gt;%\n    mutate(\n           milkPred = mean(thisUp[,\"milk_Intercept\"]),\n           milkPred_PEV = var(thisUp[,\"milk_Intercept\"]),\n           milkPred_REL = 1 - (milkPred_PEV / vAmeans[\"milk\"]),\n\n           fatPred = mean(thisUp[,\"fat_Intercept\"]),\n           fatPred_PEV = var(thisUp[,\"fat_Intercept\"]),\n           fatPred_REL = 1 - (fatPred_PEV / vAmeans[\"fat\"]),\n           )\n\n  out[[i]] &lt;- tmp\n\n}\n\ndatPred &lt;- bind_rows(out)"
+  },
+  {
+    "objectID": "labs/genomic-prediction.html",
+    "href": "labs/genomic-prediction.html",
+    "title": "Genomic Prediction",
+    "section": "",
+    "text": "Open slides"
+  },
+  {
+    "objectID": "labs/genomic-prediction.html#ridge-regression-marker-model",
+    "href": "labs/genomic-prediction.html#ridge-regression-marker-model",
+    "title": "Genomic Prediction",
+    "section": "4.1 Ridge Regression Marker Model",
+    "text": "4.1 Ridge Regression Marker Model\n\n# design matrix for random effects (marker covariates become design matrix)\nZ = Mc\n\n# design matrix for fixed effects (only intercept)\nX = array(1, dim = c(length(y), 1))\n\n# fit the model with ML\nmod_rr = mixed.solve(\n         y = y,\n         X = X,\n         Z = Z,\n         method = \"ML\"\n         )\n\n# extract marker effects\na_rr = mod_rr$u\n\n# predict breeding values from the model\ng_rr = as.numeric(Z %*% a_rr)\n\n# extract variance components\nvar_a_rr = mod_rr$Vu\nvar_e_rr = mod_rr$Ve\n\n# we get the \"additive genetic\" variance, by rescaling the variance component for\n# the marker effects\nvar_g_rr = mod_rr$Vu * mean(diag(MMdash))"
+  },
+  {
+    "objectID": "labs/genomic-prediction.html#gblup-model",
+    "href": "labs/genomic-prediction.html#gblup-model",
+    "title": "Genomic Prediction",
+    "section": "4.2 GBLUP Model",
+    "text": "4.2 GBLUP Model\n\n# fit the model with ML\nmod_gblup = mixed.solve(\n         y = y,\n         K = G, # here we pass the genomic relationship matrix as kernel\n         method = \"ML\"\n         )\n\n# extract breeding values\ng_gblup = mod_gblup$u\n\n# obtain marker effects from a GBLUP model\nMMdash_tmp = MMdash\ndiag(MMdash_tmp) = diag(MMdash_tmp) + 0.00001\na_gblup = as.numeric(t(Mc) %*% solve(MMdash_tmp, g_gblup))\n\n# extract variance components\nvar_g_gblup = mod_gblup$Vu\nvar_e_gblup = mod_gblup$Ve"
+  },
+  {
+    "objectID": "labs/genomic-prediction.html#check-equivalence-of-models",
+    "href": "labs/genomic-prediction.html#check-equivalence-of-models",
+    "title": "Genomic Prediction",
+    "section": "4.3 Check equivalence of models",
+    "text": "4.3 Check equivalence of models\n\n# plot breeding values from both models\nplot(g_rr, g_gblup)\n\n\n\n\n\n\n\n# plot marker effects from both models\nplot(a_rr, a_gblup)\n\n\n\n\n\n\n\n# some summaries\nsummary(lm(g_rr ~ g_gblup))\n\n\nCall:\nlm(formula = g_rr ~ g_gblup)\n\nResiduals:\n       Min         1Q     Median         3Q        Max \n-1.880e-06 -3.197e-07  2.300e-10  2.997e-07  1.278e-06 \n\nCoefficients:\n             Estimate Std. Error  t value Pr(&gt;|t|)    \n(Intercept) 4.354e-16  2.041e-08        0        1    \ng_gblup     1.000e+00  3.618e-08 27638903   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 4.994e-07 on 597 degrees of freedom\nMultiple R-squared:      1, Adjusted R-squared:      1 \nF-statistic: 7.639e+14 on 1 and 597 DF,  p-value: &lt; 2.2e-16\n\nsummary(lm(a_rr ~ a_gblup))\n\n\nCall:\nlm(formula = a_rr ~ a_gblup)\n\nResiduals:\n       Min         1Q     Median         3Q        Max \n-8.103e-08 -1.415e-08  2.870e-10  1.360e-08  8.062e-08 \n\nCoefficients:\n             Estimate Std. Error   t value Pr(&gt;|t|)    \n(Intercept) 7.978e-10  6.017e-10 1.326e+00    0.185    \na_gblup     1.000e+00  3.223e-08 3.102e+07   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.15e-08 on 1277 degrees of freedom\nMultiple R-squared:      1, Adjusted R-squared:      1 \nF-statistic: 9.624e+14 on 1 and 1277 DF,  p-value: &lt; 2.2e-16\n\n# variance components and heritabilities\nvc = rbind(\n         data.frame(\n          model = \"Marker Model\",\n          var_g = var_g_rr,\n          var_e = var_e_rr,\n          h2 = var_g_rr / (var_g_rr + var_e_rr)\n          ),\n         data.frame(\n          model = \"GBLUP\",\n          var_g = var_g_gblup,\n          var_e = var_e_gblup,\n          h2 = var_g_gblup / (var_g_gblup + var_e_gblup)\n          )\n         )\n\nkable(vc, digits = 3)\n\n\n\n\nmodel\nvar_g\nvar_e\nh2\n\n\n\n\nMarker Model\n0.605\n0.539\n0.529\n\n\nGBLUP\n0.605\n0.539\n0.529"
+  },
+  {
+    "objectID": "labs/genomic-prediction.html#cross-validation",
+    "href": "labs/genomic-prediction.html#cross-validation",
+    "title": "Genomic Prediction",
+    "section": "4.4 Cross Validation",
+    "text": "4.4 Cross Validation\nIn order to assess the performance of our genomic prediction models, we can run a cross validation scheme, in which we train marker effects with a subset of the data and predict the EBVs of the left out samples based on the training model.\n\n# define function to create cross validation samples\ncCV &lt;- function(y, folds=5, reps=1, matrix=FALSE, seed=NULL) {\n\n  if(!is.vector(y)) stop(\"y must be a vector\")\n  if(folds &lt; 2) stop(\"'folds' must be larger than one\")\n  if(reps &lt; 1) reps = 1\n\n  reps = as.integer(reps)\n  folds = as.integer(folds)\n\n  isy &lt;- (1:length(y))[!is.na(y)]\n\n  n_vec &lt;- rep(NA,folds)\n  start &lt;- rep(NA,folds)\n  end &lt;- rep(NA,folds)\n\n  n_vec[1:(folds-1)] &lt;- round(length(isy)/folds,digits=0)\n  n_vec[folds] &lt;- length(isy) - sum(n_vec[1:(folds-1)])\n\n\n  for(j in 1:folds) {\n\n    if(j==1) {\n\n      start[j] = 1\n\n    } else {\n\n      start[j] = end[j-1]+1\n\n    }\n\n    end[j] = sum(n_vec[1:j])\n  }\n\n  count=0\n  cv_pheno &lt;- list(folds*reps)\n\n  if(missing(seed)) seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) %% 2^31)\n  set.seed(seed)\n\n  for(i in 1:reps) {\n\n    ids &lt;- sample(isy,length(isy),replace=F)\n\n    for(j in 1:folds) {\n\n      count=count+1\n      y_temp = y\n      y_temp[ids[start[j]:end[j]]] &lt;- NA\n      cv_pheno[[count]] &lt;- y_temp\n\n    }\n\n  }\n\n\n  if(matrix) {\n\n    return(matrix(unlist(cv_pheno),nrow=length(y),ncol=length(cv_pheno),byrow=FALSE))\n\n  } else {\n\n    return(cv_pheno)\n\n  }\n\n}\n\n# create 5 fold cross validation samples\ncvs = cCV(y, folds = 5, reps = 10)\n\n# run cross validation\npred = rep(as.numeric(NA), length(y))\nfor(i in 1:length(cvs)) pred[is.na(cvs[[i]])] = mixed.solve(y = cvs[[i]], K = G)$u[is.na(cvs[[i]])]\n\n\n# if we have more than 1 repition, need to use this\npreds = list()\nfor(i in 1:length(cvs)) {\n\n  this_pred = mixed.solve(y = cvs[[i]], K = G)$u[is.na(cvs[[i]])]\n  this_y = y[is.na(cvs[[i]])]\n  preds[[i]] = data.frame(pred = this_pred, y = this_y)\n\n}\n\ncors = unlist(lapply(preds, function(x) cor(x$pred, x$y)))\n\n# Combine all predictions into a single vector if needed\npred &lt;- unlist(lapply(preds, function(x) x$pred))\n\n# plot predictes vs observed\nplot(pred, y)\n\n# prediction accuracy\ncor(pred, y)\n\n# check bias\nsummary(lm(pred ~ y))"
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html",
+    "href": "labs/maximum-likelihood.html",
+    "title": "Maximum Likelihood",
+    "section": "",
+    "text": "Open slides\nMaximum likelihood estimates the parameter values that make the observed data most probable under a statistical model. The implementation pattern in this chapter is deliberately explicit: construct the likelihood, collect the parameters in one vector, and pass that vector to optim()."
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html#definition",
+    "href": "labs/maximum-likelihood.html#definition",
+    "title": "Maximum Likelihood",
+    "section": "1 Definition",
+    "text": "1 Definition\nFor independent observations \\(y_1,\\dots,y_n\\) with density \\(p(y_i \\mid \\theta)\\), the likelihood is\n\\[\nL(\\theta; \\mathbf{y}) = \\prod_{i=1}^{n} p(y_i \\mid \\theta).\n\\]\nThe maximum likelihood estimate is\n\\[\n\\widehat{\\theta}\n=\n\\operatorname*{arg\\,max}_{\\theta \\in \\Theta}\nL(\\theta; \\mathbf{y}).\n\\]\nThe product can become extremely small. Therefore we usually optimize the log-likelihood:\n\\[\n\\log L(\\theta; \\mathbf{y})\n=\n\\sum_{i=1}^{n} \\log p(y_i \\mid \\theta).\n\\]\nBecause optim() minimizes, the function we pass to R is usually the negative log-likelihood:\n\\[\n\\widehat{\\theta}\n=\n\\operatorname*{arg\\,min}_{\\theta \\in \\Theta}\n\\left[-\\sum_{i=1}^{n}\\log p(y_i \\mid \\theta)\\right].\n\\]"
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html#normal-distribution",
+    "href": "labs/maximum-likelihood.html#normal-distribution",
+    "title": "Maximum Likelihood",
+    "section": "2 Normal Distribution",
+    "text": "2 Normal Distribution\nThe normal density is\n\\[\nf(y) = \\frac{1}{\\sigma \\sqrt{2\\pi}}\n\\exp\\left[-\\frac{1}{2}\\left(\\frac{y - \\mu}{\\sigma}\\right)^2\\right].\n\\]\nThe normal distribution has two parameters: the mean \\(\\mu\\) and the standard deviation \\(\\sigma\\).\n\ncurve(\n  dnorm(\n    x,\n    mean = 10,\n    sd = 2\n  ),\n  from = 0,\n  to = 20,\n  main = \"Normal distribution\"\n)"
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html#finding-the-mean",
+    "href": "labs/maximum-likelihood.html#finding-the-mean",
+    "title": "Maximum Likelihood",
+    "section": "3 Finding The Mean",
+    "text": "3 Finding The Mean\nHere \\(\\sigma\\) is fixed at 1 and only \\(\\mu\\) is estimated.\n\nset.seed(2026)\n\n# generate random normal variable\nmean = 4.5\nsd = 1\nn = 1000\n\ny = rnorm(n, mean, sd)\n\n# the likelihood function = L(y;.) = y ~ N(mu, sigma)\nlik &lt;- function(par, y, sd = 1) {\n\n  # the parameter we want to estimate\n  mean = par[1]\n\n  # the likelihood of y\n  L &lt;- dnorm(x = y, mean = mean, sd = sd, log = TRUE)\n\n  # the joint likelihood\n  return(-sum(L))\n\n}\n\n\n# the parameters we wish to estimate\np &lt;- c(0)\nnames(p) &lt;- c(\"mu\")\n\n# Get the Maximum Likelihood estimates for our unknowns\nML &lt;- optim(p, lik, y = y)\n\n# compare ML results to empirical mean\nprint(\"Maximum Likelihood:\")\n\n[1] \"Maximum Likelihood:\"\n\nML$par\n\n      mu \n4.514063 \n\nprint(\"Empirical:\")\n\n[1] \"Empirical:\"\n\nmean(y)\n\n[1] 4.513767"
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html#finding-mean-and-standard-deviation",
+    "href": "labs/maximum-likelihood.html#finding-mean-and-standard-deviation",
+    "title": "Maximum Likelihood",
+    "section": "4 Finding Mean And Standard Deviation",
+    "text": "4 Finding Mean And Standard Deviation\nNow estimate \\(\\mu\\) and \\(\\sigma\\) together. The only extra point is that \\(\\sigma\\) must be positive, so the likelihood returns Inf for invalid values.\n\n# likelihood for a positive standard deviation\nsdlik &lt;- function(x) {\n\n  res &lt;- 0\n  if (x &gt; 0) res = 1\n\n  return(log(res))\n\n}\n\n# the likelihood function = L(y;.) = y ~ N(mu, sigma) * sigma ~ U(0, Inf)\nlik &lt;- function(par, y) {\n\n  # the parameters we want to estimate\n  mean = par[1]\n  sd = par[2]\n\n  # the likelihood of the standard deviation\n  L2 &lt;- sdlik(sd)\n\n  # if sd is not allowed, stop here\n  if (!is.finite(L2)) return(Inf)\n\n  # the likelihood of y\n  L1 &lt;- dnorm(x = y, mean = mean, sd = sd, log = TRUE)\n\n  # the joint likelihood\n  return(-sum(L1 + L2))\n\n}\n\n\n# the parameters we wish to estimate\np &lt;- c(0, 1)\nnames(p) &lt;- c(\"mu\", \"sigma\")\n\n# Get the Maximum Likelihood estimates for our unknowns\nML &lt;- optim(p, lik, y = y, method = \"Nelder-Mead\")\n\n# compare ML results to empiricals\nout &lt;- rbind(\n  ML = ML$par,\n  empirical = c(mean(y), sd(y))\n)\n\nout\n\n                mu     sigma\nML        4.513704 0.9893471\nempirical 4.513767 0.9901296"
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html#estimating-correlation",
+    "href": "labs/maximum-likelihood.html#estimating-correlation",
+    "title": "Maximum Likelihood",
+    "section": "5 Estimating Correlation",
+    "text": "5 Estimating Correlation\nNow the likelihood is multivariate normal. The parameters are two means, two variances, and the correlation.\n\nlibrary(mvtnorm)\n\n# likelihood on correlation coefficient.\n# this is essentially a uniform prior on\n# the range -1 to 1 and 0 density outside\n# that range\ncorlik &lt;- function(x) {\n\n  res &lt;- 0\n  if (x &gt;= -1 & x &lt;= 1) res = 1\n\n  return(log(res))\n\n}\n\n# the likelihood for the variance components.\n# uniform above 0 and zero if negative\nvarlik &lt;- function(x) {\n\n  res &lt;- 0\n  if (x &gt; 0) res = 1\n\n  return(log(res))\n\n}\n\n# the likelihood function = L(y;.) = y ~ MVN(mu, sigma) * rho ~ U(-1,1)\nlik &lt;- function(par, y) {\n\n  # the prior = likelihood of rho (correlation coefficient)\n  L2 &lt;- corlik(par[5])\n\n  # and the priors on the variance components\n  L3 &lt;- varlik(par[3])\n  L4 &lt;- varlik(par[4])\n\n  # if any parameter is outside the allowed range, stop here\n  if (!all(is.finite(c(L2, L3, L4)))) return(Inf)\n\n  # we construct the covariance matrix out of the correlation coefficient\n  # and the variance components\n  covAB &lt;- par[5] * (sqrt(par[3]) * sqrt(par[4]))\n  sigma &lt;- array(c(par[3], covAB, covAB, par[4]), dim = c(2, 2))\n\n  # the likelihood of y\n  L1 &lt;- tryCatch(\n    dmvnorm(x = y, mean = c(par[1], par[2]), sigma = sigma, log = TRUE),\n    error = function(e) -Inf\n  )\n\n  if (!all(is.finite(L1))) return(Inf)\n\n  # the joint likelihood\n  return(-sum(L1 + L2 + L3 + L4))\n\n}\n\n\n# those are the optimizers available\nmethods = c(\"Nelder-Mead\", \"BFGS\", \"CG\", \"L-BFGS-B\", \"SANN\", \"Brent\")\n\n# the parameters we wish to estimate\np &lt;- c(0, 0, 1, 1, 0.2)\nnames(p) &lt;- c(\"mu1\", \"mu2\", \"tauA\", \"tauB\", \"rho\")\n\n# create random data\nset.seed(2026)\nn = 10\ntauA &lt;- 3\ntauB &lt;- 10\nrho = 0.7\ncovAB &lt;- rho * (sqrt(tauA) * sqrt(tauB))\nmuA &lt;- 5\nmuB &lt;- 20\n\n# the variance-covariance matrix\nsigma &lt;- array(c(tauA, covAB, covAB, tauB), dim = c(2, 2))\n\n# the random data\nY &lt;- rmvnorm(n, c(muA, muB), sigma)\n\n# Get the Maximum Likelihood estimates for our unknowns\nML &lt;- optim(p, lik, y = Y, method = methods[1])\n\nres &lt;- as.list(ML$par)\nres$covAB &lt;- res$rho * (sqrt(res$tauA) * sqrt(res$tauB))\n\n# compare ML estimates with empiricals\nout &lt;- rbind(\n  unlist(res),\n  c(colMeans(Y), var(Y[, 1]), var(Y[, 2]), cor(Y)[1, 2], cov(Y)[1, 2])\n)\ncolnames(out) &lt;- names(res)\nrownames(out) &lt;- c(\"ML\", \"empirical\")\n\n# inspect results\nout\n\n                 mu1       mu2      tauA      tauB       rho     covAB\nML        -22.484565  7.335499 70.379671 14.028532 0.8906419 27.985487\nempirical   4.069481 18.482726  1.771725  9.252332 0.5003696  2.025885"
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html#animal-model-likelihood",
+    "href": "labs/maximum-likelihood.html#animal-model-likelihood",
+    "title": "Maximum Likelihood",
+    "section": "6 Animal Model Likelihood",
+    "text": "6 Animal Model Likelihood\nThe animal model is\n\\[\n\\mathbf{y} = \\mathbf{X}\\mathbf{b} + \\mathbf{a} + \\mathbf{e},\n\\]\nwith the marginal distribution\n\\[\n\\mathbf{y} \\sim MVN(\\mathbf{X}\\mathbf{b}, \\mathbf{A}\\sigma_a^2 + \\mathbf{I}\\sigma_e^2).\n\\]\nThe implementation below keeps the construction explicit. We build \\(\\mathbf{V} = \\mathbf{A}\\sigma_a^2 + \\mathbf{I}\\sigma_e^2\\), calculate the multivariate normal log-likelihood, and minimize the negative log-likelihood.\n\nlibrary(mvtnorm)\n\nset.seed(2026)\n\n# the likelihood for the variance components.\n# uniform above 0 and zero if negative\nvarlik &lt;- function(x) {\n\n  res &lt;- 0\n  if (x &gt; 0) res = 1\n\n  return(log(res))\n\n}\n\n# a small relationship matrix for a teaching example\nn_animals &lt;- 20\nA &lt;- diag(n_animals)\nA[1, 2] &lt;- A[2, 1] &lt;- 0.5\nA[3, 4] &lt;- A[4, 3] &lt;- 0.5\nA[5, 6] &lt;- A[6, 5] &lt;- 0.25\n\n# design matrix for the intercept\nX &lt;- matrix(1, n_animals, 1)\n\n# true values used to simulate the data\nb &lt;- 30\nvar_a &lt;- 4\nvar_e &lt;- 9\n\n# phenotype\na &lt;- as.numeric(rmvnorm(1, mean = rep(0, n_animals), sigma = A * var_a))\ny &lt;- as.numeric(X %*% b + a + rnorm(n_animals, sd = sqrt(var_e)))\n\n# likelihood function = L(y;.) = prod(PDF(y, E(y) = Xb, var(y) = A var_a + I var_e))\nlik &lt;- function(par, y, X, A) {\n\n  # likelihood for the variance components\n  L2 &lt;- varlik(par[1])\n  L3 &lt;- varlik(par[2])\n\n  # if any variance is outside the allowed range, stop here\n  if (!all(is.finite(c(L2, L3)))) return(Inf)\n\n  # it has to be this awkward because 'optim' only wants one vector of parameters\n  b &lt;- matrix(c(par[3:(2 + ncol(X))]), ncol = 1)\n\n  # this is A var_a\n  G &lt;- A * par[2]\n\n  # this is I var_e\n  R &lt;- diag(length(y)) * par[1]\n\n  # this is var(y)\n  V &lt;- G + R\n\n  # E(y)\n  mu &lt;- X %*% b\n\n  # optim minimizes - therefore we need the negative likelihood\n  # Instead of taking the products over the likelihoods we take\n  # the sum over log(L) for numerical stability\n  L1 &lt;- tryCatch(\n    dmvnorm(x = y, mean = as.numeric(mu), sigma = V, log = TRUE),\n    error = function(e) -Inf\n  )\n\n  if (!all(is.finite(L1))) return(Inf)\n\n  return(-sum(L1 + L2 + L3))\n\n}\n\n\n# This is only necessary because 'optim' wants one parameter vector\ngetp &lt;- function(X, b = 0.1, var_e = 1, var_a = 1) {\n\n  p &lt;- c(var_e, var_a, rep(b, ncol(X)))\n  names(p) &lt;- c(\"var_e\", \"var_a\", paste(\"b\", 0:(ncol(X) - 1), sep = \"\"))\n\n  p\n\n}\n\n\n# Get the Maximum Likelihood estimates for our unknowns\nmethods = c(\"Nelder-Mead\", \"BFGS\", \"CG\", \"L-BFGS-B\", \"SANN\", \"Brent\")\nML &lt;- optim(getp(X, b = mean(y)), lik, X = X, A = A, y = y, method = methods[1])\n\n# compare ML results to the true simulation values\nout &lt;- rbind(\n  ML = ML$par,\n  true = c(var_e, var_a, b)\n)\n\nout\n\n        var_e        var_a       b0\nML   8.290905 7.775783e-06 30.09605\ntrue 9.000000 4.000000e+00 30.00000"
+  },
+  {
+    "objectID": "labs/maximum-likelihood.html#exercises",
+    "href": "labs/maximum-likelihood.html#exercises",
+    "title": "Maximum Likelihood",
+    "section": "7 Exercises",
+    "text": "7 Exercises\n\nChange the starting values in p for the normal mean example. Does the optimum change?\nEstimate \\(\\mu\\) and \\(\\sigma\\) for a smaller sample size, for example n = 20.\nChange the true value of rho in the correlation example and rerun the analysis.\nIn the animal model example, change the relationship matrix A. What happens to the variance component estimates?\nExplain why each likelihood function returns -sum(L) rather than sum(L)."
+  },
+  {
+    "objectID": "labs/optimization.html",
+    "href": "labs/optimization.html",
+    "title": "Optimization",
+    "section": "",
+    "text": "Open slides\nOptimization is the task of choosing values that make an objective function as small or as large as possible. We start with an ordinary function that does not require statistics. Later, the same language will be used for least squares, likelihoods, and animal models.\nThe important idea for this course is practical:"
+  },
+  {
+    "objectID": "labs/optimization.html#formal-definition",
+    "href": "labs/optimization.html#formal-definition",
+    "title": "Optimization",
+    "section": "1 Formal Definition",
+    "text": "1 Formal Definition\n\nObjective\n\nLet \\(\\theta\\) denote the parameter vector and let \\(\\Theta\\) denote the parameter space, meaning the set of values that \\(\\theta\\) is allowed to take. An unconstrained minimization problem is written as\n\\[\n\\widehat{\\theta} \\in \\operatorname*{arg\\,min}_{\\theta \\in \\Theta} f(\\theta),\n\\]\nwhere \\(f(\\theta)\\) is the objective function. The notation \\(\\operatorname*{arg\\,min}\\) means “the argument value that gives the minimum”. If there is only one minimum, \\(\\widehat{\\theta}\\) is a single point. If several values give the same minimum, the solution is a set.\nThe notation is compact, so define every symbol before using it:\n\n\n\n\n\n\n\nSymbol\nMeaning\n\n\n\n\n\\(\\theta\\)\nA candidate value, or vector of values, that we can choose. In statistics these are usually model parameters; in a plain optimization example they are decision variables.\n\n\n\\(\\Theta\\)\nThe parameter space: all values that \\(\\theta\\) is allowed to take.\n\n\n\\(\\widehat{\\theta}\\)\nThe value of \\(\\theta\\) that solves the optimization problem. The hat marks the selected or estimated value.\n\n\n\\(f(\\theta)\\)\nThe objective function. It maps a candidate value \\(\\theta\\) to one number that we want to minimize or maximize.\n\n\n\\(\\operatorname*{arg\\,min}\\)\n“The argument that gives the minimum.” The result is the input value \\(\\theta\\), not the minimum value of \\(f(\\theta)\\) itself.\n\n\n\\(\\operatorname*{arg\\,max}\\)\n“The argument that gives the maximum.”\n\n\n\\(g_j(\\theta)\\)\nThe \\(j\\)th inequality constraint.\n\n\n\\(h_k(\\theta)\\)\nThe \\(k\\)th equality constraint.\n\n\n\\(j = 1,\\dots,m\\)\nThere are \\(m\\) inequality constraints.\n\n\n\\(k = 1,\\dots,r\\)\nThere are \\(r\\) equality constraints.\n\n\n\nA maximization problem is written as\n\\[\n\\widehat{\\theta} \\in \\operatorname*{arg\\,max}_{\\theta \\in \\Theta} f(\\theta).\n\\]\nBecause minimizing \\(-f(\\theta)\\) is equivalent to maximizing \\(f(\\theta)\\), most software only needs one convention. In R, optim() minimizes by default:\n\\[\n\\operatorname*{arg\\,max}_{\\theta \\in \\Theta} f(\\theta)\n=\n\\operatorname*{arg\\,min}_{\\theta \\in \\Theta} -f(\\theta).\n\\]\nA constrained optimization problem adds restrictions to the parameter space:\n\\[\n\\begin{aligned}\n\\widehat{\\theta} &\\in \\operatorname*{arg\\,min}_{\\theta \\in \\Theta} f(\\theta) \\\\\n\\text{subject to } g_j(\\theta) &\\le 0, \\quad j = 1,\\dots,m \\\\\nh_k(\\theta) &= 0, \\quad k = 1,\\dots,r.\n\\end{aligned}\n\\]\nThe functions \\(g_j(\\theta)\\) define inequality constraints and the functions \\(h_k(\\theta)\\) define equality constraints. In this course, we will mostly use simple bound constraints, for example \\(0 \\le w \\le 40\\)."
+  },
+  {
+    "objectID": "labs/optimization.html#first-example-fence-a-paddock",
+    "href": "labs/optimization.html#first-example-fence-a-paddock",
+    "title": "Optimization",
+    "section": "2 First Example: Fence A Paddock",
+    "text": "2 First Example: Fence A Paddock\n\nModel\n\nSuppose we have 80 meters of fencing and want to build a rectangular paddock. A rectangle has two widths and two lengths:\n\\[\n2w + 2\\ell = 80.\n\\]\nDivide both sides by 2:\n\\[\nw + \\ell = 40.\n\\]\nThat is where the 40 comes from. If the width is \\(w\\), the length must be\n\\[\n\\ell(w) = 40 - w,\n\\]\nand the area is\n\\[\nA(w) = w(40 - w).\n\\]\nThe question is easy to state: which width gives the largest area?\n\nfence_m &lt;- 80\n\npaddock_area &lt;- function(width, fence_m = 80) {\n  length &lt;- fence_m / 2 - width\n  width * length\n}\n\ncandidate_widths &lt;- seq(0, fence_m / 2, length.out = 200)\n\narea_grid &lt;- data.frame(\n  width = candidate_widths\n)\narea_grid$length &lt;- fence_m / 2 - area_grid$width\narea_grid$area &lt;- paddock_area(area_grid$width, fence_m = fence_m)\n\nbest_grid &lt;- area_grid[which.max(area_grid$area), ]\n\nkable(best_grid, digits = 2)\n\n\n\n\n\nwidth\nlength\narea\n\n\n\n\n100\n19.9\n20.1\n399.99\n\n\n\n\n\n\nggplot(area_grid, aes(width, area)) +\n  geom_line(color = \"#155f7a\", linewidth = 1.1) +\n  geom_point(data = best_grid, color = \"#c46a2b\", size = 3) +\n  labs(\n    x = \"Paddock width (m)\",\n    y = \"Area (m2)\"\n  )"
+  },
+  {
+    "objectID": "labs/optimization.html#search-with-optim",
+    "href": "labs/optimization.html#search-with-optim",
+    "title": "Optimization",
+    "section": "3 Search With optim()",
+    "text": "3 Search With optim()\n\nSearch\n\noptim() minimizes by default. To maximize area, minimize the negative area:\n\\[\n\\widehat{w}\n=\n\\operatorname*{arg\\,min}_{0 \\le w \\le 40}\n\\left[-A(w)\\right].\n\\]\n\nnegative_area &lt;- function(width, fence_m = 80) {\n  -paddock_area(width, fence_m = fence_m)\n}\n\nfit_area &lt;- optim(\n  par = 10,\n  fn = negative_area,\n  fence_m = fence_m,\n  method = \"L-BFGS-B\",\n  lower = 0,\n  upper = fence_m / 2\n)\n\nkable(\n  data.frame(\n    method = c(\"grid search\", \"optim\"),\n    width = c(best_grid$width, fit_area$par),\n    area = c(best_grid$area, -fit_area$value)\n  ),\n  digits = 3\n)\n\n\n\n\nmethod\nwidth\narea\n\n\n\n\ngrid search\n19.899\n399.99\n\n\noptim\n20.000\n400.00"
+  },
+  {
+    "objectID": "labs/optimization.html#bound-constraints",
+    "href": "labs/optimization.html#bound-constraints",
+    "title": "Optimization",
+    "section": "4 Bound Constraints",
+    "text": "4 Bound Constraints\n\nConstraints\n\nThe bounds are not technical decoration. They are part of the problem. A width below 0 meters or above 40 meters is impossible.\n\\[\n0 \\le w \\le 40.\n\\]\n\nfit_tight_area &lt;- optim(\n  par = 10,\n  fn = negative_area,\n  fence_m = fence_m,\n  method = \"L-BFGS-B\",\n  lower = 0,\n  upper = 15\n)\n\nkable(\n  data.frame(\n    constraint = c(\"correct bounds\", \"too-tight upper bound\"),\n    lower = c(0, 0),\n    upper = c(fence_m / 2, 15),\n    width = c(fit_area$par, fit_tight_area$par),\n    area = c(-fit_area$value, -fit_tight_area$value)\n  ),\n  digits = 3\n)\n\n\n\n\nconstraint\nlower\nupper\nwidth\narea\n\n\n\n\ncorrect bounds\n0\n40\n20\n400\n\n\ntoo-tight upper bound\n0\n15\n15\n375\n\n\n\n\n\nWhen the answer lands exactly on a boundary, the boundary is part of the result and needs interpretation."
+  },
+  {
+    "objectID": "labs/optimization.html#where-this-goes-next",
+    "href": "labs/optimization.html#where-this-goes-next",
+    "title": "Optimization",
+    "section": "5 Where This Goes Next",
+    "text": "5 Where This Goes Next\n\nModel\n\nThe paddock example used a single decision variable, \\(w\\), and a directly readable objective, \\(A(w)\\). The next chapters use the same structure with statistical objectives:\n\n\n\n\n\n\n\nNext topic\nWhat gets optimized\n\n\n\n\nLeast squares\nA line is chosen by minimizing squared vertical distances to observed points.\n\n\nMaximum likelihood\nParameter values are chosen by maximizing the probability of the observed data under a model.\n\n\nAnimal models\nFixed and random effects are chosen by balancing fit to records against shrinkage from covariance assumptions.\n\n\n\nThe mathematical form changes, but the workflow does not: define the allowed values, define the objective, search for the optimum, and interpret the result."
+  },
+  {
+    "objectID": "labs/optimization.html#exercises",
+    "href": "labs/optimization.html#exercises",
+    "title": "Optimization",
+    "section": "6 Exercises",
+    "text": "6 Exercises\n\nChange fence_m in the paddock example. What happens to the optimum width?\nChange the starting value in fit_area. Does the solution change?\nChange the upper bound in fit_tight_area. At what point does the answer become boundary-driven?\nRewrite the area objective for a rectangle where one side lies along an existing wall, so only three sides require fencing.\nWrite a minimization problem for choosing a width that gets as close as possible to a target area of 300 m2."
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#bayes-theorem",
+    "href": "lectures/bayesian-inference.html#bayes-theorem",
+    "title": "Bayesian Inference",
+    "section": "Bayes Theorem",
+    "text": "Bayes Theorem\n\\[\np(A|B) = \\frac{p(B|A)p(A)}{p(B)}\n\\]\nIn statistical modelling:\n\\[\np(\\theta|y) = \\frac{p(y|\\theta)p(\\theta)}{p(y)}\n\\]"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#bayesian-vs-frequentist",
+    "href": "lectures/bayesian-inference.html#bayesian-vs-frequentist",
+    "title": "Bayesian Inference",
+    "section": "Bayesian vs Frequentist",
+    "text": "Bayesian vs Frequentist\nThis is in contrast with a frequentist (maximum likelihood) approach, in which we aim to estimate non-random, fixed parameters using the likelihood of the data given those parameters only (\\(p(y|\\theta)\\)).\nThe overall likelihood of the data (\\(p(y)\\)) only serves as a scaling constant:\n\\[\np(\\theta|y) \\propto p(y|\\theta)p(\\theta)\n\\]"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#estimating-a-normal-mean",
+    "href": "lectures/bayesian-inference.html#estimating-a-normal-mean",
+    "title": "Bayesian Inference",
+    "section": "Estimating A Normal Mean",
+    "text": "Estimating A Normal Mean\nIn a Bayesian framework, we formulate our problem in terms of the assumed distribution of our data (likelihood) and the prior distributions of our parameters we wish to estimate.\n\\[\n\\begin{align}\n\\mathbf{y} &\\sim \\mathbf{N}(\\mu, \\sigma_{e}^{2}) \\\\\n\\mu &\\sim N(\\mu_{prior}, \\sigma_{prior}^{2})\n\\end{align}\n\\]"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#brms-mean-example",
+    "href": "lectures/bayesian-inference.html#brms-mean-example",
+    "title": "Bayesian Inference",
+    "section": "brms Mean Example",
+    "text": "brms Mean Example\n\nlibrary(brms)\nlibrary(ggplot2)\nlibrary(knitr)\nlibrary(tidyverse)\n\ndata(iris)\n\n# this gives us the default brms priors\nget_prior(Sepal.Width ~ 1, data = iris)\n\n# set a custom prior for the intercept\npriors = set_prior(\"normal(0,0.2)\", class = \"Intercept\")"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#fit-the-model",
+    "href": "lectures/bayesian-inference.html#fit-the-model",
+    "title": "Bayesian Inference",
+    "section": "Fit The Model",
+    "text": "Fit The Model\n\nfit &lt;- brm(Sepal.Width ~ 1,\n     data = iris,\n     family = gaussian(),\n     prior = priors,\n     sample_prior = TRUE,\n     silent = 2,\n     refresh = 0\n)"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#prior-and-posterior-samples",
+    "href": "lectures/bayesian-inference.html#prior-and-posterior-samples",
+    "title": "Bayesian Inference",
+    "section": "Prior And Posterior Samples",
+    "text": "Prior And Posterior Samples\n\ndraws = as_draws_array(fit)[,1,, drop = TRUE]\n\nsamples = rbind(\n    data.frame(type = \"prior\",\n               samples = as.numeric(draws[, \"prior_Intercept\"])),\n    data.frame(type = \"posterior\",\n               samples = as.numeric(draws[, \"b_Intercept\"]))\n)\n\nkable(\n  samples %&gt;% group_by(type) %&gt;% summarize(\n    n = n(),\n    mean = mean(samples),\n    sd = sd(samples)\n  ),\n  digits = 3\n)"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#prior-and-posterior",
+    "href": "lectures/bayesian-inference.html#prior-and-posterior",
+    "title": "Bayesian Inference",
+    "section": "Prior And Posterior",
+    "text": "Prior And Posterior"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#updating-priors-from-existing-evidence",
+    "href": "lectures/bayesian-inference.html#updating-priors-from-existing-evidence",
+    "title": "Bayesian Inference",
+    "section": "Updating Priors From Existing Evidence",
+    "text": "Updating Priors From Existing Evidence\nBayesian Inference allows us to incorporate actual prior evidence in the estimation of parameters.\nWe might have conducted a previous experiment and arrived at an estimate of the mean of our observations.\nThen we do another experiment of similar setup and want to update our mean estimate."
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#prior-updating",
+    "href": "lectures/bayesian-inference.html#prior-updating",
+    "title": "Bayesian Inference",
+    "section": "Prior Updating",
+    "text": "Prior Updating\n\\[\np(\\theta|y)_{FirstExperiment} \\propto p(y|\\theta)p(\\theta)\n\\]\nPlugging in the posterior from the first experiment as the prior for the second:\n\\[\np(\\theta|y)_{SecondExperiment} \\propto p(y|\\theta)p(\\theta|y)_{FirstExperiment}\n\\]"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#update-prior-in-r",
+    "href": "lectures/bayesian-inference.html#update-prior-in-r",
+    "title": "Bayesian Inference",
+    "section": "Update Prior In R",
+    "text": "Update Prior In R\n\niris_first = iris[1:50,]\n\npriors = set_prior(\"normal(0,4)\", class = \"Intercept\")\n\nfit_first &lt;- brm(Sepal.Width ~ 1,\n     data = iris_first,\n     family = gaussian(),\n     prior = priors,\n     sample_prior = TRUE,\n     silent = 2,\n     refresh = 0\n)\n\ndraws_first = as_draws_array(fit_first)[,1,, drop = TRUE]"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#use-posterior-as-prior",
+    "href": "lectures/bayesian-inference.html#use-posterior-as-prior",
+    "title": "Bayesian Inference",
+    "section": "Use Posterior As Prior",
+    "text": "Use Posterior As Prior\n\nsamples_first = rbind(\n  data.frame(type = \"prior\",\n             samples = as.numeric(draws_first[, \"prior_Intercept\"])),\n  data.frame(type = \"posterior\",\n             samples = as.numeric(draws_first[, \"b_Intercept\"]))\n)\n\nmu_prior = mean(samples_first$samples[samples_first$type == \"posterior\"])\nsd_prior = sd(samples_first$samples[samples_first$type == \"posterior\"])\n\npriors = set_prior(\n  paste(\"normal(\", mu_prior, \",\", sd_prior, \")\", sep = \"\"),\n  class = \"Intercept\"\n)"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#first-experiment",
+    "href": "lectures/bayesian-inference.html#first-experiment",
+    "title": "Bayesian Inference",
+    "section": "First Experiment",
+    "text": "First Experiment"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#second-experiment",
+    "href": "lectures/bayesian-inference.html#second-experiment",
+    "title": "Bayesian Inference",
+    "section": "Second Experiment",
+    "text": "Second Experiment"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#multivariate-animal-model-in-brms",
+    "href": "lectures/bayesian-inference.html#multivariate-animal-model-in-brms",
+    "title": "Bayesian Inference",
+    "section": "Multivariate Animal Model In brms",
+    "text": "Multivariate Animal Model In brms\n\\[\n\\mathbf{Y} = \\mathbf{XB} + \\mathbf{ZU} + \\mathbf{E}\n\\]\nLikelihood:\n\\[\n\\mathbf{Y} \\sim \\mathbf{MVN}(\\mathbf{XB} + \\mathbf{ZU}, \\boldsymbol{\\Sigma}_E)\n\\]"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#priors",
+    "href": "lectures/bayesian-inference.html#priors",
+    "title": "Bayesian Inference",
+    "section": "Priors",
+    "text": "Priors\n\\[\n\\begin{align}\n\\mathbf{B} &\\sim \\mathbf{U}(-Inf,Inf)\\\\\n\\mathbf{U} &\\sim \\mathbf{MVN}(\\mathbf{0}, \\boldsymbol{\\Sigma}_U) \\\\\n\\boldsymbol{\\Sigma}_U &= \\mathbf{diag(S)}_U\\boldsymbol{\\Omega}_U\\mathbf{diag(S)}_U \\\\\n\\mathbf{S}_U &\\sim \\mathbf{Cauchy}(0,5)\\\\\n\\boldsymbol{\\Omega}_U &\\sim \\mathbf{LKJ}(1)\n\\end{align}\n\\]"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#brms-animal-model-formula",
+    "href": "lectures/bayesian-inference.html#brms-animal-model-formula",
+    "title": "Bayesian Inference",
+    "section": "brms Animal Model Formula",
+    "text": "brms Animal Model Formula\n\nbrmf &lt;- brmsformula(\n  mvbind(\n    milk,\n    fat\n  ) ~ 1 +\n  factor(lact) +\n  herd +\n  (1|g|gr(idA, cov = A)) + # additive genetic effect\n  (1|p|gr(id)), # PE effect\n  data = D,\n  data2 = list(A = A)\n)"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#check-stan-code",
+    "href": "lectures/bayesian-inference.html#check-stan-code",
+    "title": "Bayesian Inference",
+    "section": "Check Stan Code",
+    "text": "Check Stan Code\n\nstanCode &lt;- make_stancode(\n  formula = brmf,\n  data = D,\n  data2 = list(A = A),\n  family = gaussian()\n)\n\nstanData &lt;- make_standata(\n  formula = brmf,\n  data = D,\n  data2 = list(A = A),\n  family = gaussian()\n)\n\nstanCode"
+  },
+  {
+    "objectID": "lectures/bayesian-inference.html#resources",
+    "href": "lectures/bayesian-inference.html#resources",
+    "title": "Bayesian Inference",
+    "section": "Resources",
+    "text": "Resources\nStan\nbrms\nhttps://github.com/cheuerde/AnimalModels\nhttps://github.com/cheuerde/BayesianAlphabet"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#genomic-prediction",
+    "href": "lectures/genomic-prediction.html#genomic-prediction",
+    "title": "Genomic Prediction",
+    "section": "Genomic Prediction",
+    "text": "Genomic Prediction\nGenomic Prediction entails methods to predict breeding values based on phenotypic and molecular (SNP) data.\n\\[\n\\mathbf{\\hat{g}} = \\mathbf{M}\\mathbf{\\hat{a}}\n\\]\nwhere \\(\\mathbf{M}\\) is a matrix of genotype scores in {0,1,2} coding and \\(\\mathbf{\\hat{a}}\\) is a vector of average allele effects for those markers."
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#estimated-breeding-value",
+    "href": "lectures/genomic-prediction.html#estimated-breeding-value",
+    "title": "Genomic Prediction",
+    "section": "Estimated Breeding Value",
+    "text": "Estimated Breeding Value\nThe estimated breeding value (\\(\\mathbf{\\hat{g}}\\), EBV) is the sum of all the average allele effects for the marker alleles the individual carries."
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#ridge-regression-blup",
+    "href": "lectures/genomic-prediction.html#ridge-regression-blup",
+    "title": "Genomic Prediction",
+    "section": "Ridge Regression BLUP",
+    "text": "Ridge Regression BLUP\nThe average allele effects can be estimated directly in a mixed effects model, treating the them as random effects:\n\\[\n\\mathbf{y} = \\mu + \\mathbf{M}\\mathbf{{a}} + \\mathbf{e}\n\\]"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#center-marker-covariates",
+    "href": "lectures/genomic-prediction.html#center-marker-covariates",
+    "title": "Genomic Prediction",
+    "section": "Center Marker Covariates",
+    "text": "Center Marker Covariates\nIf the individuals in \\(\\mathbf{M}\\) are not representative of the general population, we have to adjust the breeding values obtained from the marker effects by the population mean.\n\\[\n\\mathbf{\\hat{g}} = \\mathbf{M}\\mathbf{\\hat{a}} - 2\\mathbf{p}\\mathbf{\\hat{a}}\n\\]"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#gblup",
+    "href": "lectures/genomic-prediction.html#gblup",
+    "title": "Genomic Prediction",
+    "section": "GBLUP",
+    "text": "GBLUP\nInstead of doing regression on the marker covariates directly, we can also generate a Gaussian Kernel from those covariates.\n\\[\n\\mathbf{G} = \\frac{\\bar{\\mathbf{M}}\\bar{\\mathbf{M}}'}{tr(\\bar{\\mathbf{M}}\\bar{\\mathbf{M}}') / n}\n\\]"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#equivalent-models",
+    "href": "lectures/genomic-prediction.html#equivalent-models",
+    "title": "Genomic Prediction",
+    "section": "Equivalent Models",
+    "text": "Equivalent Models\nThe GBLUP model becomes:\n\\[\n\\mathbf{y} = \\mu + \\mathbf{g} + \\mathbf{e}\n\\]\nwith \\(\\mathbf{g} \\sim MVN(0, \\mathbf{G}\\sigma_{g}^{2}\\)).\nBoth models, the ridge regression marker model and GBLUP are statistically identical and result in the same EBVs."
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#prepare-wheat-data",
+    "href": "lectures/genomic-prediction.html#prepare-wheat-data",
+    "title": "Genomic Prediction",
+    "section": "Prepare Wheat Data",
+    "text": "Prepare Wheat Data\n\nlibrary(BGLR)\nlibrary(rrBLUP)\nlibrary(ggplot2)\nlibrary(knitr)\nlibrary(lattice)\ntheme_set(theme_minimal(base_size = 16))\n\n# load the \"wheat\" data set from BGLR\ndata(wheat)\n\n# extract one phenotype\ny = wheat.Y[,1]\n\n# the marker covariates\nM = wheat.X\n\n# average allele frequencies (\"p\")\np = colMeans(M) / 2"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#genomic-relationship-matrix",
+    "href": "lectures/genomic-prediction.html#genomic-relationship-matrix",
+    "title": "Genomic Prediction",
+    "section": "Genomic Relationship Matrix",
+    "text": "Genomic Relationship Matrix\n\n# center our Marker covariates\nMc = sweep(\n     x = M,\n     MARGIN = 2,\n     FUN = \"-\",\n     STATS = 2 * p\n     )\n\n# compute G matrix\nMMdash = Mc %*% t(Mc)\nG = MMdash / mean(diag(MMdash))\n\n# look at genomic relationships\nlevelplot(G)"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#ridge-regression-marker-model",
+    "href": "lectures/genomic-prediction.html#ridge-regression-marker-model",
+    "title": "Genomic Prediction",
+    "section": "Ridge Regression Marker Model",
+    "text": "Ridge Regression Marker Model\n\n# design matrix for random effects (marker covariates become design matrix)\nZ = Mc\n\n# design matrix for fixed effects (only intercept)\nX = array(1, dim = c(length(y), 1))\n\n# fit the model with ML\nmod_rr = mixed.solve(\n         y = y,\n         X = X,\n         Z = Z,\n         method = \"ML\"\n         )"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#marker-effects-and-ebv",
+    "href": "lectures/genomic-prediction.html#marker-effects-and-ebv",
+    "title": "Genomic Prediction",
+    "section": "Marker Effects And EBV",
+    "text": "Marker Effects And EBV\n\n# extract marker effects\na_rr = mod_rr$u\n\n# predict breeding values from the model\ng_rr = as.numeric(Z %*% a_rr)\n\n# extract variance components\nvar_a_rr = mod_rr$Vu\nvar_e_rr = mod_rr$Ve\n\n# rescale the marker-effect variance component\nvar_g_rr = mod_rr$Vu * mean(diag(MMdash))"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#gblup-model",
+    "href": "lectures/genomic-prediction.html#gblup-model",
+    "title": "Genomic Prediction",
+    "section": "GBLUP Model",
+    "text": "GBLUP Model\n\n# fit the model with ML\nmod_gblup = mixed.solve(\n         y = y,\n         K = G,\n         method = \"ML\"\n         )\n\n# extract breeding values\ng_gblup = mod_gblup$u"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#marker-effects-from-gblup",
+    "href": "lectures/genomic-prediction.html#marker-effects-from-gblup",
+    "title": "Genomic Prediction",
+    "section": "Marker Effects From GBLUP",
+    "text": "Marker Effects From GBLUP\n\nMMdash_tmp = MMdash\ndiag(MMdash_tmp) = diag(MMdash_tmp) + 0.00001\na_gblup = as.numeric(t(Mc) %*% solve(MMdash_tmp, g_gblup))\n\n# extract variance components\nvar_g_gblup = mod_gblup$Vu\nvar_e_gblup = mod_gblup$Ve"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#check-equivalence",
+    "href": "lectures/genomic-prediction.html#check-equivalence",
+    "title": "Genomic Prediction",
+    "section": "Check Equivalence",
+    "text": "Check Equivalence\n\n# plot breeding values from both models\nplot(g_rr, g_gblup)\n\n\n\n\n\n\n\n# plot marker effects from both models\nplot(a_rr, a_gblup)"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#variance-components",
+    "href": "lectures/genomic-prediction.html#variance-components",
+    "title": "Genomic Prediction",
+    "section": "Variance Components",
+    "text": "Variance Components\n\nvc = rbind(\n       data.frame(\n        model = \"Marker Model\",\n        var_g = var_g_rr,\n        var_e = var_e_rr,\n        h2 = var_g_rr / (var_g_rr + var_e_rr)\n        ),\n       data.frame(\n        model = \"GBLUP\",\n        var_g = var_g_gblup,\n        var_e = var_e_gblup,\n        h2 = var_g_gblup / (var_g_gblup + var_e_gblup)\n        )\n       )\n\nkable(vc, digits = 3)\n\n\n\n\nmodel\nvar_g\nvar_e\nh2\n\n\n\n\nMarker Model\n0.605\n0.539\n0.529\n\n\nGBLUP\n0.605\n0.539\n0.529"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#cross-validation",
+    "href": "lectures/genomic-prediction.html#cross-validation",
+    "title": "Genomic Prediction",
+    "section": "Cross Validation",
+    "text": "Cross Validation\nIn order to assess the performance of our genomic prediction models, we can run a cross validation scheme, in which we train marker effects with a subset of the data and predict the EBVs of the left out samples based on the training model."
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#cross-validation-helper",
+    "href": "lectures/genomic-prediction.html#cross-validation-helper",
+    "title": "Genomic Prediction",
+    "section": "Cross-Validation Helper",
+    "text": "Cross-Validation Helper\n\ncCV &lt;- function(y, folds=5, reps=1, matrix=FALSE, seed=NULL) {\n\n  if(!is.vector(y)) stop(\"y must be a vector\")\n  if(folds &lt; 2) stop(\"'folds' must be larger than one\")\n  if(reps &lt; 1) reps = 1\n\n  reps = as.integer(reps)\n  folds = as.integer(folds)\n\n  isy &lt;- (1:length(y))[!is.na(y)]\n\n  n_vec &lt;- rep(NA,folds)\n  start &lt;- rep(NA,folds)\n  end &lt;- rep(NA,folds)\n\n  n_vec[1:(folds-1)] &lt;- round(length(isy)/folds,digits=0)\n  n_vec[folds] &lt;- length(isy) - sum(n_vec[1:(folds-1)])\n\n  for(j in 1:folds) {\n\n    if(j==1) {\n      start[j] = 1\n    } else {\n      start[j] = end[j-1]+1\n    }\n\n    end[j] = sum(n_vec[1:j])\n  }\n\n  count=0\n  cv_pheno &lt;- list(folds*reps)\n\n  if(missing(seed)) seed = as.integer((as.double(Sys.time())*1000+Sys.getpid()) %% 2^31)\n  set.seed(seed)\n\n  for(i in 1:reps) {\n\n    ids &lt;- sample(isy,length(isy),replace=F)\n\n    for(j in 1:folds) {\n      count=count+1\n      y_temp = y\n      y_temp[ids[start[j]:end[j]]] &lt;- NA\n      cv_pheno[[count]] &lt;- y_temp\n    }\n  }\n\n  if(matrix) {\n    return(matrix(unlist(cv_pheno),nrow=length(y),ncol=length(cv_pheno),byrow=FALSE))\n  } else {\n    return(cv_pheno)\n  }\n\n}"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#cross-validation-fit",
+    "href": "lectures/genomic-prediction.html#cross-validation-fit",
+    "title": "Genomic Prediction",
+    "section": "Cross-Validation Fit",
+    "text": "Cross-Validation Fit\n\ncvs = cCV(y, folds = 5, reps = 10)\n\npreds = list()\nfor(i in 1:length(cvs)) {\n\n  this_pred = mixed.solve(y = cvs[[i]], K = G)$u[is.na(cvs[[i]])]\n  this_y = y[is.na(cvs[[i]])]\n  preds[[i]] = data.frame(pred = this_pred, y = this_y)\n\n}\n\ncors = unlist(lapply(preds, function(x) cor(x$pred, x$y)))"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#bayesian-alphabet",
+    "href": "lectures/genomic-prediction.html#bayesian-alphabet",
+    "title": "Genomic Prediction",
+    "section": "Bayesian Alphabet",
+    "text": "Bayesian Alphabet\nA linear mixed model with a series of independent random effects has the following form:\n\\[\n\\mathbf{y} = \\mathbf{X\\boldsymbol{\\beta}} + \\mathbf{Z}_{1}\\mathbf{u}_1 + \\mathbf{Z}_{2}\\mathbf{u}_2 + \\mathbf{Z}_{3}\\mathbf{u}_3 + \\dots + \\mathbf{Z}_{k}\\mathbf{u}_{k} + \\mathbf{e}\n\\]"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#spike-and-slap",
+    "href": "lectures/genomic-prediction.html#spike-and-slap",
+    "title": "Genomic Prediction",
+    "section": "Spike-And-Slap",
+    "text": "Spike-And-Slap\nIn the Bayesian Alphabet, the prior distributions on the marker effects is altered to generally generate a sparsity pattern on the marker effects, meaning feature selection.\nThis feature selection is achieved by using spike-and-slap mixture priors."
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#priors",
+    "href": "lectures/genomic-prediction.html#priors",
+    "title": "Genomic Prediction",
+    "section": "Priors",
+    "text": "Priors"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#bayescpi---threshold-model",
+    "href": "lectures/genomic-prediction.html#bayescpi---threshold-model",
+    "title": "Genomic Prediction",
+    "section": "\\(BayesC\\pi\\) - Threshold Model",
+    "text": "\\(BayesC\\pi\\) - Threshold Model\n\\[\n\\begin{aligned}\n\\mathbf{y} &\\sim \\mathbf{B}(1,\\mathbf{p})\\\\\n\\mathbf{p} &= probit(\\mathbf{X}\\boldsymbol{\\beta} + \\mathbf{Zu}) \\\\\n\\boldsymbol{\\beta} &\\sim \\mathbf{U}(-Inf,Inf) \\\\\n\\mathbf{u} &\\sim \\pi N(0,{\\sigma_u}^2) + (1-\\pi)\\delta_0 \\\\\n\\pi &\\sim U(0,1) \\\\\n{\\sigma_u}^2 &\\sim Gamma(1,0.01)\n\\end{aligned}\n\\]"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#definition",
+    "href": "lectures/maximum-likelihood.html#definition",
+    "title": "Maximum Likelihood",
+    "section": "Definition",
+    "text": "Definition\nOptimization asked:\n\\[\n\\widehat{\\theta} = \\operatorname*{arg\\,min}_{\\theta} f(\\theta)\n\\]\nMaximum likelihood chooses \\(f(\\theta)\\) from a probability model."
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#likelihood-and-log-likelihood",
+    "href": "lectures/maximum-likelihood.html#likelihood-and-log-likelihood",
+    "title": "Maximum Likelihood",
+    "section": "Likelihood And Log-Likelihood",
+    "text": "Likelihood And Log-Likelihood\nFor independent observations:\n\\[\nL(\\theta; \\mathbf{y})\n=\n\\prod_{i=1}^{n} p(y_i \\mid \\theta)\n\\]\n\\[\n\\log L(\\theta; \\mathbf{y})\n=\n\\sum_{i=1}^{n} \\log p(y_i \\mid \\theta)\n\\]"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#in-r",
+    "href": "lectures/maximum-likelihood.html#in-r",
+    "title": "Maximum Likelihood",
+    "section": "In R",
+    "text": "In R\noptim() minimizes.\nSo we return the negative log-likelihood:\n\\[\n-\\sum_{i=1}^{n} \\log p(y_i \\mid \\theta)\n\\]"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#normal-distribution",
+    "href": "lectures/maximum-likelihood.html#normal-distribution",
+    "title": "Maximum Likelihood",
+    "section": "Normal Distribution",
+    "text": "Normal Distribution\n\\[\nf(y) = \\frac{1}{\\sigma \\sqrt{2\\pi}}\n\\exp\\left[-\\frac{1}{2}\\left(\\frac{y - \\mu}{\\sigma}\\right)^2\\right]\n\\]\n\nlibrary(ggplot2)\nlibrary(knitr)\ntheme_set(theme_minimal(base_size = 16))\n\ncurve(\n  dnorm(\n    x,\n    mean = 10,\n    sd = 2\n  ),\n  from = 0,\n  to = 20,\n  main = \"Normal distribution\"\n)"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#finding-the-mean",
+    "href": "lectures/maximum-likelihood.html#finding-the-mean",
+    "title": "Maximum Likelihood",
+    "section": "Finding The Mean",
+    "text": "Finding The Mean\n\nset.seed(2026)\n\nmean = 4.5\nsd = 1\nn = 1000\n\ny = rnorm(n, mean, sd)\n\nlik &lt;- function(par, y, sd = 1) {\n  mean = par[1]\n  L &lt;- dnorm(x = y, mean = mean, sd = sd, log = TRUE)\n  return(-sum(L))\n}"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#estimate-mean",
+    "href": "lectures/maximum-likelihood.html#estimate-mean",
+    "title": "Maximum Likelihood",
+    "section": "Estimate Mean",
+    "text": "Estimate Mean\n\np &lt;- c(0)\nnames(p) &lt;- c(\"mu\")\n\nML &lt;- optim(p, lik, y = y)\n\ndata.frame(\n  method = c(\"Maximum Likelihood\", \"Empirical\"),\n  mu = c(ML$par, mean(y))\n)\n\n               method       mu\nmu Maximum Likelihood 4.514063\n            Empirical 4.513767"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#finding-mean-and-standard-deviation",
+    "href": "lectures/maximum-likelihood.html#finding-mean-and-standard-deviation",
+    "title": "Maximum Likelihood",
+    "section": "Finding Mean And Standard Deviation",
+    "text": "Finding Mean And Standard Deviation\n\nsdlik &lt;- function(x) {\n  res &lt;- 0\n  if (x &gt; 0) res = 1\n  return(log(res))\n}\n\nlik &lt;- function(par, y) {\n  mean = par[1]\n  sd = par[2]\n\n  L2 &lt;- sdlik(sd)\n  if (!is.finite(L2)) return(Inf)\n\n  L1 &lt;- dnorm(x = y, mean = mean, sd = sd, log = TRUE)\n  return(-sum(L1 + L2))\n}"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#estimate-both",
+    "href": "lectures/maximum-likelihood.html#estimate-both",
+    "title": "Maximum Likelihood",
+    "section": "Estimate Both",
+    "text": "Estimate Both\n\np &lt;- c(0, 1)\nnames(p) &lt;- c(\"mu\", \"sigma\")\n\nML &lt;- optim(p, lik, y = y, method = \"Nelder-Mead\")\n\nrbind(\n  ML = ML$par,\n  empirical = c(mean(y), sd(y))\n)\n\n                mu     sigma\nML        4.513704 0.9893471\nempirical 4.513767 0.9901296"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#estimating-correlation",
+    "href": "lectures/maximum-likelihood.html#estimating-correlation",
+    "title": "Maximum Likelihood",
+    "section": "Estimating Correlation",
+    "text": "Estimating Correlation\n\nlibrary(mvtnorm)\n\ncorlik &lt;- function(x) {\n  res &lt;- 0\n  if (x &gt;= -1 & x &lt;= 1) res = 1\n  return(log(res))\n}\n\nvarlik &lt;- function(x) {\n  res &lt;- 0\n  if (x &gt; 0) res = 1\n  return(log(res))\n}"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#build-sigma",
+    "href": "lectures/maximum-likelihood.html#build-sigma",
+    "title": "Maximum Likelihood",
+    "section": "Build Sigma",
+    "text": "Build Sigma\n\nlik &lt;- function(par, y) {\n  L2 &lt;- corlik(par[5])\n  L3 &lt;- varlik(par[3])\n  L4 &lt;- varlik(par[4])\n  if (!all(is.finite(c(L2, L3, L4)))) return(Inf)\n\n  covAB &lt;- par[5] * (sqrt(par[3]) * sqrt(par[4]))\n  sigma &lt;- array(c(par[3], covAB, covAB, par[4]), dim = c(2, 2))\n\n  L1 &lt;- tryCatch(\n    dmvnorm(x = y, mean = c(par[1], par[2]), sigma = sigma, log = TRUE),\n    error = function(e) -Inf\n  )\n  if (!all(is.finite(L1))) return(Inf)\n\n  return(-sum(L1 + L2 + L3 + L4))\n}"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#estimate-correlation",
+    "href": "lectures/maximum-likelihood.html#estimate-correlation",
+    "title": "Maximum Likelihood",
+    "section": "Estimate Correlation",
+    "text": "Estimate Correlation\n\nmethods = c(\"Nelder-Mead\", \"BFGS\", \"CG\", \"L-BFGS-B\", \"SANN\", \"Brent\")\n\np &lt;- c(0, 0, 1, 1, 0.2)\nnames(p) &lt;- c(\"mu1\", \"mu2\", \"tauA\", \"tauB\", \"rho\")\n\nset.seed(2026)\nn = 10\ntauA &lt;- 3\ntauB &lt;- 10\nrho = 0.7\ncovAB &lt;- rho * (sqrt(tauA) * sqrt(tauB))\nmuA &lt;- 5\nmuB &lt;- 20\nsigma &lt;- array(c(tauA, covAB, covAB, tauB), dim = c(2, 2))\nY &lt;- rmvnorm(n, c(muA, muB), sigma)\n\nML &lt;- optim(p, lik, y = Y, method = methods[1])\n\nres &lt;- as.list(ML$par)\nres$covAB &lt;- res$rho * (sqrt(res$tauA) * sqrt(res$tauB))"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#correlation-results",
+    "href": "lectures/maximum-likelihood.html#correlation-results",
+    "title": "Maximum Likelihood",
+    "section": "Correlation Results",
+    "text": "Correlation Results\n\nout &lt;- rbind(\n  unlist(res),\n  c(colMeans(Y), var(Y[, 1]), var(Y[, 2]), cor(Y)[1, 2], cov(Y)[1, 2])\n)\ncolnames(out) &lt;- names(res)\nrownames(out) &lt;- c(\"ML\", \"empirical\")\n\nout\n\n                 mu1       mu2      tauA      tauB       rho     covAB\nML        -22.484565  7.335499 70.379671 14.028532 0.8906419 27.985487\nempirical   4.069481 18.482726  1.771725  9.252332 0.5003696  2.025885"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#animal-model-likelihood",
+    "href": "lectures/maximum-likelihood.html#animal-model-likelihood",
+    "title": "Maximum Likelihood",
+    "section": "Animal Model Likelihood",
+    "text": "Animal Model Likelihood\n\\[\n\\mathbf{y}\n=\n\\mathbf{X}\\mathbf{b}\n+ \\mathbf{a}\n+ \\mathbf{e}\n\\]\n\\[\n\\mathbf{y} \\sim MVN(\\mathbf{X}\\mathbf{b},\n\\mathbf{A}\\sigma_a^2 + \\mathbf{I}\\sigma_e^2)\n\\]"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#animal-likelihood",
+    "href": "lectures/maximum-likelihood.html#animal-likelihood",
+    "title": "Maximum Likelihood",
+    "section": "Animal Likelihood",
+    "text": "Animal Likelihood\n\nset.seed(2026)\nn_animals &lt;- 20\nA &lt;- diag(n_animals)\nA[1, 2] &lt;- A[2, 1] &lt;- 0.5\nA[3, 4] &lt;- A[4, 3] &lt;- 0.5\nA[5, 6] &lt;- A[6, 5] &lt;- 0.25\n\nX &lt;- matrix(1, n_animals, 1)\nb &lt;- 30\nvar_a &lt;- 4\nvar_e &lt;- 9\n\na &lt;- as.numeric(rmvnorm(1, mean = rep(0, n_animals), sigma = A * var_a))\ny &lt;- as.numeric(X %*% b + a + rnorm(n_animals, sd = sqrt(var_e)))"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#animal-likelihood-function",
+    "href": "lectures/maximum-likelihood.html#animal-likelihood-function",
+    "title": "Maximum Likelihood",
+    "section": "Animal Likelihood Function",
+    "text": "Animal Likelihood Function\n\nlik &lt;- function(par, y, X, A) {\n  L2 &lt;- varlik(par[1])\n  L3 &lt;- varlik(par[2])\n  if (!all(is.finite(c(L2, L3)))) return(Inf)\n\n  b &lt;- matrix(c(par[3:(2 + ncol(X))]), ncol = 1)\n  G &lt;- A * par[2]\n  R &lt;- diag(length(y)) * par[1]\n  V &lt;- G + R\n  mu &lt;- X %*% b\n\n  L1 &lt;- tryCatch(\n    dmvnorm(x = y, mean = as.numeric(mu), sigma = V, log = TRUE),\n    error = function(e) -Inf\n  )\n  if (!all(is.finite(L1))) return(Inf)\n\n  return(-sum(L1 + L2 + L3))\n}"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#estimate-animal-model",
+    "href": "lectures/maximum-likelihood.html#estimate-animal-model",
+    "title": "Maximum Likelihood",
+    "section": "Estimate Animal Model",
+    "text": "Estimate Animal Model\n\ngetp &lt;- function(X, b = 0.1, var_e = 1, var_a = 1) {\n  p &lt;- c(var_e, var_a, rep(b, ncol(X)))\n  names(p) &lt;- c(\"var_e\", \"var_a\", paste(\"b\", 0:(ncol(X) - 1), sep = \"\"))\n  p\n}\n\nML &lt;- optim(getp(X, b = mean(y)), lik, X = X, A = A, y = y, method = methods[1])\n\nrbind(\n  ML = ML$par,\n  true = c(var_e, var_a, b)\n)\n\n        var_e        var_a       b0\nML   8.290905 7.775783e-06 30.09605\ntrue 9.000000 4.000000e+00 30.00000"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#take-home",
+    "href": "lectures/maximum-likelihood.html#take-home",
+    "title": "Maximum Likelihood",
+    "section": "Take-Home",
+    "text": "Take-Home\nMaximum likelihood is not a new algorithm.\nIt is an optimization problem where the objective comes from a probability model.\nThe code pattern is:\n\ncollect unknowns in p,\nbuild the likelihood in lik(),\nrun optim(p, lik, ...)."
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#exercises",
+    "href": "lectures/maximum-likelihood.html#exercises",
+    "title": "Maximum Likelihood",
+    "section": "Exercises",
+    "text": "Exercises\n\nChange starting values in p.\nEstimate mu and sigma with n = 20.\nChange the true value of rho.\nChange the relationship matrix A."
+  },
+  {
+    "objectID": "lectures/optimization.html#formal-definition",
+    "href": "lectures/optimization.html#formal-definition",
+    "title": "Optimization",
+    "section": "Formal Definition",
+    "text": "Formal Definition\nChoose values that make a function small or large.\nWe start with an ordinary function.\nLeast squares and likelihood come later.\n\nStart by demystifying optimization. The students should leave this first section knowing that the topic is not a separate mathematical island. It is the machinery underneath regression, likelihood, and later Bayesian computation."
+  },
+  {
+    "objectID": "lectures/optimization.html#basic-optimization-problem",
+    "href": "lectures/optimization.html#basic-optimization-problem",
+    "title": "Optimization",
+    "section": "Basic Optimization Problem",
+    "text": "Basic Optimization Problem\n\nObjective\n\nLet \\(\\theta\\) be the parameter vector and \\(\\Theta\\) the allowed parameter space.\n\\[\n\\widehat{\\theta}\n\\in\n\\operatorname*{arg\\,min}_{\\theta \\in \\Theta}\nf(\\theta)\n\\]\nFor maximization:\n\\[\n\\operatorname*{arg\\,max}_{\\theta \\in \\Theta} f(\\theta)\n=\n\\operatorname*{arg\\,min}_{\\theta \\in \\Theta} -f(\\theta)\n\\]\n\nDefine the notation carefully. The students need to know that the result of an optimization is the parameter value, not the objective value itself."
+  },
+  {
+    "objectID": "lectures/optimization.html#symbol-map",
+    "href": "lectures/optimization.html#symbol-map",
+    "title": "Optimization",
+    "section": "Symbol Map",
+    "text": "Symbol Map\n\n\n\n\n\n\n\nSymbol\nMeaning\n\n\n\n\n\\(\\theta\\)\nCandidate value or parameter vector.\n\n\n\\(\\Theta\\)\nAllowed set of candidate values.\n\n\n\\(\\widehat{\\theta}\\)\nOptimizing value, marked with a hat because it has been selected or estimated.\n\n\n\\(f(\\theta)\\)\nObjective function.\n\n\n\\(\\operatorname*{arg\\,min}\\)\nInput value that gives the minimum.\n\n\n\\(\\operatorname*{arg\\,max}\\)\nInput value that gives the maximum.\n\n\n\n\nThe key distinction is between the input that solves the problem and the objective value itself. The optimizer returns the input value."
+  },
+  {
+    "objectID": "lectures/optimization.html#constrained-problems",
+    "href": "lectures/optimization.html#constrained-problems",
+    "title": "Optimization",
+    "section": "Constrained Problems",
+    "text": "Constrained Problems\n\nConstraints\n\n\\[\n\\begin{aligned}\n\\widehat{\\theta}\n&\\in\n\\operatorname*{arg\\,min}_{\\theta \\in \\Theta}\nf(\\theta) \\\\\n\\text{subject to } g_j(\\theta) &\\le 0, \\quad j = 1,\\dots,m \\\\\nh_k(\\theta) &= 0, \\quad k = 1,\\dots,r\n\\end{aligned}\n\\]\nConstraints narrow the parameter space.\n\n\n\nSymbol\nMeaning\n\n\n\n\n\\(g_j(\\theta)\\)\nThe \\(j\\)th inequality constraint.\n\n\n\\(h_k(\\theta)\\)\nThe \\(k\\)th equality constraint.\n\n\n\\(m\\)\nNumber of inequality constraints.\n\n\n\\(r\\)\nNumber of equality constraints.\n\n\n\n\nUse this slide to connect to bounds in optim(method = \"L-BFGS-B\"). We do not need to go deep into constrained optimization algorithms yet."
+  },
+  {
+    "objectID": "lectures/optimization.html#the-workflow",
+    "href": "lectures/optimization.html#the-workflow",
+    "title": "Optimization",
+    "section": "The Workflow",
+    "text": "The Workflow\n\nModel Objective Search Constraints\n\n\nDefine the model.\nDefine the objective.\nSearch for good parameter values.\nCheck whether the result makes statistical and biological sense.\n\n\nKeep coming back to this four-step structure. It is the common language for the rest of the course."
+  },
+  {
+    "objectID": "lectures/optimization.html#first-example-fence-a-paddock",
+    "href": "lectures/optimization.html#first-example-fence-a-paddock",
+    "title": "Optimization",
+    "section": "First Example: Fence A Paddock",
+    "text": "First Example: Fence A Paddock\n\nModel\n\n80 meters of fence.\n\\[\n2w + 2\\ell = 80\n\\]\nDivide by 2:\n\\[\nw + \\ell = 40\n\\]\nSo:\n\\[\n\\ell(w) = 40 - w\n\\]\n\\[\nA(w) = w(40 - w)\n\\]\n\nThis should be the first concrete optimization example. No statistics, no residuals, no loss. Just a readable function with an obvious interpretation."
+  },
+  {
+    "objectID": "lectures/optimization.html#area-function",
+    "href": "lectures/optimization.html#area-function",
+    "title": "Optimization",
+    "section": "Area Function",
+    "text": "Area Function\n\nObjective\n\n\nfence_m &lt;- 80\n\npaddock_area &lt;- function(width, fence_m = 80) {\n  length &lt;- fence_m / 2 - width\n  width * length\n}\n\ncandidate_widths &lt;- seq(0, fence_m / 2, length.out = 200)\narea_grid &lt;- data.frame(width = candidate_widths)\narea_grid$area &lt;- paddock_area(area_grid$width, fence_m)\nbest_grid &lt;- area_grid[which.max(area_grid$area), ]\n\n\\[\n\\widehat{w}\n=\n\\operatorname*{arg\\,max}_{0 \\le w \\le 40}\nA(w)\n\\]"
+  },
+  {
+    "objectID": "lectures/optimization.html#objective-shape",
+    "href": "lectures/optimization.html#objective-shape",
+    "title": "Optimization",
+    "section": "Objective Shape",
+    "text": "Objective Shape\n\nggplot(area_grid, aes(width, area)) +\n  geom_line(color = \"#155f7a\", linewidth = 1.2) +\n  geom_point(data = best_grid, color = \"#c46a2b\", size = 4) +\n  labs(x = \"Paddock width (m)\", y = \"Area (m2)\")"
+  },
+  {
+    "objectID": "lectures/optimization.html#search-with-optim",
+    "href": "lectures/optimization.html#search-with-optim",
+    "title": "Optimization",
+    "section": "Search With optim()",
+    "text": "Search With optim()\n\nSearch\n\nMaximize area by minimizing negative area.\n\nnegative_area &lt;- function(width, fence_m = 80) {\n  -paddock_area(width, fence_m)\n}\n\nfit_area &lt;- optim(\n  par = 10,\n  fn = negative_area,\n  fence_m = fence_m,\n  method = \"L-BFGS-B\",\n  lower = 0,\n  upper = fence_m / 2\n)\n\ndata.frame(width = fit_area$par, area = -fit_area$value)\n\n  width area\n1    20  400"
+  },
+  {
+    "objectID": "lectures/optimization.html#bound-constraints",
+    "href": "lectures/optimization.html#bound-constraints",
+    "title": "Optimization",
+    "section": "Bound Constraints",
+    "text": "Bound Constraints\n\nConstraints\n\n\\[\n0 \\le w \\le 40\n\\]\n\nfit_tight_area &lt;- optim(\n  par = 10,\n  fn = negative_area,\n  fence_m = fence_m,\n  method = \"L-BFGS-B\",\n  lower = 0,\n  upper = 15\n)\n\ndata.frame(\n  problem = c(\"correct bounds\", \"too-tight upper bound\"),\n  width = c(fit_area$par, fit_tight_area$par),\n  area = c(-fit_area$value, -fit_tight_area$value)\n)\n\n                problem width area\n1        correct bounds    20  400\n2 too-tight upper bound    15  375"
+  },
+  {
+    "objectID": "lectures/optimization.html#where-this-goes-next",
+    "href": "lectures/optimization.html#where-this-goes-next",
+    "title": "Optimization",
+    "section": "Where This Goes Next",
+    "text": "Where This Goes Next\n\nModel\n\nSame workflow, statistical objectives:\n\n\n\nTopic\nObjective\n\n\n\n\nLeast squares\nMinimize squared vertical distances.\n\n\nMaximum likelihood\nMaximize probability of the observed data.\n\n\nAnimal models\nBalance fit and shrinkage.\n\n\n\n\nStop the optimization lecture here. The first statistical example belongs in the least-squares chapter, where it can be introduced visually before the closed-form solution."
+  },
+  {
+    "objectID": "lectures/optimization.html#exercises",
+    "href": "lectures/optimization.html#exercises",
+    "title": "Optimization",
+    "section": "Exercises",
+    "text": "Exercises\n\nChange the amount of fencing.\nChange the starting value in optim().\nMake the upper bound too tight.\nRewrite the objective for a three-sided fence."
+  }
+]
