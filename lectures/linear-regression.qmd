@@ -257,6 +257,36 @@ $$
 \min_{\beta} \left( \sum_{i=1}^{n} \left( y_i - \beta_0 - \sum_{j=1}^{p} \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^{p} \beta_j^2 \right)
 $$
 
+The ridge parameter $\lambda$ controls how much we penalize large marker effects.
+We can visualize the solution space by evaluating the ridge criterion on a grid of $\lambda$ values.
+
+## Closed-Form Ridge Solution {.smaller}
+
+For a fixed $\lambda$, ridge regression has an analytical solution.
+
+If $X = [\mathbf{1}, M]$ and the intercept is not penalized:
+
+$$
+\hat{\beta}_{\lambda} =
+\left(X'X + \lambda P\right)^{-1}X'y,
+\qquad
+P =
+\begin{bmatrix}
+0 & 0 \\
+0 & I_p
+\end{bmatrix}.
+$$
+
+With centered markers and centered response, as in the next code block:
+
+$$
+\hat{u}_{\lambda} =
+\left(\frac{M_c'M_c}{n} + \lambda I_p\right)^{-1}
+\frac{M_c'y_c}{n},
+\qquad
+\hat{\beta}_0 = \bar{y}.
+$$
+
 ## Lambda Solution Space {.smaller}
 
 ```{r}

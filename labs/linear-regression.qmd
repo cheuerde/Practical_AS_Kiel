@@ -246,6 +246,29 @@ $$
 The ridge parameter $\lambda$ controls how much we penalize large marker effects.
 We can visualize the solution space by evaluating the ridge criterion on a grid of $\lambda$ values.
 
+For a fixed $\lambda$, ridge regression still has a closed-form solution. If we write the design matrix as $X = [\mathbf{1}, M]$ and do not penalize the intercept, then
+
+$$
+\hat{\beta}_{\lambda} =
+\left(X'X + \lambda P\right)^{-1}X'y,
+\qquad
+P =
+\begin{bmatrix}
+0 & 0 \\
+0 & I_p
+\end{bmatrix}.
+$$
+
+In the code below, the marker matrix and response are centered first, so this reduces to
+
+$$
+\hat{u}_{\lambda} =
+\left(\frac{M_c'M_c}{n} + \lambda I_p\right)^{-1}
+\frac{M_c'y_c}{n},
+\qquad
+\hat{\beta}_0 = \bar{y}.
+$$
+
 ```{r ridge_lambda_visual}
 library(BGLR)
 
