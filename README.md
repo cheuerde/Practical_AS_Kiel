@@ -10,6 +10,14 @@ The repository is being moved from standalone R Markdown chapters to a Quarto-ba
 - `models/`: scripts that generate fitted model artifacts.
 - `artifacts/models/`: generated model artifacts used by labs and lectures.
 
+## Published Material
+
+The no-compile version is published as a static site:
+
+<https://cheuerde.github.io/Practical_AS_Kiel/>
+
+Labs are rendered as HTML pages, and each lab links to the matching RevealJS slide deck. Colleagues can use the site directly in a browser without installing R, Quarto, or the course package dependencies.
+
 ## Clone The Repository
 
 ```bash

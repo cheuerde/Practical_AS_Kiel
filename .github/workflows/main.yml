@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,8 +26,25 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install pak
+        run: |
+          Rscript -e '
+          repo <- Sys.getenv("RSPM", unset = "https://cloud.r-project.org")
+          if (!nzchar(repo)) repo <- "https://cloud.r-project.org"
+          install.packages("pak", repos = repo)
+          '
+
       - name: Install R dependencies
-        run: Rscript setup/install.R
+        run: |
+          Rscript -e '
+          source("R/packages.R")
+          packages <- course_packages()
+          pak::pkg_install(packages, ask = FALSE)
+          missing <- missing_packages(packages)
+          if (length(missing)) {
+            stop("Missing R packages after install: ", paste(missing, collapse = ", "))
+          }
+          '
 
       - name: Render Quarto site
         run: quarto render

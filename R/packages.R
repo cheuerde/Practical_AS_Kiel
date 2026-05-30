@@ -1,5 +1,14 @@
 course_repos <- function() {
-  cran <- getOption("repos")[["CRAN"]]
+  rspm <- Sys.getenv("RSPM", unset = "")
+  renv_override <- Sys.getenv("RENV_CONFIG_REPOS_OVERRIDE", unset = "")
+
+  cran <- if (nzchar(rspm)) {
+    rspm
+  } else if (nzchar(renv_override)) {
+    renv_override
+  } else {
+    getOption("repos")[["CRAN"]]
+  }
 
   if (is.null(cran) || identical(cran, "@CRAN@") || !nzchar(cran)) {
     cran <- "https://cloud.r-project.org"
@@ -76,6 +85,17 @@ install_missing_packages <- function(packages) {
 
   message("Installing missing packages: ", paste(missing, collapse = ", "))
   install.packages(missing, repos = course_repos())
+
+  still_missing <- missing_packages(packages)
+
+  if (length(still_missing)) {
+    stop(
+      "Failed to install required packages: ",
+      paste(still_missing, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
   invisible(missing)
 }
 
