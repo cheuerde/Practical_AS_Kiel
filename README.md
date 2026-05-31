@@ -18,6 +18,10 @@ The no-compile version is published as a static site:
 
 Labs are rendered as HTML pages, and each lab links to the matching RevealJS slide deck. Colleagues can use the site directly in a browser without installing R, Quarto, or the course package dependencies.
 
+PDF exports are published from the same GitHub Pages site:
+
+<https://cheuerde.github.io/Practical_AS_Kiel/downloads.html>
+
 ## Clone The Repository
 
 ```bash
@@ -53,6 +57,17 @@ quarto render
 ```
 
 The rendered site is written to `_site/`.
+
+## Build PDF Exports
+
+Render the site first, then build PDFs for sharing:
+
+```bash
+quarto render
+scripts/build-pdfs.sh
+```
+
+The PDFs and zip bundles are written to `_site/pdfs/`. Lab notes are rendered through Quarto Typst output; slides are printed from the rendered RevealJS HTML with headless Chrome.
 
 ## Present A Lecture
 

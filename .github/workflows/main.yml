@@ -49,6 +49,9 @@ jobs:
       - name: Render Quarto site
         run: quarto render
 
+      - name: Build PDF exports
+        run: scripts/build-pdfs.sh
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:

@@ -1,0 +1,26 @@
+---
+title: "Downloads"
+---
+
+# PDF Exports
+
+The browser site is the primary version of the course material. PDF exports are built automatically from the same source material and published here for offline sharing.
+
+## Bundles
+
+- [All PDFs](pdfs/advanced-statistics-lab-pdfs.zip)
+- [Lab notes only](pdfs/advanced-statistics-lab-notes.zip)
+- [Slides only](pdfs/advanced-statistics-lab-slides.zip)
+
+## Individual Files
+
+| Topic | Lab Notes | Slides |
+|---|---|---|
+| Introduction to R | [PDF](pdfs/labs/r-intro.pdf) | [PDF](pdfs/lectures/r-intro.pdf) |
+| Optimization | [PDF](pdfs/labs/optimization.pdf) | [PDF](pdfs/lectures/optimization.pdf) |
+| Maximum Likelihood | [PDF](pdfs/labs/maximum-likelihood.pdf) | [PDF](pdfs/lectures/maximum-likelihood.pdf) |
+| Linear Regression | [PDF](pdfs/labs/linear-regression.pdf) | [PDF](pdfs/lectures/linear-regression.pdf) |
+| Bayesian Inference | [PDF](pdfs/labs/bayesian-inference.pdf) | [PDF](pdfs/lectures/bayesian-inference.pdf) |
+| Genomic Prediction | [PDF](pdfs/labs/genomic-prediction.pdf) | [PDF](pdfs/lectures/genomic-prediction.pdf) |
+| Clustering | [PDF](pdfs/labs/clustering.pdf) | [PDF](pdfs/lectures/clustering.pdf) |
+| Multivariate Clustering | [PDF](pdfs/labs/multivariate-clustering.pdf) | [PDF](pdfs/lectures/multivariate-clustering.pdf) |

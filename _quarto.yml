@@ -3,6 +3,7 @@ project:
   output-dir: _site
   render:
     - index.qmd
+    - downloads.qmd
     - labs/*.qmd
     - lectures/*.qmd
 
@@ -15,6 +16,8 @@ website:
     left:
       - text: Home
         href: index.qmd
+      - text: Downloads
+        href: downloads.qmd
       - text: Labs
         menu:
           - text: Introduction to R
