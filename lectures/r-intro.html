@@ -357,17 +357,17 @@ Claas Heuer
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)</span>
 <span id="cb32-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(y)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> num [1:10] 0.94 -0.422 -0.852 0.782 1.037 ...</code></pre>
+<pre><code> num [1:10] -0.775 -0.503 1.123 -0.824 1.583 ...</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a aria-hidden="true" tabindex="-1"></a>D <span class="ot">=</span> <span class="fu">matrix</span>(<span class="at">data =</span> <span class="fu">rnorm</span>(<span class="dv">5</span> <span class="sc">*</span> <span class="dv">5</span>), <span class="at">nrow =</span> <span class="dv">5</span>, <span class="at">ncol =</span> <span class="dv">5</span>)</span>
 <span id="cb34-2"><a aria-hidden="true" tabindex="-1"></a>D</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>           [,1]       [,2]       [,3]       [,4]       [,5]
-[1,] -2.2153940  1.2068161  0.3856771 -0.7060726  1.2108538
-[2,] -0.2066167  0.6087701 -2.0697038 -0.1029963  0.7491026
-[3,] -0.7123613 -0.6905677  0.3504965 -0.6409511 -0.7333024
-[4,] -1.0628546  0.8516926  0.0163154  0.4327210 -0.8639295
-[5,] -0.4771185  0.1777331  0.9936057  0.4095861  0.4688998</code></pre>
+<pre><code>           [,1]       [,2]        [,3]       [,4]       [,5]
+[1,] -1.0947200 -1.6864584 -0.36647287 -0.4245857 -0.1828272
+[2,] -1.0048981 -0.2281715 -0.04786797  0.7488563 -0.6177607
+[3,] -0.6136573  0.6747762 -0.29883223 -0.4020819  0.4380955
+[4,]  0.4388820 -1.2880571  0.20272960 -0.6785895  0.4287005
+[5,]  0.2703989 -0.4033161 -0.19445280  0.1717627  1.3157590</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(D)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -381,12 +381,12 @@ Claas Heuer
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">colMeans</span>(D)</span>
 <span id="cb38-2"><a aria-hidden="true" tabindex="-1"></a>means</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.9348690  0.4308888 -0.0647218 -0.1215426  0.1663249</code></pre>
+<pre><code>[1] -0.4007989 -0.5862454 -0.1409793 -0.1169276  0.2763934</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">diag</span>(D)</span>
 <span id="cb40-2"><a aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -2.2153940  0.6087701  0.3504965  0.4327210  0.4688998</code></pre>
+<pre><code>[1] -1.0947200 -0.2281715 -0.2988322 -0.6785895  1.3157590</code></pre>
 </div>
 </div>
 </section>
@@ -483,11 +483,11 @@ Claas Heuer
 <span id="cb51-3"><a aria-hidden="true" tabindex="-1"></a>our_mean <span class="ot">=</span> <span class="fu">my_mean_function</span>(x)</span>
 <span id="cb51-4"><a aria-hidden="true" tabindex="-1"></a>our_mean</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.52066</code></pre>
+<pre><code>[1] 23.31251</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.52066</code></pre>
+<pre><code>[1] 23.31251</code></pre>
 </div>
 </div>
 

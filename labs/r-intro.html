@@ -132,6 +132,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../downloads.html"> 
+<span class="menu-text">Downloads</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-labs" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Labs</span>
@@ -479,12 +483,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>D <span class="ot">=</span> <span class="fu">matrix</span>(<span class="at">data =</span> <span class="fu">rnorm</span>(<span class="dv">5</span><span class="sc">*</span><span class="dv">5</span>), <span class="at">nrow =</span> <span class="dv">5</span>, <span class="at">ncol =</span> <span class="dv">5</span>)</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>D</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>           [,1]       [,2]       [,3]          [,4]       [,5]
-[1,]  1.2526797 -1.5998992  0.5514994 -1.141255e-01  1.9963268
-[2,] -0.0475952  0.2410510 -1.5821355  4.393511e-06 -1.3373521
-[3,] -1.4216340 -0.1966338 -0.7063919 -6.971917e-01  0.9379761
-[4,] -2.0712443 -0.3269447  0.8974941  8.501566e-01  0.3109446
-[5,]  0.4012008  1.1004449  1.3582636  5.130313e-01 -0.1633946</code></pre>
+<pre><code>            [,1]       [,2]       [,3]       [,4]        [,5]
+[1,]  0.29873977 -0.4323317  0.1045445 -1.3552230 -0.01502658
+[2,]  0.54502832  0.4463922  1.4606684 -1.3262767 -1.16853669
+[3,]  0.04123784 -0.9189856 -0.7897692 -0.8987012 -0.89577779
+[4,]  0.45513781 -0.3579415  0.7898885 -0.1113947 -0.27429876
+[5,] -0.83202854  0.6546879  1.0122781 -0.1800984  0.58061588</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(D)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -494,13 +498,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">colMeans</span>(D)</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>means</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.3773186 -0.1563964  0.1037459  0.1103750  0.3489002</code></pre>
+<pre><code>[1]  0.1016230 -0.1216357  0.5155221 -0.7743388 -0.3546048</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extract diagonal</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">diag</span>(D)</span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  1.2526797  0.2410510 -0.7063919  0.8501566 -0.1633946</code></pre>
+<pre><code>[1]  0.2987398  0.4463922 -0.7897692 -0.1113947  0.5806159</code></pre>
 </div>
 </div>
 </section>
@@ -612,12 +616,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>our_mean <span class="ot">=</span> <span class="fu">my_mean_function</span>(x)</span>
 <span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>our_mean</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.58817</code></pre>
+<pre><code>[1] 23.30005</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compare with R's built in function</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.58817</code></pre>
+<pre><code>[1] 23.30005</code></pre>
 </div>
 </div>
 
