@@ -39,7 +39,7 @@ The average allele effects can be estimated directly in a mixed effects model,
 treating the them as random effects:
 
 $$
-\mathbf{y} = \mu + \mathbf{M}\mathbf{{a}} + \mathbf{e}
+\mathbf{y} = \mu + \mathbf{M}\mathbf{a} + \mathbf{e}
 $$
 
 If the individuals in $\mathbf{M}$ are not representative of the general population (if they are top ranking
@@ -83,7 +83,7 @@ $$
 \mathbf{y} = \mu + \mathbf{g} + \mathbf{e}
 $$
 
-with $\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2}$).
+with $\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2})$.
 
 It is important to note that both models, the ridge regression marker model and GBLUP are statistically
 identical and result in the same EBVs. So we can chose the model that is most convenient to fit

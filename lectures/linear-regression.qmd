@@ -41,7 +41,9 @@ In ordinary least squares, we aim to find regression weights that minimize
 the mean squared error between predicted and observed values:
 
 $$
-\hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
+\hat{\beta} =
+\operatorname*{arg\,min}_{\beta}
+\sum_{i = 1}^{n} (y_i - x_i \beta)^2
 $$
 
 ## Least-Squares Geometry

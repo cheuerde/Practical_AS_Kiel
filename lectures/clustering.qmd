@@ -90,7 +90,7 @@ p = ggplot(dplot, aes(x = Value)) +
 p
 ```
 
-## Feature Distributions
+## Feature Distributions {.code-tight}
 
 ```{r}
 library(ggplot2)
@@ -123,7 +123,7 @@ $$
 
 Univariate normal distribution: $f(x) \sim N(\mu, \sigma^2)$.
 
-## Simulate Mixture Data
+## Simulate Mixture Data {.code-tight}
 
 ```{r}
 library(ggplot2)
@@ -158,7 +158,7 @@ ggplot(dplot, aes(x = y)) +
   geom_density(color = "#b3212d", linewidth = 1.1)
 ```
 
-## Stan Mixture Program
+## Stan Mixture Program {.code-tight}
 
 ```{r eval=FALSE}
 hcode =
@@ -213,9 +213,10 @@ sds = colMeans(out$tau)
 
 ![](../chapters/Figs/gauss_mixture_stan-2.png)
 
-## Fitted Mixture Densities
+## Fitted Mixture Densities {.code-tight}
 
 ```{r}
+#| fig-show: hide
 sim_density = rbind(
   data.frame(
     component = "Component 1",
@@ -235,7 +236,7 @@ sim_density = rbind(
 
 sim_density$density = with(sim_density, lambda * dnorm(y, mu, sigma))
 
-ggplot(dplot, aes(x = y)) +
+mixture_density_plot = ggplot(dplot, aes(x = y)) +
   geom_histogram(
     aes(y = after_stat(density)),
     bins = 50,
@@ -251,6 +252,15 @@ ggplot(dplot, aes(x = y)) +
   ) +
   scale_color_manual(values = c("Component 1" = "#0b5cad", "Component 2" = "#b3212d")) +
   labs(x = "y", y = "Density", color = NULL)
+
+mixture_density_plot
+```
+
+## Fitted Mixture Densities Plot
+
+```{r}
+#| echo: false
+mixture_density_plot
 ```
 
 ## Mixture Probability Helper
@@ -288,9 +298,10 @@ pl_mixture = RunMixture(iris$Petal.Length, k = 2, seed = seed)
 pw_mixture = RunMixture(iris$Petal.Width, k = 2, seed = seed)
 ```
 
-## Iris Mixture Densities
+## Iris Mixture Densities {.code-tight}
 
 ```{r}
+#| fig-show: hide
 iris_features = iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")]
 
 iris_density = do.call(
@@ -305,7 +316,7 @@ iris_density = do.call(
 iris_long = stack(iris_features)
 colnames(iris_long) = c("Value", "Feature")
 
-ggplot(iris_long, aes(x = Value)) +
+iris_density_plot = ggplot(iris_long, aes(x = Value)) +
   geom_histogram(
     aes(y = after_stat(density)),
     bins = 40,
@@ -322,6 +333,15 @@ ggplot(iris_long, aes(x = Value)) +
   scale_color_manual(values = c("Component 1" = "#0b5cad", "Component 2" = "#b3212d")) +
   facet_wrap(~ Feature, scales = "free") +
   labs(x = "Value", y = "Density", color = NULL)
+
+iris_density_plot
+```
+
+## Iris Mixture Densities Plot
+
+```{r}
+#| echo: false
+iris_density_plot
 ```
 
 ## Iris Mixture Probabilities

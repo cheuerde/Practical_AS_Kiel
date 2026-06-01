@@ -43,7 +43,7 @@ $$
 -\sum_{i=1}^{n} \log p(y_i \mid \theta)
 $$
 
-## Normal Distribution
+## Normal Distribution {.code-tight}
 
 $$
 f(y) = \frac{1}{\sigma \sqrt{2\pi}}
@@ -51,10 +51,27 @@ f(y) = \frac{1}{\sigma \sqrt{2\pi}}
 $$
 
 ```{r}
+#| fig-show: hide
 library(ggplot2)
 library(knitr)
 theme_set(theme_minimal(base_size = 16))
 
+curve(
+  dnorm(
+    x,
+    mean = 10,
+    sd = 2
+  ),
+  from = 0,
+  to = 20,
+  main = "Normal distribution"
+)
+```
+
+## Normal Density Plot
+
+```{r}
+#| echo: false
 curve(
   dnorm(
     x,

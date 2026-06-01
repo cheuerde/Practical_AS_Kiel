@@ -30,7 +30,7 @@ The average allele effects can be estimated directly in a mixed effects model,
 treating the them as random effects:
 
 $$
-\mathbf{y} = \mu + \mathbf{M}\mathbf{{a}} + \mathbf{e}
+\mathbf{y} = \mu + \mathbf{M}\mathbf{a} + \mathbf{e}
 $$
 
 ## Center Marker Covariates
@@ -60,7 +60,7 @@ $$
 \mathbf{y} = \mu + \mathbf{g} + \mathbf{e}
 $$
 
-with $\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2}$).
+with $\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2})$.
 
 Both models, the ridge regression marker model and GBLUP are statistically
 identical and result in the same EBVs.
