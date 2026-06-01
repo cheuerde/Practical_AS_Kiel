@@ -53,14 +53,14 @@
     "href": "lectures/r-intro.html#vectors-and-matrices",
     "title": "Introduction to R",
     "section": "Vectors And Matrices",
-    "text": "Vectors And Matrices\n\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\ny = rnorm(10)\nstr(y)\n\n num [1:10] -0.775 -0.503 1.123 -0.824 1.583 ...\n\nD = matrix(data = rnorm(5 * 5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]        [,3]       [,4]       [,5]\n[1,] -1.0947200 -1.6864584 -0.36647287 -0.4245857 -0.1828272\n[2,] -1.0048981 -0.2281715 -0.04786797  0.7488563 -0.6177607\n[3,] -0.6136573  0.6747762 -0.29883223 -0.4020819  0.4380955\n[4,]  0.4388820 -1.2880571  0.20272960 -0.6785895  0.4287005\n[5,]  0.2703989 -0.4033161 -0.19445280  0.1717627  1.3157590\n\nclass(D)\n\n[1] \"matrix\" \"array\""
+    "text": "Vectors And Matrices\n\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\ny = rnorm(10)\nstr(y)\n\n num [1:10] -0.214 1.657 0.667 0.623 -1.155 ...\n\nD = matrix(data = rnorm(5 * 5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]        [,3]       [,4]        [,5]\n[1,] -0.7921558  2.0568362 -1.41952524 -0.7012892 -0.81766062\n[2,]  0.7289979 -0.3126469 -2.00600863  1.4872646  1.60369377\n[3,] -0.3210123 -0.7584070 -0.06071815  1.1154392 -0.07323955\n[4,] -1.4789812  0.7974553  1.09052207 -0.5539862  0.03396357\n[5,]  0.4537841  1.5996937  0.89729598  1.4936323  1.21799820\n\nclass(D)\n\n[1] \"matrix\" \"array\""
   },
   {
     "objectID": "lectures/r-intro.html#matrix-helpers",
     "href": "lectures/r-intro.html#matrix-helpers",
     "title": "Introduction to R",
     "section": "Matrix Helpers",
-    "text": "Matrix Helpers\n\nmeans = colMeans(D)\nmeans\n\n[1] -0.4007989 -0.5862454 -0.1409793 -0.1169276  0.2763934\n\nd = diag(D)\nd\n\n[1] -1.0947200 -0.2281715 -0.2988322 -0.6785895  1.3157590"
+    "text": "Matrix Helpers\n\nmeans = colMeans(D)\nmeans\n\n[1] -0.2818735  0.6765863 -0.2996868  0.5682121  0.3929511\n\nd = diag(D)\nd\n\n[1] -0.79215578 -0.31264685 -0.06071815 -0.55398624  1.21799820"
   },
   {
     "objectID": "lectures/r-intro.html#data-exploration-and-visualization",
@@ -109,7 +109,7 @@
     "href": "lectures/r-intro.html#use-the-function",
     "title": "Introduction to R",
     "section": "Use The Function",
-    "text": "Use The Function\n\nx = rnorm(1000, mean = 23.42, sd = 4)\n\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.31251\n\nmean(x)\n\n[1] 23.31251"
+    "text": "Use The Function\n\nx = rnorm(1000, mean = 23.42, sd = 4)\n\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.57816\n\nmean(x)\n\n[1] 23.57816"
   },
   {
     "objectID": "lectures/multivariate-clustering.html#multivariate-clustering",
@@ -557,7 +557,7 @@
     "href": "labs/r-intro.html#vectors-and-matrices",
     "title": "Introduction to R",
     "section": "4.4 Vectors and Matrices",
-    "text": "4.4 Vectors and Matrices\nIn R, everything is a vector or a list or an array of vectors. A data.frame is a list of vectors of different types, a matrix is a list of vectors of a single type. A scalar is a vector of length 1.\n\n###########################\n### Vectos and Matrices ###\n###########################\n\n# integer vector of length one\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\n# numeric vector\ny = rnorm(10)\nstr(x)\n\n int 1\n\nx\n\n[1] 1\n\n#  matrix\nD = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)\nD\n\n            [,1]       [,2]       [,3]       [,4]        [,5]\n[1,]  0.29873977 -0.4323317  0.1045445 -1.3552230 -0.01502658\n[2,]  0.54502832  0.4463922  1.4606684 -1.3262767 -1.16853669\n[3,]  0.04123784 -0.9189856 -0.7897692 -0.8987012 -0.89577779\n[4,]  0.45513781 -0.3579415  0.7898885 -0.1113947 -0.27429876\n[5,] -0.83202854  0.6546879  1.0122781 -0.1800984  0.58061588\n\nclass(D)\n\n[1] \"matrix\" \"array\" \n\n# specialized functions can be applied to matrices\nmeans = colMeans(D)\nmeans\n\n[1]  0.1016230 -0.1216357  0.5155221 -0.7743388 -0.3546048\n\n# extract diagonal\nd = diag(D)\nd\n\n[1]  0.2987398  0.4463922 -0.7897692 -0.1113947  0.5806159"
+    "text": "4.4 Vectors and Matrices\nIn R, everything is a vector or a list or an array of vectors. A data.frame is a list of vectors of different types, a matrix is a list of vectors of a single type. A scalar is a vector of length 1.\n\n###########################\n### Vectos and Matrices ###\n###########################\n\n# integer vector of length one\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\n# numeric vector\ny = rnorm(10)\nstr(x)\n\n int 1\n\nx\n\n[1] 1\n\n#  matrix\nD = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]       [,3]       [,4]        [,5]\n[1,]  2.1710677 -0.4065511 -0.9488823 -0.4172666  0.14800339\n[2,] -0.5007581 -0.4055448 -0.2636764 -0.3660859 -1.52944149\n[3,] -0.1467179 -1.6199133 -0.7685052 -0.1460887  0.94736658\n[4,]  1.3559835  1.1192536 -1.3966513 -0.2225779  0.34573276\n[5,] -0.7029070  0.1625544  1.2500082 -0.7645399 -0.03315627\n\nclass(D)\n\n[1] \"matrix\" \"array\" \n\n# specialized functions can be applied to matrices\nmeans = colMeans(D)\nmeans\n\n[1]  0.43533361 -0.23004022 -0.42554141 -0.38331179 -0.02429901\n\n# extract diagonal\nd = diag(D)\nd\n\n[1]  2.17106768 -0.40554480 -0.76850522 -0.22257793 -0.03315627"
   },
   {
     "objectID": "labs/r-intro.html#data-exploration-and-visualization",
@@ -571,7 +571,7 @@
     "href": "labs/r-intro.html#writing-functions",
     "title": "Introduction to R",
     "section": "4.6 Writing Functions",
-    "text": "4.6 Writing Functions\nAll operators in R are functions, for instance + is just a special way of calling a function:\n\n# get help for a function\n?sum\n\n# get help for the function '+'\n?`+`\n\n# check the function definition for `+`\nfix(`+`)\n\nA function is an operation on input variables ($f(x)), the function can be anything interpretable by R. For example, this is how we can define a function that computes and returns the empirical mean (average) of a numeric vector:\n\nmy_mean_function = function(y) {\n\n    n = length(y)\n    sum = 0\n    for(i in 1:n) sum = sum + y[i]\n\n    mean = sum / n\n\n    return(mean)\n\n}\n\nWe can now use that function inside R for estimating means on any input vector y for which the the operators + and / are defined.\n\n# generate random vector\nx = rnorm(1000, mean = 23.42, sd = 4)\n\n# calculate mean with our function\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.30005\n\n# compare with R's built in function\nmean(x)\n\n[1] 23.30005"
+    "text": "4.6 Writing Functions\nAll operators in R are functions, for instance + is just a special way of calling a function:\n\n# get help for a function\n?sum\n\n# get help for the function '+'\n?`+`\n\n# check the function definition for `+`\nfix(`+`)\n\nA function is an operation on input variables ($f(x)), the function can be anything interpretable by R. For example, this is how we can define a function that computes and returns the empirical mean (average) of a numeric vector:\n\nmy_mean_function = function(y) {\n\n    n = length(y)\n    sum = 0\n    for(i in 1:n) sum = sum + y[i]\n\n    mean = sum / n\n\n    return(mean)\n\n}\n\nWe can now use that function inside R for estimating means on any input vector y for which the the operators + and / are defined.\n\n# generate random vector\nx = rnorm(1000, mean = 23.42, sd = 4)\n\n# calculate mean with our function\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.32124\n\n# compare with R's built in function\nmean(x)\n\n[1] 23.32124"
   },
   {
     "objectID": "labs/multivariate-clustering.html",
