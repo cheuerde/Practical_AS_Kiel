@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-472e7d90eea24336bc8a1c72a1cef582.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-6098df969b2460e171d7ab0828b0d99c.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -214,7 +214,9 @@ Claas Heuer
 <p>Linear Regression deals with fitting predicted values based on input features and regression weights to observations.</p>
 <p>In ordinary least squares, we aim to find regression weights that minimize the mean squared error between predicted and observed values:</p>
 <p><span class="math display">\[
-\hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
+\hat{\beta} =
+\operatorname*{arg\,min}_{\beta}
+\sum_{i = 1}^{n} (y_i - x_i \beta)^2
 \]</span></p>
 </section>
 <section id="least-squares-geometry" class="slide level2">

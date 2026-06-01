@@ -312,7 +312,7 @@ window.Quarto = {
 <h1 data-number="2"><span class="header-section-number">2</span> Ridge Regression BLUP</h1>
 <p>The average allele effects can be estimated directly in a mixed effects model, treating the them as random effects:</p>
 <p><span class="math display">\[
-\mathbf{y} = \mu + \mathbf{M}\mathbf{{a}} + \mathbf{e}
+\mathbf{y} = \mu + \mathbf{M}\mathbf{a} + \mathbf{e}
 \]</span></p>
 <p>If the individuals in <span class="math inline">\(\mathbf{M}\)</span> are not representative of the general population (if they are top ranking individuals only, for example), we have to adjust the breeding values obtained from the marker effects by the population mean. In genomics, the population mean can be descriped by the allele frequencies in the general population:</p>
 <p><span class="math display">\[
@@ -335,7 +335,7 @@ p_i =  \frac{\sum_{i = 1}^{p}  m_{b_i}}{n},
 <p><span class="math display">\[
 \mathbf{y} = \mu + \mathbf{g} + \mathbf{e}
 \]</span></p>
-<p>with <span class="math inline">\(\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2}\)</span>).</p>
+<p>with <span class="math inline">\(\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2})\)</span>.</p>
 <p>It is important to note that both models, the ridge regression marker model and GBLUP are statistically identical and result in the same EBVs. So we can chose the model that is most convenient to fit computationally.</p>
 </section>
 <section id="gblup-examples-in-r" class="level1" data-number="4">

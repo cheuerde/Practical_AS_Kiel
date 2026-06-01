@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-472e7d90eea24336bc8a1c72a1cef582.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-6098df969b2460e171d7ab0828b0d99c.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -225,7 +225,7 @@ Claas Heuer
 <h2>Ridge Regression BLUP</h2>
 <p>The average allele effects can be estimated directly in a mixed effects model, treating the them as random effects:</p>
 <p><span class="math display">\[
-\mathbf{y} = \mu + \mathbf{M}\mathbf{{a}} + \mathbf{e}
+\mathbf{y} = \mu + \mathbf{M}\mathbf{a} + \mathbf{e}
 \]</span></p>
 </section>
 <section id="center-marker-covariates" class="slide level2">
@@ -248,7 +248,7 @@ Claas Heuer
 <p><span class="math display">\[
 \mathbf{y} = \mu + \mathbf{g} + \mathbf{e}
 \]</span></p>
-<p>with <span class="math inline">\(\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2}\)</span>).</p>
+<p>with <span class="math inline">\(\mathbf{g} \sim MVN(0, \mathbf{G}\sigma_{g}^{2})\)</span>.</p>
 <p>Both models, the ridge regression marker model and GBLUP are statistically identical and result in the same EBVs.</p>
 </section>
 <section id="prepare-wheat-data" class="slide level2">

@@ -298,7 +298,9 @@ window.Quarto = {
 <h1 data-number="1"><span class="header-section-number">1</span> Linear Regression</h1>
 <p>Linear Regression deals with fitting predicted values based on input features and regression weights to observations. In ordinary least squares, we aim to find regression weights that minimize the mean squared error between predicted and observed values:</p>
 <p><span class="math display">\[
-\hat{\beta} = arg min \sum_{i = 1}^{n}  (y_i - x_i \beta_i)^2
+\hat{\beta} =
+\operatorname*{arg\,min}_{\beta}
+\sum_{i = 1}^{n} (y_i - x_i \beta)^2
 \]</span></p>
 <p>In the regression plots below, the vertical segments show residuals <span class="math inline">\(e_i = y_i - \hat{y}_i\)</span>. A small toy plot first isolates what the “squares” in least squares mean.</p>
 <div class="cell">

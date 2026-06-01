@@ -53,14 +53,14 @@
     "href": "lectures/r-intro.html#vectors-and-matrices",
     "title": "Introduction to R",
     "section": "Vectors And Matrices",
-    "text": "Vectors And Matrices\n\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\ny = rnorm(10)\nstr(y)\n\n num [1:10] -0.214 1.657 0.667 0.623 -1.155 ...\n\nD = matrix(data = rnorm(5 * 5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]        [,3]       [,4]        [,5]\n[1,] -0.7921558  2.0568362 -1.41952524 -0.7012892 -0.81766062\n[2,]  0.7289979 -0.3126469 -2.00600863  1.4872646  1.60369377\n[3,] -0.3210123 -0.7584070 -0.06071815  1.1154392 -0.07323955\n[4,] -1.4789812  0.7974553  1.09052207 -0.5539862  0.03396357\n[5,]  0.4537841  1.5996937  0.89729598  1.4936323  1.21799820\n\nclass(D)\n\n[1] \"matrix\" \"array\""
+    "text": "Vectors And Matrices\n\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\ny = rnorm(10)\nstr(y)\n\n num [1:10] -0.6588 -0.2889 0.0847 1.4714 0.0139 ...\n\nD = matrix(data = rnorm(5 * 5), nrow = 5, ncol = 5)\nD\n\n           [,1]        [,2]        [,3]        [,4]       [,5]\n[1,] -0.6340910  0.92068999  0.20202515 -0.89231290  1.1737426\n[2,]  0.8626869 -1.27317327  0.01580746  0.88362306 -0.5524931\n[3,]  1.7873326  2.10748999  1.33039736 -1.70807868 -0.2631091\n[4,] -0.9274102  0.63603345 -1.46394140  0.03020573  0.4391256\n[5,]  0.6330386 -0.05443828  1.53446063  0.16462659  0.7232650\n\nclass(D)\n\n[1] \"matrix\" \"array\""
   },
   {
     "objectID": "lectures/r-intro.html#matrix-helpers",
     "href": "lectures/r-intro.html#matrix-helpers",
     "title": "Introduction to R",
     "section": "Matrix Helpers",
-    "text": "Matrix Helpers\n\nmeans = colMeans(D)\nmeans\n\n[1] -0.2818735  0.6765863 -0.2996868  0.5682121  0.3929511\n\nd = diag(D)\nd\n\n[1] -0.79215578 -0.31264685 -0.06071815 -0.55398624  1.21799820"
+    "text": "Matrix Helpers\n\nmeans = colMeans(D)\nmeans\n\n[1]  0.3443114  0.4673204  0.3237498 -0.3043872  0.3041062\n\nd = diag(D)\nd\n\n[1] -0.63409104 -1.27317327  1.33039736  0.03020573  0.72326496"
   },
   {
     "objectID": "lectures/r-intro.html#data-exploration-and-visualization",
@@ -109,7 +109,7 @@
     "href": "lectures/r-intro.html#use-the-function",
     "title": "Introduction to R",
     "section": "Use The Function",
-    "text": "Use The Function\n\nx = rnorm(1000, mean = 23.42, sd = 4)\n\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.57816\n\nmean(x)\n\n[1] 23.57816"
+    "text": "Use The Function\n\nx = rnorm(1000, mean = 23.42, sd = 4)\n\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.49462\n\nmean(x)\n\n[1] 23.49462"
   },
   {
     "objectID": "lectures/multivariate-clustering.html#multivariate-clustering",
@@ -242,7 +242,7 @@
     "href": "lectures/linear-regression.html#linear-regression",
     "title": "Linear Regression",
     "section": "Linear Regression",
-    "text": "Linear Regression\nLinear Regression deals with fitting predicted values based on input features and regression weights to observations.\nIn ordinary least squares, we aim to find regression weights that minimize the mean squared error between predicted and observed values:\n\\[\n\\hat{\\beta} = arg min \\sum_{i = 1}^{n}  (y_i - x_i \\beta_i)^2\n\\]"
+    "text": "Linear Regression\nLinear Regression deals with fitting predicted values based on input features and regression weights to observations.\nIn ordinary least squares, we aim to find regression weights that minimize the mean squared error between predicted and observed values:\n\\[\n\\hat{\\beta} =\n\\operatorname*{arg\\,min}_{\\beta}\n\\sum_{i = 1}^{n} (y_i - x_i \\beta)^2\n\\]"
   },
   {
     "objectID": "lectures/linear-regression.html#least-squares-geometry",
@@ -487,7 +487,14 @@
     "href": "lectures/clustering.html#fitted-mixture-densities",
     "title": "Clustering",
     "section": "Fitted Mixture Densities",
-    "text": "Fitted Mixture Densities\n\nsim_density = rbind(\n  data.frame(\n    component = \"Component 1\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = theta,\n    mu = mu1,\n    sigma = sd1\n  ),\n  data.frame(\n    component = \"Component 2\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = 1 - theta,\n    mu = mu2,\n    sigma = sd2\n  )\n)\n\nsim_density$density = with(sim_density, lambda * dnorm(y, mu, sigma))\n\nggplot(dplot, aes(x = y)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 50,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = sim_density,\n    aes(x = y, y = density, color = component),\n    linewidth = 1.25,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  labs(x = \"y\", y = \"Density\", color = NULL)"
+    "text": "Fitted Mixture Densities\n\nsim_density = rbind(\n  data.frame(\n    component = \"Component 1\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = theta,\n    mu = mu1,\n    sigma = sd1\n  ),\n  data.frame(\n    component = \"Component 2\",\n    y = seq(min(y) - sd(y), max(y) + sd(y), length.out = 400),\n    lambda = 1 - theta,\n    mu = mu2,\n    sigma = sd2\n  )\n)\n\nsim_density$density = with(sim_density, lambda * dnorm(y, mu, sigma))\n\nmixture_density_plot = ggplot(dplot, aes(x = y)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 50,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = sim_density,\n    aes(x = y, y = density, color = component),\n    linewidth = 1.25,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  labs(x = \"y\", y = \"Density\", color = NULL)\n\nmixture_density_plot"
+  },
+  {
+    "objectID": "lectures/clustering.html#fitted-mixture-densities-plot",
+    "href": "lectures/clustering.html#fitted-mixture-densities-plot",
+    "title": "Clustering",
+    "section": "Fitted Mixture Densities Plot",
+    "text": "Fitted Mixture Densities Plot"
   },
   {
     "objectID": "lectures/clustering.html#mixture-probability-helper",
@@ -508,7 +515,14 @@
     "href": "lectures/clustering.html#iris-mixture-densities",
     "title": "Clustering",
     "section": "Iris Mixture Densities",
-    "text": "Iris Mixture Densities\n\niris_features = iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")]\n\niris_density = do.call(\n  rbind,\n  lapply(names(iris_features), function(feature) {\n    out = mixture_preview(iris_features[[feature]], k = 2, seed = 242151)\n    out$Feature = feature\n    out\n  })\n)\n\niris_long = stack(iris_features)\ncolnames(iris_long) = c(\"Value\", \"Feature\")\n\nggplot(iris_long, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = iris_density,\n    aes(x = Value, y = density, color = component),\n    linewidth = 1.15,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\", color = NULL)"
+    "text": "Iris Mixture Densities\n\niris_features = iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")]\n\niris_density = do.call(\n  rbind,\n  lapply(names(iris_features), function(feature) {\n    out = mixture_preview(iris_features[[feature]], k = 2, seed = 242151)\n    out$Feature = feature\n    out\n  })\n)\n\niris_long = stack(iris_features)\ncolnames(iris_long) = c(\"Value\", \"Feature\")\n\niris_density_plot = ggplot(iris_long, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#e8edf0\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_line(\n    data = iris_density,\n    aes(x = Value, y = density, color = component),\n    linewidth = 1.15,\n    inherit.aes = FALSE\n  ) +\n  scale_color_manual(values = c(\"Component 1\" = \"#0b5cad\", \"Component 2\" = \"#b3212d\")) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\", color = NULL)\n\niris_density_plot"
+  },
+  {
+    "objectID": "lectures/clustering.html#iris-mixture-densities-plot",
+    "href": "lectures/clustering.html#iris-mixture-densities-plot",
+    "title": "Clustering",
+    "section": "Iris Mixture Densities Plot",
+    "text": "Iris Mixture Densities Plot"
   },
   {
     "objectID": "lectures/clustering.html#iris-mixture-probabilities",
@@ -557,7 +571,7 @@
     "href": "labs/r-intro.html#vectors-and-matrices",
     "title": "Introduction to R",
     "section": "4.4 Vectors and Matrices",
-    "text": "4.4 Vectors and Matrices\nIn R, everything is a vector or a list or an array of vectors. A data.frame is a list of vectors of different types, a matrix is a list of vectors of a single type. A scalar is a vector of length 1.\n\n###########################\n### Vectos and Matrices ###\n###########################\n\n# integer vector of length one\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\n# numeric vector\ny = rnorm(10)\nstr(x)\n\n int 1\n\nx\n\n[1] 1\n\n#  matrix\nD = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]       [,3]       [,4]        [,5]\n[1,]  2.1710677 -0.4065511 -0.9488823 -0.4172666  0.14800339\n[2,] -0.5007581 -0.4055448 -0.2636764 -0.3660859 -1.52944149\n[3,] -0.1467179 -1.6199133 -0.7685052 -0.1460887  0.94736658\n[4,]  1.3559835  1.1192536 -1.3966513 -0.2225779  0.34573276\n[5,] -0.7029070  0.1625544  1.2500082 -0.7645399 -0.03315627\n\nclass(D)\n\n[1] \"matrix\" \"array\" \n\n# specialized functions can be applied to matrices\nmeans = colMeans(D)\nmeans\n\n[1]  0.43533361 -0.23004022 -0.42554141 -0.38331179 -0.02429901\n\n# extract diagonal\nd = diag(D)\nd\n\n[1]  2.17106768 -0.40554480 -0.76850522 -0.22257793 -0.03315627"
+    "text": "4.4 Vectors and Matrices\nIn R, everything is a vector or a list or an array of vectors. A data.frame is a list of vectors of different types, a matrix is a list of vectors of a single type. A scalar is a vector of length 1.\n\n###########################\n### Vectos and Matrices ###\n###########################\n\n# integer vector of length one\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\n# numeric vector\ny = rnorm(10)\nstr(x)\n\n int 1\n\nx\n\n[1] 1\n\n#  matrix\nD = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]       [,3]       [,4]       [,5]\n[1,] -1.1304822  1.7754094  0.3869728 -0.1701024  0.2849612\n[2,] -0.2862822 -0.5558928  0.9863807 -1.8184317 -0.9857760\n[3,]  1.5648816  0.8072052 -0.2573684  0.8143222  0.3058701\n[4,] -0.4198694  0.5853321 -0.5402244 -1.5815970 -1.1137239\n[5,] -0.2880533  1.4022262  0.9889771  1.6707660  0.6688779\n\nclass(D)\n\n[1] \"matrix\" \"array\" \n\n# specialized functions can be applied to matrices\nmeans = colMeans(D)\nmeans\n\n[1] -0.1119611  0.8028560  0.3129476 -0.2170086 -0.1679581\n\n# extract diagonal\nd = diag(D)\nd\n\n[1] -1.1304822 -0.5558928 -0.2573684 -1.5815970  0.6688779"
   },
   {
     "objectID": "labs/r-intro.html#data-exploration-and-visualization",
@@ -571,7 +585,7 @@
     "href": "labs/r-intro.html#writing-functions",
     "title": "Introduction to R",
     "section": "4.6 Writing Functions",
-    "text": "4.6 Writing Functions\nAll operators in R are functions, for instance + is just a special way of calling a function:\n\n# get help for a function\n?sum\n\n# get help for the function '+'\n?`+`\n\n# check the function definition for `+`\nfix(`+`)\n\nA function is an operation on input variables ($f(x)), the function can be anything interpretable by R. For example, this is how we can define a function that computes and returns the empirical mean (average) of a numeric vector:\n\nmy_mean_function = function(y) {\n\n    n = length(y)\n    sum = 0\n    for(i in 1:n) sum = sum + y[i]\n\n    mean = sum / n\n\n    return(mean)\n\n}\n\nWe can now use that function inside R for estimating means on any input vector y for which the the operators + and / are defined.\n\n# generate random vector\nx = rnorm(1000, mean = 23.42, sd = 4)\n\n# calculate mean with our function\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.32124\n\n# compare with R's built in function\nmean(x)\n\n[1] 23.32124"
+    "text": "4.6 Writing Functions\nAll operators in R are functions, for instance + is just a special way of calling a function:\n\n# get help for a function\n?sum\n\n# get help for the function '+'\n?`+`\n\n# check the function definition for `+`\nfix(`+`)\n\nA function is an operation on input variables ($f(x)), the function can be anything interpretable by R. For example, this is how we can define a function that computes and returns the empirical mean (average) of a numeric vector:\n\nmy_mean_function = function(y) {\n\n    n = length(y)\n    sum = 0\n    for(i in 1:n) sum = sum + y[i]\n\n    mean = sum / n\n\n    return(mean)\n\n}\n\nWe can now use that function inside R for estimating means on any input vector y for which the the operators + and / are defined.\n\n# generate random vector\nx = rnorm(1000, mean = 23.42, sd = 4)\n\n# calculate mean with our function\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.4085\n\n# compare with R's built in function\nmean(x)\n\n[1] 23.4085"
   },
   {
     "objectID": "labs/multivariate-clustering.html",
@@ -1012,7 +1026,7 @@
     "href": "lectures/genomic-prediction.html#ridge-regression-blup",
     "title": "Genomic Prediction",
     "section": "Ridge Regression BLUP",
-    "text": "Ridge Regression BLUP\nThe average allele effects can be estimated directly in a mixed effects model, treating the them as random effects:\n\\[\n\\mathbf{y} = \\mu + \\mathbf{M}\\mathbf{{a}} + \\mathbf{e}\n\\]"
+    "text": "Ridge Regression BLUP\nThe average allele effects can be estimated directly in a mixed effects model, treating the them as random effects:\n\\[\n\\mathbf{y} = \\mu + \\mathbf{M}\\mathbf{a} + \\mathbf{e}\n\\]"
   },
   {
     "objectID": "lectures/genomic-prediction.html#center-marker-covariates",
@@ -1033,7 +1047,7 @@
     "href": "lectures/genomic-prediction.html#equivalent-models",
     "title": "Genomic Prediction",
     "section": "Equivalent Models",
-    "text": "Equivalent Models\nThe GBLUP model becomes:\n\\[\n\\mathbf{y} = \\mu + \\mathbf{g} + \\mathbf{e}\n\\]\nwith \\(\\mathbf{g} \\sim MVN(0, \\mathbf{G}\\sigma_{g}^{2}\\)).\nBoth models, the ridge regression marker model and GBLUP are statistically identical and result in the same EBVs."
+    "text": "Equivalent Models\nThe GBLUP model becomes:\n\\[\n\\mathbf{y} = \\mu + \\mathbf{g} + \\mathbf{e}\n\\]\nwith \\(\\mathbf{g} \\sim MVN(0, \\mathbf{G}\\sigma_{g}^{2})\\).\nBoth models, the ridge regression marker model and GBLUP are statistically identical and result in the same EBVs."
   },
   {
     "objectID": "lectures/genomic-prediction.html#prepare-wheat-data",
@@ -1167,6 +1181,13 @@
     "title": "Maximum Likelihood",
     "section": "Normal Distribution",
     "text": "Normal Distribution\n\\[\nf(y) = \\frac{1}{\\sigma \\sqrt{2\\pi}}\n\\exp\\left[-\\frac{1}{2}\\left(\\frac{y - \\mu}{\\sigma}\\right)^2\\right]\n\\]\n\nlibrary(ggplot2)\nlibrary(knitr)\ntheme_set(theme_minimal(base_size = 16))\n\ncurve(\n  dnorm(\n    x,\n    mean = 10,\n    sd = 2\n  ),\n  from = 0,\n  to = 20,\n  main = \"Normal distribution\"\n)"
+  },
+  {
+    "objectID": "lectures/maximum-likelihood.html#normal-density-plot",
+    "href": "lectures/maximum-likelihood.html#normal-density-plot",
+    "title": "Maximum Likelihood",
+    "section": "Normal Density Plot",
+    "text": "Normal Density Plot"
   },
   {
     "objectID": "lectures/maximum-likelihood.html#finding-the-mean",
