@@ -268,3 +268,39 @@ $code-block-bg: #fffaf1;
 .theme-switcher select:focus {
   border-color: var(--course-accent);
 }
+
+html.reveal-print .reveal .slides section:has(> img.r-stretch) > .cell > .sourceCode,
+html.reveal-print .reveal .slides section:has(.cell-output-display img) .cell > .sourceCode {
+  display: none !important;
+}
+
+html.reveal-print .reveal .slides section:has(> img.r-stretch) > .cell,
+html.reveal-print .reveal .slides section:has(.cell-output-display img) .cell {
+  margin: 0;
+}
+
+html.reveal-print .reveal .slides section > img.r-stretch {
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: 96% !important;
+  object-fit: contain;
+}
+
+html.reveal-print .reveal .slides section .cell-output-display {
+  overflow: visible !important;
+}
+
+html.reveal-print .reveal .slides section .cell-output-display figure,
+html.reveal-print .reveal .slides section .cell-output-display p {
+  margin: 0;
+}
+
+html.reveal-print .reveal .slides section .cell-output-display img {
+  display: block;
+  margin: 0.25rem auto;
+  max-height: 520px;
+  max-width: 96%;
+  object-fit: contain;
+  width: auto;
+}
