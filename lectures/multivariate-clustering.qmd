@@ -122,6 +122,7 @@ for(i in 1:k) {
 ## Bivariate Clustering Preview
 
 ```{r}
+#| fig-show: hide
 library(ggplot2)
 theme_set(theme_minimal(base_size = 16))
 
@@ -135,10 +136,19 @@ set.seed(2026)
 km_iris = kmeans(iris_out[, c("x", "y")], centers = 2)
 iris_out$cluster = factor(km_iris$cluster)
 
-ggplot(iris_out, aes(x = x, y = y, color = cluster)) +
+bivariate_clustering_plot = ggplot(iris_out, aes(x = x, y = y, color = cluster)) +
   geom_point(alpha = 0.8) +
   stat_ellipse(type = "norm", linewidth = 1) +
   labs(x = "Petal.Length", y = "Petal.Width", color = "Cluster")
+
+bivariate_clustering_plot
+```
+
+## Bivariate Clustering Plot
+
+```{r}
+#| echo: false
+bivariate_clustering_plot
 ```
 
 ## Run On Iris Data
@@ -189,6 +199,7 @@ ggplot(data.frame(x = pca$x[,1], y = pca$x[,2]), aes(x = x, y = y)) +
 ## PCA Scatter
 
 ```{r}
+#| fig-show: hide
 library(BGLR)
 
 data(wheat)
@@ -201,9 +212,18 @@ pca_scores = data.frame(
   PC2 = pca$x[,2]
 )
 
-ggplot(pca_scores, aes(x = PC1, y = PC2)) +
+pca_scatter_plot = ggplot(pca_scores, aes(x = PC1, y = PC2)) +
   geom_point(alpha = 0.8) +
   labs(x = "PC1", y = "PC2")
+
+pca_scatter_plot
+```
+
+## PCA Scatter Plot
+
+```{r}
+#| echo: false
+pca_scatter_plot
 ```
 
 ## PCA Mixture
@@ -245,12 +265,22 @@ kplot
 ## K-Means Preview
 
 ```{r}
+#| fig-show: hide
 set.seed(2026)
 
 kmeans_pca = kmeans(pca$x[,1:2], centers = 2)
 pca_scores$cluster = factor(kmeans_pca$cluster)
 
-ggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +
+kmeans_preview_plot = ggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +
   geom_point(alpha = 0.8) +
   labs(x = "PC1", y = "PC2", color = "Cluster")
+
+kmeans_preview_plot
+```
+
+## K-Means Preview Plot
+
+```{r}
+#| echo: false
+kmeans_preview_plot
 ```

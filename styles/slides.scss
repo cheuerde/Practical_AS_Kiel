@@ -278,60 +278,13 @@ html.reveal-print .reveal div.sourceCode pre code {
   line-height: 1.12;
   max-height: none !important;
   overflow: visible !important;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap !important;
 }
 
 html.reveal-print .reveal .slides section.code-tight div.sourceCode pre code {
   font-size: 0.58em;
   line-height: 1.08;
-}
-
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) {
-  align-items: center;
-  column-gap: 0.75rem;
-  display: grid !important;
-  grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
-  grid-template-rows: auto 1fr;
-}
-
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > h1,
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > h2,
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > h3,
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > p,
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > ul,
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > ol,
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > .math.display {
-  grid-column: 1 / -1;
-}
-
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > .cell {
-  align-self: center;
-  grid-column: 1;
-}
-
-html.reveal-print .reveal .slides section:has(> .cell + img.r-stretch) > img.r-stretch {
-  align-self: center;
-  grid-column: 2;
-  height: auto !important;
-  max-height: 470px !important;
-  max-width: 100% !important;
-  width: 100% !important;
-}
-
-html.reveal-print .reveal .slides section:has(.cell-output-display img) .cell {
-  column-gap: 0.75rem;
-  display: grid;
-  grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
-  margin: 0;
-}
-
-html.reveal-print .reveal .slides section:has(.cell-output-display img) .cell > .sourceCode {
-  align-self: center;
-  grid-column: 1;
-}
-
-html.reveal-print .reveal .slides section:has(.cell-output-display img) .cell > .cell-output-display {
-  align-self: center;
-  grid-column: 2;
 }
 
 html.reveal-print .reveal .slides section > img.r-stretch {

@@ -63,6 +63,7 @@ The toy plot isolates the squared-error pieces.
 ## Toy Least-Squares Piece
 
 ```{r}
+#| fig-show: hide
 toy_dat = data.frame(
   x = 1:10,
   y = c(2.0, 4.7, 2.6, 5.9, 3.4, 7.2, 4.9, 8.3, 6.1, 9.4)
@@ -73,7 +74,7 @@ toy_dat$pred = predict(toy_fit)
 
 toy_squares = residual_square_data(toy_dat, "x", "y", "pred", every = 1, scale = 0.55)
 
-ggplot(toy_dat, aes(x = x, y = y)) +
+toy_least_squares_plot = ggplot(toy_dat, aes(x = x, y = y)) +
   geom_rect(
     data = toy_squares,
     aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
@@ -86,6 +87,15 @@ ggplot(toy_dat, aes(x = x, y = y)) +
   geom_point(size = 2.2) +
   geom_line(aes(y = pred), color = "red", linewidth = 1) +
   labs(x = "x", y = "y")
+
+toy_least_squares_plot
+```
+
+## Toy Least-Squares Plot
+
+```{r}
+#| echo: false
+toy_least_squares_plot
 ```
 
 ## Feature / Design Matrix
@@ -157,6 +167,7 @@ res$par
 ## Predicted vs Observed
 
 ```{r}
+#| fig-show: hide
 pred = X %*% res$par
 
 dat = data.frame(
@@ -165,10 +176,19 @@ dat = data.frame(
      id = seq_along(y)
      )
 
-ggplot(dat, aes(x = y, y = pred)) +
+predicted_observed_plot = ggplot(dat, aes(x = y, y = pred)) +
  geom_point() +
  geom_abline(intercept = 0, slope = 1, color = "red") +
  labs(x = "Observed Wind", y = "Predicted Wind")
+
+predicted_observed_plot
+```
+
+## Predicted vs Observed Plot
+
+```{r}
+#| echo: false
+predicted_observed_plot
 ```
 
 ## Raw Data And Intercept
@@ -237,6 +257,7 @@ res$par
 ## Fitted Slope
 
 ```{r}
+#| fig-show: hide
 pred = X %*% res$par
 
 dat = data.frame(
@@ -246,11 +267,20 @@ dat = data.frame(
      id = 1:length(y)
      )
 
-ggplot(dat, aes(x = Temp, y = Wind)) +
+fitted_slope_plot = ggplot(dat, aes(x = Temp, y = Wind)) +
   geom_segment(aes(xend = Temp, yend = pred), color = "#155f7a", alpha = 0.45) +
   geom_point() +
   geom_abline(intercept = res$par[1], slope = res$par[2], color = "red") +
   labs(x = "Temp", y = "Wind")
+
+fitted_slope_plot
+```
+
+## Fitted Slope Plot
+
+```{r}
+#| echo: false
+fitted_slope_plot
 ```
 
 ## Ridge Regression

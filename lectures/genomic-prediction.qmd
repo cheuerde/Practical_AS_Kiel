@@ -91,6 +91,7 @@ p = colMeans(M) / 2
 ## Genomic Relationship Matrix
 
 ```{r}
+#| fig-show: hide
 # center our Marker covariates
 Mc = sweep(
      x = M,
@@ -104,7 +105,15 @@ MMdash = Mc %*% t(Mc)
 G = MMdash / mean(diag(MMdash))
 
 # look at genomic relationships
-levelplot(G)
+genomic_relationship_plot = levelplot(G)
+genomic_relationship_plot
+```
+
+## Genomic Relationship Plot
+
+```{r}
+#| echo: false
+genomic_relationship_plot
 ```
 
 ## Ridge Regression Marker Model
@@ -171,10 +180,25 @@ var_e_gblup = mod_gblup$Ve
 ## Check Equivalence
 
 ```{r}
+#| fig-show: hide
 # plot breeding values from both models
 plot(g_rr, g_gblup)
 
 # plot marker effects from both models
+plot(a_rr, a_gblup)
+```
+
+## Breeding Value Equivalence Plot
+
+```{r}
+#| echo: false
+plot(g_rr, g_gblup)
+```
+
+## Marker Effect Equivalence Plot
+
+```{r}
+#| echo: false
 plot(a_rr, a_gblup)
 ```
 

@@ -93,13 +93,14 @@ p
 ## Feature Distributions {.code-tight}
 
 ```{r}
+#| fig-show: hide
 library(ggplot2)
 data(iris)
 
 dplot = stack(iris[, c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")])
 colnames(dplot) = c("Value", "Feature")
 
-ggplot(dplot, aes(x = Value)) +
+feature_distribution_plot = ggplot(dplot, aes(x = Value)) +
   geom_histogram(
     aes(y = after_stat(density)),
     bins = 40,
@@ -110,6 +111,15 @@ ggplot(dplot, aes(x = Value)) +
   geom_density(color = "#b3212d", linewidth = 1.1) +
   facet_wrap(~ Feature, scales = "free") +
   labs(x = "Value", y = "Density")
+
+feature_distribution_plot
+```
+
+## Feature Distribution Plot
+
+```{r}
+#| echo: false
+feature_distribution_plot
 ```
 
 ## Normal Mixture Model
