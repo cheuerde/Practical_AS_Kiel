@@ -53,14 +53,14 @@
     "href": "lectures/r-intro.html#vectors-and-matrices",
     "title": "Introduction to R",
     "section": "Vectors And Matrices",
-    "text": "Vectors And Matrices\n\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\ny = rnorm(10)\nstr(y)\n\n num [1:10] -0.6588 -0.2889 0.0847 1.4714 0.0139 ...\n\nD = matrix(data = rnorm(5 * 5), nrow = 5, ncol = 5)\nD\n\n           [,1]        [,2]        [,3]        [,4]       [,5]\n[1,] -0.6340910  0.92068999  0.20202515 -0.89231290  1.1737426\n[2,]  0.8626869 -1.27317327  0.01580746  0.88362306 -0.5524931\n[3,]  1.7873326  2.10748999  1.33039736 -1.70807868 -0.2631091\n[4,] -0.9274102  0.63603345 -1.46394140  0.03020573  0.4391256\n[5,]  0.6330386 -0.05443828  1.53446063  0.16462659  0.7232650\n\nclass(D)\n\n[1] \"matrix\" \"array\""
+    "text": "Vectors And Matrices\n\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\ny = rnorm(10)\nstr(y)\n\n num [1:10] 0.161 0.397 -0.688 -0.259 1.106 ...\n\nD = matrix(data = rnorm(5 * 5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]        [,3]      [,4]       [,5]\n[1,]  0.7818261 -0.9846848 -1.68313231 0.2720552 -0.2974026\n[2,] -0.2497865 -1.4219702 -0.54052719 1.1137353  0.8414808\n[3,] -0.5612766 -0.6969566 -1.07146811 0.1501556 -0.4995392\n[4,]  1.5717090  0.7514258  1.25386655 0.3106957  0.6961961\n[5,]  0.8953812 -1.4237623 -0.01767046 0.3594474  1.8671142\n\nclass(D)\n\n[1] \"matrix\" \"array\""
   },
   {
     "objectID": "lectures/r-intro.html#matrix-helpers",
     "href": "lectures/r-intro.html#matrix-helpers",
     "title": "Introduction to R",
     "section": "Matrix Helpers",
-    "text": "Matrix Helpers\n\nmeans = colMeans(D)\nmeans\n\n[1]  0.3443114  0.4673204  0.3237498 -0.3043872  0.3041062\n\nd = diag(D)\nd\n\n[1] -0.63409104 -1.27317327  1.33039736  0.03020573  0.72326496"
+    "text": "Matrix Helpers\n\nmeans = colMeans(D)\nmeans\n\n[1]  0.4875706 -0.7551896 -0.4117863  0.4412178  0.5215699\n\nd = diag(D)\nd\n\n[1]  0.7818261 -1.4219702 -1.0714681  0.3106957  1.8671142"
   },
   {
     "objectID": "lectures/r-intro.html#data-exploration-and-visualization",
@@ -109,7 +109,7 @@
     "href": "lectures/r-intro.html#use-the-function",
     "title": "Introduction to R",
     "section": "Use The Function",
-    "text": "Use The Function\n\nx = rnorm(1000, mean = 23.42, sd = 4)\n\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.49462\n\nmean(x)\n\n[1] 23.49462"
+    "text": "Use The Function\n\nx = rnorm(1000, mean = 23.42, sd = 4)\n\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.59141\n\nmean(x)\n\n[1] 23.59141"
   },
   {
     "objectID": "lectures/multivariate-clustering.html#multivariate-clustering",
@@ -179,7 +179,14 @@
     "href": "lectures/multivariate-clustering.html#bivariate-clustering-preview",
     "title": "Multivariate Clustering",
     "section": "Bivariate Clustering Preview",
-    "text": "Bivariate Clustering Preview\n\nlibrary(ggplot2)\ntheme_set(theme_minimal(base_size = 16))\n\niris_out = data.frame(\n  x = iris$Petal.Length,\n  y = iris$Petal.Width,\n  Species = iris$Species\n)\n\nset.seed(2026)\nkm_iris = kmeans(iris_out[, c(\"x\", \"y\")], centers = 2)\niris_out$cluster = factor(km_iris$cluster)\n\nggplot(iris_out, aes(x = x, y = y, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  stat_ellipse(type = \"norm\", linewidth = 1) +\n  labs(x = \"Petal.Length\", y = \"Petal.Width\", color = \"Cluster\")"
+    "text": "Bivariate Clustering Preview\n\nlibrary(ggplot2)\ntheme_set(theme_minimal(base_size = 16))\n\niris_out = data.frame(\n  x = iris$Petal.Length,\n  y = iris$Petal.Width,\n  Species = iris$Species\n)\n\nset.seed(2026)\nkm_iris = kmeans(iris_out[, c(\"x\", \"y\")], centers = 2)\niris_out$cluster = factor(km_iris$cluster)\n\nbivariate_clustering_plot = ggplot(iris_out, aes(x = x, y = y, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  stat_ellipse(type = \"norm\", linewidth = 1) +\n  labs(x = \"Petal.Length\", y = \"Petal.Width\", color = \"Cluster\")\n\nbivariate_clustering_plot"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#bivariate-clustering-plot",
+    "href": "lectures/multivariate-clustering.html#bivariate-clustering-plot",
+    "title": "Multivariate Clustering",
+    "section": "Bivariate Clustering Plot",
+    "text": "Bivariate Clustering Plot"
   },
   {
     "objectID": "lectures/multivariate-clustering.html#run-on-iris-data",
@@ -207,7 +214,14 @@
     "href": "lectures/multivariate-clustering.html#pca-scatter",
     "title": "Multivariate Clustering",
     "section": "PCA Scatter",
-    "text": "PCA Scatter\n\nlibrary(BGLR)\n\ndata(wheat)\n\nM = wheat.X\npca = prcomp(M, scale = TRUE, center = TRUE)\n\npca_scores = data.frame(\n  PC1 = pca$x[,1],\n  PC2 = pca$x[,2]\n)\n\nggplot(pca_scores, aes(x = PC1, y = PC2)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\")"
+    "text": "PCA Scatter\n\nlibrary(BGLR)\n\ndata(wheat)\n\nM = wheat.X\npca = prcomp(M, scale = TRUE, center = TRUE)\n\npca_scores = data.frame(\n  PC1 = pca$x[,1],\n  PC2 = pca$x[,2]\n)\n\npca_scatter_plot = ggplot(pca_scores, aes(x = PC1, y = PC2)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\")\n\npca_scatter_plot"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#pca-scatter-plot",
+    "href": "lectures/multivariate-clustering.html#pca-scatter-plot",
+    "title": "Multivariate Clustering",
+    "section": "PCA Scatter Plot",
+    "text": "PCA Scatter Plot"
   },
   {
     "objectID": "lectures/multivariate-clustering.html#pca-mixture",
@@ -235,7 +249,14 @@
     "href": "lectures/multivariate-clustering.html#k-means-preview",
     "title": "Multivariate Clustering",
     "section": "K-Means Preview",
-    "text": "K-Means Preview\n\nset.seed(2026)\n\nkmeans_pca = kmeans(pca$x[,1:2], centers = 2)\npca_scores$cluster = factor(kmeans_pca$cluster)\n\nggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\", color = \"Cluster\")"
+    "text": "K-Means Preview\n\nset.seed(2026)\n\nkmeans_pca = kmeans(pca$x[,1:2], centers = 2)\npca_scores$cluster = factor(kmeans_pca$cluster)\n\nkmeans_preview_plot = ggplot(pca_scores, aes(x = PC1, y = PC2, color = cluster)) +\n  geom_point(alpha = 0.8) +\n  labs(x = \"PC1\", y = \"PC2\", color = \"Cluster\")\n\nkmeans_preview_plot"
+  },
+  {
+    "objectID": "lectures/multivariate-clustering.html#k-means-preview-plot",
+    "href": "lectures/multivariate-clustering.html#k-means-preview-plot",
+    "title": "Multivariate Clustering",
+    "section": "K-Means Preview Plot",
+    "text": "K-Means Preview Plot"
   },
   {
     "objectID": "lectures/linear-regression.html#linear-regression",
@@ -256,7 +277,14 @@
     "href": "lectures/linear-regression.html#toy-least-squares-piece",
     "title": "Linear Regression",
     "section": "Toy Least-Squares Piece",
-    "text": "Toy Least-Squares Piece\n\ntoy_dat = data.frame(\n  x = 1:10,\n  y = c(2.0, 4.7, 2.6, 5.9, 3.4, 7.2, 4.9, 8.3, 6.1, 9.4)\n)\n\ntoy_fit = lm(y ~ x, data = toy_dat)\ntoy_dat$pred = predict(toy_fit)\n\ntoy_squares = residual_square_data(toy_dat, \"x\", \"y\", \"pred\", every = 1, scale = 0.55)\n\nggplot(toy_dat, aes(x = x, y = y)) +\n  geom_rect(\n    data = toy_squares,\n    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),\n    inherit.aes = FALSE,\n    fill = \"#c46a2b\",\n    color = \"#c46a2b\",\n    alpha = 0.18\n  ) +\n  geom_segment(aes(xend = x, yend = pred), color = \"#155f7a\", alpha = 0.65) +\n  geom_point(size = 2.2) +\n  geom_line(aes(y = pred), color = \"red\", linewidth = 1) +\n  labs(x = \"x\", y = \"y\")"
+    "text": "Toy Least-Squares Piece\n\ntoy_dat = data.frame(\n  x = 1:10,\n  y = c(2.0, 4.7, 2.6, 5.9, 3.4, 7.2, 4.9, 8.3, 6.1, 9.4)\n)\n\ntoy_fit = lm(y ~ x, data = toy_dat)\ntoy_dat$pred = predict(toy_fit)\n\ntoy_squares = residual_square_data(toy_dat, \"x\", \"y\", \"pred\", every = 1, scale = 0.55)\n\ntoy_least_squares_plot = ggplot(toy_dat, aes(x = x, y = y)) +\n  geom_rect(\n    data = toy_squares,\n    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),\n    inherit.aes = FALSE,\n    fill = \"#c46a2b\",\n    color = \"#c46a2b\",\n    alpha = 0.18\n  ) +\n  geom_segment(aes(xend = x, yend = pred), color = \"#155f7a\", alpha = 0.65) +\n  geom_point(size = 2.2) +\n  geom_line(aes(y = pred), color = \"red\", linewidth = 1) +\n  labs(x = \"x\", y = \"y\")\n\ntoy_least_squares_plot"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#toy-least-squares-plot",
+    "href": "lectures/linear-regression.html#toy-least-squares-plot",
+    "title": "Linear Regression",
+    "section": "Toy Least-Squares Plot",
+    "text": "Toy Least-Squares Plot"
   },
   {
     "objectID": "lectures/linear-regression.html#feature-design-matrix",
@@ -291,7 +319,14 @@
     "href": "lectures/linear-regression.html#predicted-vs-observed",
     "title": "Linear Regression",
     "section": "Predicted vs Observed",
-    "text": "Predicted vs Observed\n\npred = X %*% res$par\n\ndat = data.frame(\n     y = y,\n     pred = as.numeric(pred),\n     id = seq_along(y)\n     )\n\nggplot(dat, aes(x = y, y = pred)) +\n geom_point() +\n geom_abline(intercept = 0, slope = 1, color = \"red\") +\n labs(x = \"Observed Wind\", y = \"Predicted Wind\")"
+    "text": "Predicted vs Observed\n\npred = X %*% res$par\n\ndat = data.frame(\n     y = y,\n     pred = as.numeric(pred),\n     id = seq_along(y)\n     )\n\npredicted_observed_plot = ggplot(dat, aes(x = y, y = pred)) +\n geom_point() +\n geom_abline(intercept = 0, slope = 1, color = \"red\") +\n labs(x = \"Observed Wind\", y = \"Predicted Wind\")\n\npredicted_observed_plot"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#predicted-vs-observed-plot",
+    "href": "lectures/linear-regression.html#predicted-vs-observed-plot",
+    "title": "Linear Regression",
+    "section": "Predicted vs Observed Plot",
+    "text": "Predicted vs Observed Plot"
   },
   {
     "objectID": "lectures/linear-regression.html#raw-data-and-intercept",
@@ -333,7 +368,14 @@
     "href": "lectures/linear-regression.html#fitted-slope",
     "title": "Linear Regression",
     "section": "Fitted Slope",
-    "text": "Fitted Slope\n\npred = X %*% res$par\n\ndat = data.frame(\n     Wind = y,\n     Temp = airquality$Temp,\n     pred = as.numeric(pred),\n     id = 1:length(y)\n     )\n\nggplot(dat, aes(x = Temp, y = Wind)) +\n  geom_segment(aes(xend = Temp, yend = pred), color = \"#155f7a\", alpha = 0.45) +\n  geom_point() +\n  geom_abline(intercept = res$par[1], slope = res$par[2], color = \"red\") +\n  labs(x = \"Temp\", y = \"Wind\")"
+    "text": "Fitted Slope\n\npred = X %*% res$par\n\ndat = data.frame(\n     Wind = y,\n     Temp = airquality$Temp,\n     pred = as.numeric(pred),\n     id = 1:length(y)\n     )\n\nfitted_slope_plot = ggplot(dat, aes(x = Temp, y = Wind)) +\n  geom_segment(aes(xend = Temp, yend = pred), color = \"#155f7a\", alpha = 0.45) +\n  geom_point() +\n  geom_abline(intercept = res$par[1], slope = res$par[2], color = \"red\") +\n  labs(x = \"Temp\", y = \"Wind\")\n\nfitted_slope_plot"
+  },
+  {
+    "objectID": "lectures/linear-regression.html#fitted-slope-plot",
+    "href": "lectures/linear-regression.html#fitted-slope-plot",
+    "title": "Linear Regression",
+    "section": "Fitted Slope Plot",
+    "text": "Fitted Slope Plot"
   },
   {
     "objectID": "lectures/linear-regression.html#ridge-regression",
@@ -438,7 +480,14 @@
     "href": "lectures/clustering.html#feature-distributions",
     "title": "Clustering",
     "section": "Feature Distributions",
-    "text": "Feature Distributions\n\nlibrary(ggplot2)\ndata(iris)\n\ndplot = stack(iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")])\ncolnames(dplot) = c(\"Value\", \"Feature\")\n\nggplot(dplot, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#d9e2e7\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\")"
+    "text": "Feature Distributions\n\nlibrary(ggplot2)\ndata(iris)\n\ndplot = stack(iris[, c(\"Sepal.Length\", \"Sepal.Width\", \"Petal.Length\", \"Petal.Width\")])\ncolnames(dplot) = c(\"Value\", \"Feature\")\n\nfeature_distribution_plot = ggplot(dplot, aes(x = Value)) +\n  geom_histogram(\n    aes(y = after_stat(density)),\n    bins = 40,\n    fill = \"#d9e2e7\",\n    color = \"#374151\",\n    linewidth = 0.25\n  ) +\n  geom_density(color = \"#b3212d\", linewidth = 1.1) +\n  facet_wrap(~ Feature, scales = \"free\") +\n  labs(x = \"Value\", y = \"Density\")\n\nfeature_distribution_plot"
+  },
+  {
+    "objectID": "lectures/clustering.html#feature-distribution-plot",
+    "href": "lectures/clustering.html#feature-distribution-plot",
+    "title": "Clustering",
+    "section": "Feature Distribution Plot",
+    "text": "Feature Distribution Plot"
   },
   {
     "objectID": "lectures/clustering.html#normal-mixture-model",
@@ -571,7 +620,7 @@
     "href": "labs/r-intro.html#vectors-and-matrices",
     "title": "Introduction to R",
     "section": "4.4 Vectors and Matrices",
-    "text": "4.4 Vectors and Matrices\nIn R, everything is a vector or a list or an array of vectors. A data.frame is a list of vectors of different types, a matrix is a list of vectors of a single type. A scalar is a vector of length 1.\n\n###########################\n### Vectos and Matrices ###\n###########################\n\n# integer vector of length one\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\n# numeric vector\ny = rnorm(10)\nstr(x)\n\n int 1\n\nx\n\n[1] 1\n\n#  matrix\nD = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]       [,3]       [,4]       [,5]\n[1,] -1.1304822  1.7754094  0.3869728 -0.1701024  0.2849612\n[2,] -0.2862822 -0.5558928  0.9863807 -1.8184317 -0.9857760\n[3,]  1.5648816  0.8072052 -0.2573684  0.8143222  0.3058701\n[4,] -0.4198694  0.5853321 -0.5402244 -1.5815970 -1.1137239\n[5,] -0.2880533  1.4022262  0.9889771  1.6707660  0.6688779\n\nclass(D)\n\n[1] \"matrix\" \"array\" \n\n# specialized functions can be applied to matrices\nmeans = colMeans(D)\nmeans\n\n[1] -0.1119611  0.8028560  0.3129476 -0.2170086 -0.1679581\n\n# extract diagonal\nd = diag(D)\nd\n\n[1] -1.1304822 -0.5558928 -0.2573684 -1.5815970  0.6688779"
+    "text": "4.4 Vectors and Matrices\nIn R, everything is a vector or a list or an array of vectors. A data.frame is a list of vectors of different types, a matrix is a list of vectors of a single type. A scalar is a vector of length 1.\n\n###########################\n### Vectos and Matrices ###\n###########################\n\n# integer vector of length one\nx = as.integer(1)\nstr(x)\n\n int 1\n\nis.vector(x)\n\n[1] TRUE\n\n# numeric vector\ny = rnorm(10)\nstr(x)\n\n int 1\n\nx\n\n[1] 1\n\n#  matrix\nD = matrix(data = rnorm(5*5), nrow = 5, ncol = 5)\nD\n\n           [,1]       [,2]       [,3]       [,4]       [,5]\n[1,] -1.5022645  0.9766291 -0.1911186 -0.9144608 -0.6186160\n[2,]  1.0926388  0.5237465 -1.2162000  0.2299095 -1.8473224\n[3,] -1.7630403 -2.4091211 -1.4215882 -0.6640930  0.8122126\n[4,] -0.1948687 -1.0993045 -0.5778849  1.0693606  0.5316896\n[5,]  0.3511403 -1.0116102 -0.8145998 -0.1823751 -0.7324786\n\nclass(D)\n\n[1] \"matrix\" \"array\" \n\n# specialized functions can be applied to matrices\nmeans = colMeans(D)\nmeans\n\n[1] -0.40327888 -0.60393203 -0.84427829 -0.09233176 -0.37090295\n\n# extract diagonal\nd = diag(D)\nd\n\n[1] -1.5022645  0.5237465 -1.4215882  1.0693606 -0.7324786"
   },
   {
     "objectID": "labs/r-intro.html#data-exploration-and-visualization",
@@ -585,7 +634,7 @@
     "href": "labs/r-intro.html#writing-functions",
     "title": "Introduction to R",
     "section": "4.6 Writing Functions",
-    "text": "4.6 Writing Functions\nAll operators in R are functions, for instance + is just a special way of calling a function:\n\n# get help for a function\n?sum\n\n# get help for the function '+'\n?`+`\n\n# check the function definition for `+`\nfix(`+`)\n\nA function is an operation on input variables ($f(x)), the function can be anything interpretable by R. For example, this is how we can define a function that computes and returns the empirical mean (average) of a numeric vector:\n\nmy_mean_function = function(y) {\n\n    n = length(y)\n    sum = 0\n    for(i in 1:n) sum = sum + y[i]\n\n    mean = sum / n\n\n    return(mean)\n\n}\n\nWe can now use that function inside R for estimating means on any input vector y for which the the operators + and / are defined.\n\n# generate random vector\nx = rnorm(1000, mean = 23.42, sd = 4)\n\n# calculate mean with our function\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.4085\n\n# compare with R's built in function\nmean(x)\n\n[1] 23.4085"
+    "text": "4.6 Writing Functions\nAll operators in R are functions, for instance + is just a special way of calling a function:\n\n# get help for a function\n?sum\n\n# get help for the function '+'\n?`+`\n\n# check the function definition for `+`\nfix(`+`)\n\nA function is an operation on input variables ($f(x)), the function can be anything interpretable by R. For example, this is how we can define a function that computes and returns the empirical mean (average) of a numeric vector:\n\nmy_mean_function = function(y) {\n\n    n = length(y)\n    sum = 0\n    for(i in 1:n) sum = sum + y[i]\n\n    mean = sum / n\n\n    return(mean)\n\n}\n\nWe can now use that function inside R for estimating means on any input vector y for which the the operators + and / are defined.\n\n# generate random vector\nx = rnorm(1000, mean = 23.42, sd = 4)\n\n# calculate mean with our function\nour_mean = my_mean_function(x)\nour_mean\n\n[1] 23.4525\n\n# compare with R's built in function\nmean(x)\n\n[1] 23.4525"
   },
   {
     "objectID": "labs/multivariate-clustering.html",
@@ -767,7 +816,7 @@
     "href": "labs/genomic-prediction.html#check-equivalence-of-models",
     "title": "Genomic Prediction",
     "section": "4.3 Check equivalence of models",
-    "text": "4.3 Check equivalence of models\n\n# plot breeding values from both models\nplot(g_rr, g_gblup)\n\n\n\n\n\n\n\n# plot marker effects from both models\nplot(a_rr, a_gblup)\n\n\n\n\n\n\n\n# some summaries\nsummary(lm(g_rr ~ g_gblup))\n\n\nCall:\nlm(formula = g_rr ~ g_gblup)\n\nResiduals:\n       Min         1Q     Median         3Q        Max \n-1.880e-06 -3.197e-07  2.300e-10  2.997e-07  1.278e-06 \n\nCoefficients:\n             Estimate Std. Error  t value Pr(&gt;|t|)    \n(Intercept) 4.354e-16  2.041e-08        0        1    \ng_gblup     1.000e+00  3.618e-08 27638903   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 4.994e-07 on 597 degrees of freedom\nMultiple R-squared:      1, Adjusted R-squared:      1 \nF-statistic: 7.639e+14 on 1 and 597 DF,  p-value: &lt; 2.2e-16\n\nsummary(lm(a_rr ~ a_gblup))\n\n\nCall:\nlm(formula = a_rr ~ a_gblup)\n\nResiduals:\n       Min         1Q     Median         3Q        Max \n-8.103e-08 -1.415e-08  2.870e-10  1.360e-08  8.062e-08 \n\nCoefficients:\n             Estimate Std. Error   t value Pr(&gt;|t|)    \n(Intercept) 7.978e-10  6.017e-10 1.326e+00    0.185    \na_gblup     1.000e+00  3.223e-08 3.102e+07   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.15e-08 on 1277 degrees of freedom\nMultiple R-squared:      1, Adjusted R-squared:      1 \nF-statistic: 9.624e+14 on 1 and 1277 DF,  p-value: &lt; 2.2e-16\n\n# variance components and heritabilities\nvc = rbind(\n         data.frame(\n          model = \"Marker Model\",\n          var_g = var_g_rr,\n          var_e = var_e_rr,\n          h2 = var_g_rr / (var_g_rr + var_e_rr)\n          ),\n         data.frame(\n          model = \"GBLUP\",\n          var_g = var_g_gblup,\n          var_e = var_e_gblup,\n          h2 = var_g_gblup / (var_g_gblup + var_e_gblup)\n          )\n         )\n\nkable(vc, digits = 3)\n\n\n\n\nmodel\nvar_g\nvar_e\nh2\n\n\n\n\nMarker Model\n0.605\n0.539\n0.529\n\n\nGBLUP\n0.605\n0.539\n0.529"
+    "text": "4.3 Check equivalence of models\n\n# plot breeding values from both models\nplot(g_rr, g_gblup)\n\n\n\n\n\n\n\n# plot marker effects from both models\nplot(a_rr, a_gblup)\n\n\n\n\n\n\n\n# some summaries\nsummary(lm(g_rr ~ g_gblup))\n\n\nCall:\nlm(formula = g_rr ~ g_gblup)\n\nResiduals:\n       Min         1Q     Median         3Q        Max \n-1.879e-06 -3.197e-07  2.300e-10  2.997e-07  1.278e-06 \n\nCoefficients:\n             Estimate Std. Error  t value Pr(&gt;|t|)    \n(Intercept) 4.630e-16  2.041e-08        0        1    \ng_gblup     1.000e+00  3.618e-08 27640116   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 4.994e-07 on 597 degrees of freedom\nMultiple R-squared:      1, Adjusted R-squared:      1 \nF-statistic: 7.64e+14 on 1 and 597 DF,  p-value: &lt; 2.2e-16\n\nsummary(lm(a_rr ~ a_gblup))\n\n\nCall:\nlm(formula = a_rr ~ a_gblup)\n\nResiduals:\n       Min         1Q     Median         3Q        Max \n-8.103e-08 -1.415e-08  2.870e-10  1.360e-08  8.061e-08 \n\nCoefficients:\n             Estimate Std. Error   t value Pr(&gt;|t|)    \n(Intercept) 7.978e-10  6.016e-10 1.326e+00    0.185    \na_gblup     1.000e+00  3.223e-08 3.102e+07   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.15e-08 on 1277 degrees of freedom\nMultiple R-squared:      1, Adjusted R-squared:      1 \nF-statistic: 9.625e+14 on 1 and 1277 DF,  p-value: &lt; 2.2e-16\n\n# variance components and heritabilities\nvc = rbind(\n         data.frame(\n          model = \"Marker Model\",\n          var_g = var_g_rr,\n          var_e = var_e_rr,\n          h2 = var_g_rr / (var_g_rr + var_e_rr)\n          ),\n         data.frame(\n          model = \"GBLUP\",\n          var_g = var_g_gblup,\n          var_e = var_e_gblup,\n          h2 = var_g_gblup / (var_g_gblup + var_e_gblup)\n          )\n         )\n\nkable(vc, digits = 3)\n\n\n\n\nmodel\nvar_g\nvar_e\nh2\n\n\n\n\nMarker Model\n0.605\n0.539\n0.529\n\n\nGBLUP\n0.605\n0.539\n0.529"
   },
   {
     "objectID": "labs/genomic-prediction.html#cross-validation",
@@ -1061,7 +1110,14 @@
     "href": "lectures/genomic-prediction.html#genomic-relationship-matrix",
     "title": "Genomic Prediction",
     "section": "Genomic Relationship Matrix",
-    "text": "Genomic Relationship Matrix\n\n# center our Marker covariates\nMc = sweep(\n     x = M,\n     MARGIN = 2,\n     FUN = \"-\",\n     STATS = 2 * p\n     )\n\n# compute G matrix\nMMdash = Mc %*% t(Mc)\nG = MMdash / mean(diag(MMdash))\n\n# look at genomic relationships\nlevelplot(G)"
+    "text": "Genomic Relationship Matrix\n\n# center our Marker covariates\nMc = sweep(\n     x = M,\n     MARGIN = 2,\n     FUN = \"-\",\n     STATS = 2 * p\n     )\n\n# compute G matrix\nMMdash = Mc %*% t(Mc)\nG = MMdash / mean(diag(MMdash))\n\n# look at genomic relationships\ngenomic_relationship_plot = levelplot(G)\ngenomic_relationship_plot"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#genomic-relationship-plot",
+    "href": "lectures/genomic-prediction.html#genomic-relationship-plot",
+    "title": "Genomic Prediction",
+    "section": "Genomic Relationship Plot",
+    "text": "Genomic Relationship Plot"
   },
   {
     "objectID": "lectures/genomic-prediction.html#ridge-regression-marker-model",
@@ -1096,7 +1152,21 @@
     "href": "lectures/genomic-prediction.html#check-equivalence",
     "title": "Genomic Prediction",
     "section": "Check Equivalence",
-    "text": "Check Equivalence\n\n# plot breeding values from both models\nplot(g_rr, g_gblup)\n\n\n\n\n\n\n\n# plot marker effects from both models\nplot(a_rr, a_gblup)"
+    "text": "Check Equivalence\n\n# plot breeding values from both models\nplot(g_rr, g_gblup)\n# plot marker effects from both models\nplot(a_rr, a_gblup)"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#breeding-value-equivalence-plot",
+    "href": "lectures/genomic-prediction.html#breeding-value-equivalence-plot",
+    "title": "Genomic Prediction",
+    "section": "Breeding Value Equivalence Plot",
+    "text": "Breeding Value Equivalence Plot"
+  },
+  {
+    "objectID": "lectures/genomic-prediction.html#marker-effect-equivalence-plot",
+    "href": "lectures/genomic-prediction.html#marker-effect-equivalence-plot",
+    "title": "Genomic Prediction",
+    "section": "Marker Effect Equivalence Plot",
+    "text": "Marker Effect Equivalence Plot"
   },
   {
     "objectID": "lectures/genomic-prediction.html#variance-components",

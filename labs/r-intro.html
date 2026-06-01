@@ -484,11 +484,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>D</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>           [,1]       [,2]       [,3]       [,4]       [,5]
-[1,] -1.1304822  1.7754094  0.3869728 -0.1701024  0.2849612
-[2,] -0.2862822 -0.5558928  0.9863807 -1.8184317 -0.9857760
-[3,]  1.5648816  0.8072052 -0.2573684  0.8143222  0.3058701
-[4,] -0.4198694  0.5853321 -0.5402244 -1.5815970 -1.1137239
-[5,] -0.2880533  1.4022262  0.9889771  1.6707660  0.6688779</code></pre>
+[1,] -1.5022645  0.9766291 -0.1911186 -0.9144608 -0.6186160
+[2,]  1.0926388  0.5237465 -1.2162000  0.2299095 -1.8473224
+[3,] -1.7630403 -2.4091211 -1.4215882 -0.6640930  0.8122126
+[4,] -0.1948687 -1.0993045 -0.5778849  1.0693606  0.5316896
+[5,]  0.3511403 -1.0116102 -0.8145998 -0.1823751 -0.7324786</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(D)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -498,13 +498,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">colMeans</span>(D)</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>means</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.1119611  0.8028560  0.3129476 -0.2170086 -0.1679581</code></pre>
+<pre><code>[1] -0.40327888 -0.60393203 -0.84427829 -0.09233176 -0.37090295</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extract diagonal</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">diag</span>(D)</span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -1.1304822 -0.5558928 -0.2573684 -1.5815970  0.6688779</code></pre>
+<pre><code>[1] -1.5022645  0.5237465 -1.4215882  1.0693606 -0.7324786</code></pre>
 </div>
 </div>
 </section>
@@ -616,12 +616,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>our_mean <span class="ot">=</span> <span class="fu">my_mean_function</span>(x)</span>
 <span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>our_mean</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.4085</code></pre>
+<pre><code>[1] 23.4525</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compare with R's built in function</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.4085</code></pre>
+<pre><code>[1] 23.4525</code></pre>
 </div>
 </div>
 

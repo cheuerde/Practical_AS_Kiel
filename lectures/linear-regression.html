@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-6098df969b2460e171d7ab0828b0d99c.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-a5888fd759f321ff004427eedf840fae.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -243,7 +243,7 @@ e_i = y_i - \hat{y}_i
 <span id="cb1-8"><a aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a aria-hidden="true" tabindex="-1"></a>toy_squares <span class="ot">=</span> <span class="fu">residual_square_data</span>(toy_dat, <span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"pred"</span>, <span class="at">every =</span> <span class="dv">1</span>, <span class="at">scale =</span> <span class="fl">0.55</span>)</span>
 <span id="cb1-10"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(toy_dat, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb1-11"><a aria-hidden="true" tabindex="-1"></a>toy_least_squares_plot <span class="ot">=</span> <span class="fu">ggplot</span>(toy_dat, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
 <span id="cb1-12"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(</span>
 <span id="cb1-13"><a aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> toy_squares,</span>
 <span id="cb1-14"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">xmin =</span> xmin, <span class="at">xmax =</span> xmax, <span class="at">ymin =</span> ymin, <span class="at">ymax =</span> ymax),</span>
@@ -255,10 +255,15 @@ e_i = y_i - \hat{y}_i
 <span id="cb1-20"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> x, <span class="at">yend =</span> pred), <span class="at">color =</span> <span class="st">"#155f7a"</span>, <span class="at">alpha =</span> <span class="fl">0.65</span>) <span class="sc">+</span></span>
 <span id="cb1-21"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.2</span>) <span class="sc">+</span></span>
 <span id="cb1-22"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> pred), <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb1-23"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"x"</span>, <span class="at">y =</span> <span class="st">"y"</span>)</span></code></pre></div>
-
+<span id="cb1-23"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"x"</span>, <span class="at">y =</span> <span class="st">"y"</span>)</span>
+<span id="cb1-24"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a aria-hidden="true" tabindex="-1"></a>toy_least_squares_plot</span></code></pre></div>
 </div>
-<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
+</section>
+<section id="toy-least-squares-plot" class="slide level2">
+<h2>Toy Least-Squares Plot</h2>
+
+<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
 <section id="feature-design-matrix" class="slide level2">
 <h2>Feature / Design Matrix</h2>
 <p>A Feature or Design Matrix maps observations to individual feature criteria.</p>
@@ -342,13 +347,18 @@ e_i = y_i - \hat{y}_i
 <span id="cb7-6"><a aria-hidden="true" tabindex="-1"></a>     <span class="at">id =</span> <span class="fu">seq_along</span>(y)</span>
 <span id="cb7-7"><a aria-hidden="true" tabindex="-1"></a>     )</span>
 <span id="cb7-8"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(<span class="at">x =</span> y, <span class="at">y =</span> pred)) <span class="sc">+</span></span>
+<span id="cb7-9"><a aria-hidden="true" tabindex="-1"></a>predicted_observed_plot <span class="ot">=</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(<span class="at">x =</span> y, <span class="at">y =</span> pred)) <span class="sc">+</span></span>
 <span id="cb7-10"><a aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb7-11"><a aria-hidden="true" tabindex="-1"></a> <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb7-12"><a aria-hidden="true" tabindex="-1"></a> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Observed Wind"</span>, <span class="at">y =</span> <span class="st">"Predicted Wind"</span>)</span></code></pre></div>
-
+<span id="cb7-12"><a aria-hidden="true" tabindex="-1"></a> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Observed Wind"</span>, <span class="at">y =</span> <span class="st">"Predicted Wind"</span>)</span>
+<span id="cb7-13"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a aria-hidden="true" tabindex="-1"></a>predicted_observed_plot</span></code></pre></div>
 </div>
-<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
+</section>
+<section id="predicted-vs-observed-plot" class="slide level2">
+<h2>Predicted vs Observed Plot</h2>
+
+<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
 <section id="raw-data-and-intercept" class="slide level2">
 <h2>Raw Data And Intercept</h2>
 <div class="cell">
@@ -359,7 +369,7 @@ e_i = y_i - \hat{y}_i
 <span id="cb8-5"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Observation"</span>, <span class="at">y =</span> <span class="st">"Wind"</span>)</span></code></pre></div>
 
 </div>
-<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
 <section id="multiple-linear-regression" class="slide level2">
 <h2>Multiple Linear Regression</h2>
 <p>When there is more than one feature in the design matrix we call that Multiple Linear Regression.</p>
@@ -394,7 +404,7 @@ e_i = y_i - \hat{y}_i
 <span id="cb10-3"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Temp"</span>, <span class="at">y =</span> <span class="st">"Wind"</span>)</span></code></pre></div>
 
 </div>
-<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
 <section id="fit-multiple-regression" class="slide level2">
 <h2>Fit Multiple Regression</h2>
 <div class="cell">
@@ -428,14 +438,19 @@ e_i = y_i - \hat{y}_i
 <span id="cb13-7"><a aria-hidden="true" tabindex="-1"></a>     <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(y)</span>
 <span id="cb13-8"><a aria-hidden="true" tabindex="-1"></a>     )</span>
 <span id="cb13-9"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(<span class="at">x =</span> Temp, <span class="at">y =</span> Wind)) <span class="sc">+</span></span>
+<span id="cb13-10"><a aria-hidden="true" tabindex="-1"></a>fitted_slope_plot <span class="ot">=</span> <span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(<span class="at">x =</span> Temp, <span class="at">y =</span> Wind)) <span class="sc">+</span></span>
 <span id="cb13-11"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> Temp, <span class="at">yend =</span> pred), <span class="at">color =</span> <span class="st">"#155f7a"</span>, <span class="at">alpha =</span> <span class="fl">0.45</span>) <span class="sc">+</span></span>
 <span id="cb13-12"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb13-13"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> res<span class="sc">$</span>par[<span class="dv">1</span>], <span class="at">slope =</span> res<span class="sc">$</span>par[<span class="dv">2</span>], <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb13-14"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Temp"</span>, <span class="at">y =</span> <span class="st">"Wind"</span>)</span></code></pre></div>
-
+<span id="cb13-14"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Temp"</span>, <span class="at">y =</span> <span class="st">"Wind"</span>)</span>
+<span id="cb13-15"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a aria-hidden="true" tabindex="-1"></a>fitted_slope_plot</span></code></pre></div>
 </div>
-<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
+</section>
+<section id="fitted-slope-plot" class="slide level2">
+<h2>Fitted Slope Plot</h2>
+
+<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-14-1.png" width="960" class="r-stretch"></section>
 <section id="ridge-regression" class="slide level2">
 <h2>Ridge Regression</h2>
 <p><span class="math display">\[
@@ -515,7 +530,7 @@ P =
 <span id="cb16-4"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"log10(lambda)"</span>, <span class="at">y =</span> <span class="st">"Ridge criterion"</span>)</span></code></pre></div>
 
 </div>
-<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"></section>
+<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-16-1.png" width="960" class="r-stretch"></section>
 <section id="marker-shrinkage" class="slide level2">
 <h2>Marker Shrinkage</h2>
 <div class="cell">
@@ -525,7 +540,7 @@ P =
 <span id="cb17-4"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"log10(lambda)"</span>, <span class="at">y =</span> <span class="st">"SD of marker effects"</span>)</span></code></pre></div>
 
 </div>
-<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-14-1.png" width="960" class="r-stretch"></section>
+<img data-src="linear-regression_files/figure-revealjs/unnamed-chunk-17-1.png" width="960" class="r-stretch"></section>
 <section id="ridge-in-the-original-lab" class="slide level2">
 <h2>Ridge In The Original Lab</h2>
 <div class="cell">

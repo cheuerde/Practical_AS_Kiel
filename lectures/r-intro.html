@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-6098df969b2460e171d7ab0828b0d99c.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-a5888fd759f321ff004427eedf840fae.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -357,17 +357,17 @@ Claas Heuer
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">10</span>)</span>
 <span id="cb32-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(y)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> num [1:10] -0.6588 -0.2889 0.0847 1.4714 0.0139 ...</code></pre>
+<pre><code> num [1:10] 0.161 0.397 -0.688 -0.259 1.106 ...</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a aria-hidden="true" tabindex="-1"></a>D <span class="ot">=</span> <span class="fu">matrix</span>(<span class="at">data =</span> <span class="fu">rnorm</span>(<span class="dv">5</span> <span class="sc">*</span> <span class="dv">5</span>), <span class="at">nrow =</span> <span class="dv">5</span>, <span class="at">ncol =</span> <span class="dv">5</span>)</span>
 <span id="cb34-2"><a aria-hidden="true" tabindex="-1"></a>D</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>           [,1]        [,2]        [,3]        [,4]       [,5]
-[1,] -0.6340910  0.92068999  0.20202515 -0.89231290  1.1737426
-[2,]  0.8626869 -1.27317327  0.01580746  0.88362306 -0.5524931
-[3,]  1.7873326  2.10748999  1.33039736 -1.70807868 -0.2631091
-[4,] -0.9274102  0.63603345 -1.46394140  0.03020573  0.4391256
-[5,]  0.6330386 -0.05443828  1.53446063  0.16462659  0.7232650</code></pre>
+<pre><code>           [,1]       [,2]        [,3]      [,4]       [,5]
+[1,]  0.7818261 -0.9846848 -1.68313231 0.2720552 -0.2974026
+[2,] -0.2497865 -1.4219702 -0.54052719 1.1137353  0.8414808
+[3,] -0.5612766 -0.6969566 -1.07146811 0.1501556 -0.4995392
+[4,]  1.5717090  0.7514258  1.25386655 0.3106957  0.6961961
+[5,]  0.8953812 -1.4237623 -0.01767046 0.3594474  1.8671142</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(D)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -381,12 +381,12 @@ Claas Heuer
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">colMeans</span>(D)</span>
 <span id="cb38-2"><a aria-hidden="true" tabindex="-1"></a>means</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  0.3443114  0.4673204  0.3237498 -0.3043872  0.3041062</code></pre>
+<pre><code>[1]  0.4875706 -0.7551896 -0.4117863  0.4412178  0.5215699</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">diag</span>(D)</span>
 <span id="cb40-2"><a aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.63409104 -1.27317327  1.33039736  0.03020573  0.72326496</code></pre>
+<pre><code>[1]  0.7818261 -1.4219702 -1.0714681  0.3106957  1.8671142</code></pre>
 </div>
 </div>
 </section>
@@ -483,11 +483,11 @@ Claas Heuer
 <span id="cb51-3"><a aria-hidden="true" tabindex="-1"></a>our_mean <span class="ot">=</span> <span class="fu">my_mean_function</span>(x)</span>
 <span id="cb51-4"><a aria-hidden="true" tabindex="-1"></a>our_mean</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.49462</code></pre>
+<pre><code>[1] 23.59141</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 23.49462</code></pre>
+<pre><code>[1] 23.59141</code></pre>
 </div>
 </div>
 

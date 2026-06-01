@@ -468,18 +468,18 @@ lm(formula = g_rr ~ g_gblup)
 
 Residuals:
        Min         1Q     Median         3Q        Max 
--1.880e-06 -3.197e-07  2.300e-10  2.997e-07  1.278e-06 
+-1.879e-06 -3.197e-07  2.300e-10  2.997e-07  1.278e-06 
 
 Coefficients:
              Estimate Std. Error  t value Pr(&gt;|t|)    
-(Intercept) 4.354e-16  2.041e-08        0        1    
-g_gblup     1.000e+00  3.618e-08 27638903   &lt;2e-16 ***
+(Intercept) 4.630e-16  2.041e-08        0        1    
+g_gblup     1.000e+00  3.618e-08 27640116   &lt;2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 4.994e-07 on 597 degrees of freedom
 Multiple R-squared:      1, Adjusted R-squared:      1 
-F-statistic: 7.639e+14 on 1 and 597 DF,  p-value: &lt; 2.2e-16</code></pre>
+F-statistic: 7.64e+14 on 1 and 597 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(a_rr <span class="sc">~</span> a_gblup))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -489,18 +489,18 @@ lm(formula = a_rr ~ a_gblup)
 
 Residuals:
        Min         1Q     Median         3Q        Max 
--8.103e-08 -1.415e-08  2.870e-10  1.360e-08  8.062e-08 
+-8.103e-08 -1.415e-08  2.870e-10  1.360e-08  8.061e-08 
 
 Coefficients:
              Estimate Std. Error   t value Pr(&gt;|t|)    
-(Intercept) 7.978e-10  6.017e-10 1.326e+00    0.185    
+(Intercept) 7.978e-10  6.016e-10 1.326e+00    0.185    
 a_gblup     1.000e+00  3.223e-08 3.102e+07   &lt;2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 2.15e-08 on 1277 degrees of freedom
 Multiple R-squared:      1, Adjusted R-squared:      1 
-F-statistic: 9.624e+14 on 1 and 1277 DF,  p-value: &lt; 2.2e-16</code></pre>
+F-statistic: 9.625e+14 on 1 and 1277 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># variance components and heritabilities</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>vc <span class="ot">=</span> <span class="fu">rbind</span>(</span>

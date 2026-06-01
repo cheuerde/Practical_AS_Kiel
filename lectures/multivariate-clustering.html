@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-6098df969b2460e171d7ab0828b0d99c.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-a5888fd759f321ff004427eedf840fae.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -328,13 +328,18 @@ Ellipses: &amp; \frac{(x - \mu_x)^2}{r_x^2} + \frac{(y - \mu_y)^2}{r_y^2} = 1 \\
 <span id="cb4-11"><a aria-hidden="true" tabindex="-1"></a>km_iris <span class="ot">=</span> <span class="fu">kmeans</span>(iris_out[, <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>)], <span class="at">centers =</span> <span class="dv">2</span>)</span>
 <span id="cb4-12"><a aria-hidden="true" tabindex="-1"></a>iris_out<span class="sc">$</span>cluster <span class="ot">=</span> <span class="fu">factor</span>(km_iris<span class="sc">$</span>cluster)</span>
 <span id="cb4-13"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(iris_out, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb4-14"><a aria-hidden="true" tabindex="-1"></a>bivariate_clustering_plot <span class="ot">=</span> <span class="fu">ggplot</span>(iris_out, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
 <span id="cb4-15"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
 <span id="cb4-16"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_ellipse</span>(<span class="at">type =</span> <span class="st">"norm"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb4-17"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Petal.Length"</span>, <span class="at">y =</span> <span class="st">"Petal.Width"</span>, <span class="at">color =</span> <span class="st">"Cluster"</span>)</span></code></pre></div>
-
+<span id="cb4-17"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Petal.Length"</span>, <span class="at">y =</span> <span class="st">"Petal.Width"</span>, <span class="at">color =</span> <span class="st">"Cluster"</span>)</span>
+<span id="cb4-18"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a aria-hidden="true" tabindex="-1"></a>bivariate_clustering_plot</span></code></pre></div>
 </div>
-<img data-src="multivariate-clustering_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+</section>
+<section id="bivariate-clustering-plot" class="slide level2">
+<h2>Bivariate Clustering Plot</h2>
+
+<img data-src="multivariate-clustering_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
 <section id="run-on-iris-data" class="slide level2">
 <h2>Run On Iris Data</h2>
 <div class="cell">
@@ -390,12 +395,17 @@ Ellipses: &amp; \frac{(x - \mu_x)^2}{r_x^2} + \frac{(y - \mu_y)^2}{r_y^2} = 1 \\
 <span id="cb7-10"><a aria-hidden="true" tabindex="-1"></a>  <span class="at">PC2 =</span> pca<span class="sc">$</span>x[,<span class="dv">2</span>]</span>
 <span id="cb7-11"><a aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb7-12"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pca_scores, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2)) <span class="sc">+</span></span>
+<span id="cb7-13"><a aria-hidden="true" tabindex="-1"></a>pca_scatter_plot <span class="ot">=</span> <span class="fu">ggplot</span>(pca_scores, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2)) <span class="sc">+</span></span>
 <span id="cb7-14"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb7-15"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"PC1"</span>, <span class="at">y =</span> <span class="st">"PC2"</span>)</span></code></pre></div>
-
+<span id="cb7-15"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"PC1"</span>, <span class="at">y =</span> <span class="st">"PC2"</span>)</span>
+<span id="cb7-16"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a aria-hidden="true" tabindex="-1"></a>pca_scatter_plot</span></code></pre></div>
 </div>
-<img data-src="multivariate-clustering_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+</section>
+<section id="pca-scatter-plot" class="slide level2">
+<h2>PCA Scatter Plot</h2>
+
+<img data-src="multivariate-clustering_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
 <section id="pca-mixture" class="slide level2">
 <h2>PCA Mixture</h2>
 <div class="cell">
@@ -439,14 +449,19 @@ f(x) = \sum_{i = 1}^{k}\sum_{j = 1}^{nk}  (x_j - \mu_i)^2
 <span id="cb10-3"><a aria-hidden="true" tabindex="-1"></a>kmeans_pca <span class="ot">=</span> <span class="fu">kmeans</span>(pca<span class="sc">$</span>x[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="at">centers =</span> <span class="dv">2</span>)</span>
 <span id="cb10-4"><a aria-hidden="true" tabindex="-1"></a>pca_scores<span class="sc">$</span>cluster <span class="ot">=</span> <span class="fu">factor</span>(kmeans_pca<span class="sc">$</span>cluster)</span>
 <span id="cb10-5"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pca_scores, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
+<span id="cb10-6"><a aria-hidden="true" tabindex="-1"></a>kmeans_preview_plot <span class="ot">=</span> <span class="fu">ggplot</span>(pca_scores, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> cluster)) <span class="sc">+</span></span>
 <span id="cb10-7"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb10-8"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"PC1"</span>, <span class="at">y =</span> <span class="st">"PC2"</span>, <span class="at">color =</span> <span class="st">"Cluster"</span>)</span></code></pre></div>
-
+<span id="cb10-8"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"PC1"</span>, <span class="at">y =</span> <span class="st">"PC2"</span>, <span class="at">color =</span> <span class="st">"Cluster"</span>)</span>
+<span id="cb10-9"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a aria-hidden="true" tabindex="-1"></a>kmeans_preview_plot</span></code></pre></div>
 </div>
+</section>
+<section id="k-means-preview-plot" class="slide level2">
+<h2>K-Means Preview Plot</h2>
 
 
-<img data-src="multivariate-clustering_files/figure-revealjs/unnamed-chunk-10-1.png" width="960" class="r-stretch"></section>
+
+<img data-src="multivariate-clustering_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

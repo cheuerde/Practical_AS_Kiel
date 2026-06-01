@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-6098df969b2460e171d7ab0828b0d99c.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-a5888fd759f321ff004427eedf840fae.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -265,7 +265,7 @@ Claas Heuer
 <span id="cb4-4"><a aria-hidden="true" tabindex="-1"></a>dplot <span class="ot">=</span> <span class="fu">stack</span>(iris[, <span class="fu">c</span>(<span class="st">"Sepal.Length"</span>, <span class="st">"Sepal.Width"</span>, <span class="st">"Petal.Length"</span>, <span class="st">"Petal.Width"</span>)])</span>
 <span id="cb4-5"><a aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(dplot) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Value"</span>, <span class="st">"Feature"</span>)</span>
 <span id="cb4-6"><a aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dplot, <span class="fu">aes</span>(<span class="at">x =</span> Value)) <span class="sc">+</span></span>
+<span id="cb4-7"><a aria-hidden="true" tabindex="-1"></a>feature_distribution_plot <span class="ot">=</span> <span class="fu">ggplot</span>(dplot, <span class="fu">aes</span>(<span class="at">x =</span> Value)) <span class="sc">+</span></span>
 <span id="cb4-8"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
 <span id="cb4-9"><a aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)),</span>
 <span id="cb4-10"><a aria-hidden="true" tabindex="-1"></a>    <span class="at">bins =</span> <span class="dv">40</span>,</span>
@@ -275,10 +275,15 @@ Claas Heuer
 <span id="cb4-14"><a aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb4-15"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">color =</span> <span class="st">"#b3212d"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
 <span id="cb4-16"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Feature, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
-<span id="cb4-17"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Value"</span>, <span class="at">y =</span> <span class="st">"Density"</span>)</span></code></pre></div>
-
+<span id="cb4-17"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Value"</span>, <span class="at">y =</span> <span class="st">"Density"</span>)</span>
+<span id="cb4-18"><a aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a aria-hidden="true" tabindex="-1"></a>feature_distribution_plot</span></code></pre></div>
 </div>
-<img data-src="clustering_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+</section>
+<section id="feature-distribution-plot" class="slide level2">
+<h2>Feature Distribution Plot</h2>
+
+<img data-src="clustering_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
 <section id="normal-mixture-model" class="slide level2">
 <h2>Normal Mixture Model</h2>
 <p>Some features indicate that the data had been generated not from a single normal process, but potentially a series of processes.</p>
@@ -322,7 +327,7 @@ p(\mathbf{x}) = \sum_{i=1}^{K} \lambda_i f_i(\mathbf{x}), ~~~~~~ with \sum \bold
 <span id="cb6-5"><a aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">color =</span> <span class="st">"#b3212d"</span>, <span class="at">linewidth =</span> <span class="fl">1.1</span>)</span></code></pre></div>
 
 </div>
-<img data-src="clustering_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+<img data-src="clustering_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
 <section id="stan-mixture-program" class="slide level2 code-tight">
 <h2>Stan Mixture Program</h2>
 <div class="cell">
@@ -423,7 +428,7 @@ p(\mathbf{x}) = \sum_{i=1}^{K} \lambda_i f_i(\mathbf{x}), ~~~~~~ with \sum \bold
 <section id="fitted-mixture-densities-plot" class="slide level2">
 <h2>Fitted Mixture Densities Plot</h2>
 
-<img data-src="clustering_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
+<img data-src="clustering_files/figure-revealjs/unnamed-chunk-12-1.png" width="960" class="r-stretch"></section>
 <section id="mixture-probability-helper" class="slide level2">
 <h2>Mixture Probability Helper</h2>
 <div class="cell">
@@ -498,7 +503,7 @@ p(\mathbf{x}) = \sum_{i=1}^{K} \lambda_i f_i(\mathbf{x}), ~~~~~~ with \sum \bold
 <section id="iris-mixture-densities-plot" class="slide level2">
 <h2>Iris Mixture Densities Plot</h2>
 
-<img data-src="clustering_files/figure-revealjs/unnamed-chunk-15-1.png" width="960" class="r-stretch"></section>
+<img data-src="clustering_files/figure-revealjs/unnamed-chunk-16-1.png" width="960" class="r-stretch"></section>
 <section id="iris-mixture-probabilities" class="slide level2">
 <h2>Iris Mixture Probabilities</h2>
 

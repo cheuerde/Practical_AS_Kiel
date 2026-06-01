@@ -97,7 +97,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-6098df969b2460e171d7ab0828b0d99c.css">
+  <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-a5888fd759f321ff004427eedf840fae.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -290,10 +290,14 @@ Claas Heuer
 <span id="cb2-11"><a aria-hidden="true" tabindex="-1"></a>G <span class="ot">=</span> MMdash <span class="sc">/</span> <span class="fu">mean</span>(<span class="fu">diag</span>(MMdash))</span>
 <span id="cb2-12"><a aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-13"><a aria-hidden="true" tabindex="-1"></a><span class="co"># look at genomic relationships</span></span>
-<span id="cb2-14"><a aria-hidden="true" tabindex="-1"></a><span class="fu">levelplot</span>(G)</span></code></pre></div>
-
+<span id="cb2-14"><a aria-hidden="true" tabindex="-1"></a>genomic_relationship_plot <span class="ot">=</span> <span class="fu">levelplot</span>(G)</span>
+<span id="cb2-15"><a aria-hidden="true" tabindex="-1"></a>genomic_relationship_plot</span></code></pre></div>
 </div>
-<img data-src="genomic-prediction_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
+</section>
+<section id="genomic-relationship-plot" class="slide level2">
+<h2>Genomic Relationship Plot</h2>
+
+<img data-src="genomic-prediction_files/figure-revealjs/unnamed-chunk-3-1.png" width="960" class="r-stretch"></section>
 <section id="ridge-regression-marker-model" class="slide level2">
 <h2>Ridge Regression Marker Model</h2>
 <div class="cell">
@@ -360,24 +364,18 @@ Claas Heuer
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a aria-hidden="true" tabindex="-1"></a><span class="co"># plot breeding values from both models</span></span>
 <span id="cb7-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g_rr, g_gblup)</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="genomic-prediction_files/figure-revealjs/unnamed-chunk-7-1.png" width="960"></p>
-</figure>
-</div>
-</div>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a aria-hidden="true" tabindex="-1"></a><span class="co"># plot marker effects from both models</span></span>
 <span id="cb8-2"><a aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(a_rr, a_gblup)</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="genomic-prediction_files/figure-revealjs/unnamed-chunk-7-2.png" width="960"></p>
-</figure>
-</div>
-</div>
 </div>
 </section>
+<section id="breeding-value-equivalence-plot" class="slide level2">
+<h2>Breeding Value Equivalence Plot</h2>
+
+<img data-src="genomic-prediction_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<section id="marker-effect-equivalence-plot" class="slide level2">
+<h2>Marker Effect Equivalence Plot</h2>
+
+<img data-src="genomic-prediction_files/figure-revealjs/unnamed-chunk-10-1.png" width="960" class="r-stretch"></section>
 <section id="variance-components" class="slide level2">
 <h2>Variance Components</h2>
 <div class="cell">
